@@ -11,6 +11,7 @@ class LowPolyPainterWindow(tk.Frame):
 	# List of points and tris
 	points = []
 	tris = []
+	clickedPointsI = []
 	
 	def __init__(self, imagePath, master=None):
 		
@@ -23,11 +24,12 @@ class LowPolyPainterWindow(tk.Frame):
 		# Place a canvas in the window and set the supplied image to the background
 		self.canvasBackground = tk.PhotoImage(file=imagePath)
 		self.canvas = tk.Canvas(self, width=self.canvasBackground.width(), height=self.canvasBackground.height())
+		self.canvas.bind("<Button-1>",self.__canvasClick)
 		self.canvas.grid()
 		
 		self.canvas.create_image(0,0, image=self.canvasBackground, anchor=tk.NW)
 		
-		self.testButton = tk.Button(self, text='Test', command=self.test)
+		self.testButton = tk.Button(self, text='Random Tris', command=self.test)
 		self.testButton.grid()
 		
 		self.clearButton = tk.Button(self, text='Clear', command=self.clear)
@@ -50,6 +52,20 @@ class LowPolyPainterWindow(tk.Frame):
 			v3 = self.points[tri.verts[2]]
 			self.canvas.create_polygon(v1[0],v1[1],v2[0],v2[1],v3[0],v3[1],fill=tri.color,tag="tri")
 
+	# Canvas click event
+	# Adds points for each click and after 3 points creates a tri
+	def __canvasClick(self, event):
+		# Get index of added point and store it
+		i = self.addPoints([(event.x,event.y)])[0]
+		self.clickedPointsI.append(i)
+		
+		# 3 points => Tri
+		if len(self.clickedPointsI) == 3:
+			tri = Tri(self.clickedPointsI[0],self.clickedPointsI[1],self.clickedPointsI[2],getRandomColorString())
+			self.tris.append(tri)
+			self.clickedPointsI[:] = []
+			self.drawTris()
+	
 	# Add NUM_POINTS random new points and creates NUM_TRIS random tris
 	def test(self):
 		NUM_POINTS = 10
