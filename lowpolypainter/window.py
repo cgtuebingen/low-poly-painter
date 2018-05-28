@@ -1,9 +1,11 @@
 # Python Modules
+import numpy as np
 from Tkinter import *
 from PIL import ImageTk, Image
 
 # Local Modules
 from lowpolypainter.mesh import Mesh
+from lowpolypainter.color import Color
 
 # TODO: Design UI
 # TODO: Split buttons and canvas into different frames
@@ -41,19 +43,40 @@ class Window(object):
 
     # Clear mesh and canvas
     def clear(self):
-        self.canvasFrame.deleteFaces(self.mesh)
+        self.canvasFrame.deleteFaces(0, len(self.mesh.faces))
         self.mesh.clear()
 
     # Canvas is clicked at position
     def click(self, event):
         self.mesh.addVertex(event.x, event.y)
-        # TODO: Remove redraw every face
-        self.canvasFrame.drawFaces(self.mesh)
+
+        # TODO: Remove this call
+        self.addedVertexCreateFace()
 
     # Create random mesh
+    # TODO: Remove this function
     def random(self):
-        self.mesh.addRandomVerticies(10)
-        self.canvasFrame.drawFaces(self.mesh)
+        count = 10
+        for x in range(count):
+            x = np.random.randint(self.canvasFrame.frameWidth)
+            y = np.random.randint(self.canvasFrame.frameHeight)
+            self.mesh.addVertex(x, y)
+            self.addedVertexCreateFace()
+
+
+    # TODO: Remove this function
+    # This function is just used for testing
+    # This generates a face when the mesh has more then 3 verticies
+    # A new face is instanced by the last three verticies in the verticies array
+    # As soon as you add a new vertex to the mesh this function should be called
+    def addedVertexCreateFace(self):
+        verticesLength = len(self.mesh.vertices)
+        if (verticesLength >= 3):
+            self.mesh.addFace(verticesLength - 3 ,
+                              verticesLength - 2,
+                              verticesLength - 1,
+                              Color.random())
+            self.canvasFrame.drawFace(self.mesh, len(self.mesh.faces) - 1)
 
 
 """
@@ -70,7 +93,8 @@ class CanvasFrame(Frame):
 
         # Load Image
         filepath = 'lowpolypainter/resources/images/' + inputimage
-        self.canvasBackground = ImageTk.PhotoImage(Image.open(filepath))
+        self.image = Image.open(filepath)
+        self.canvasBackground = ImageTk.PhotoImage(self.image)
 
         # Create Canvas
         self.frameWidth = self.canvasBackground.width()
@@ -92,15 +116,15 @@ class CanvasFrame(Frame):
                                    vertex_3.x, vertex_3.y,
                                    fill = face.color, tag = 'face_' + str(index))
 
-    def drawFaces(self, mesh):
-        for index in range(0, len(mesh.faces)):
+    def drawFaces(self, mesh, start_index, end_index):
+        for index in range(start_index, end_index):
             self.drawFace(mesh, index)
 
     def deleteFace(self, index):
         self.canvas.delete('face_' + str(index))
 
-    def deleteFaces(self, mesh):
-        for index in range(0, len(mesh.faces)):
+    def deleteFaces(self, start_index, end_index):
+        for index in range(start_index, end_index):
             self.deleteFace(index)
 
 
