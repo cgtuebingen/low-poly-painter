@@ -19,13 +19,35 @@ class Mesh(object):
 
     # Adds vertex to mesh
     def addVertex(self, x, y):
+        # Create Vertex
         vertex = Vertex(x, y)
         self.vertices.append(vertex)
 
     # Adds face to mesh
+    # (!) Faces should be sorted anticlockwise
     def addFace(self, vertexIndex1, vertexIndex2, vertexIndex3, color):
-        face = Face(vertexIndex1, vertexIndex2, vertexIndex3, color)
+
+        # Sort vertices anticlockwise
+        verticesIndex = [vertexIndex1, vertexIndex2, vertexIndex3]
+        verticesIndex.sort(key = lambda i: self.vertices[i].y, reverse = False)
+
+        # Current vertices sorted by y
+        v1 = self.vertices[verticesIndex[0]]
+        v2 = self.vertices[verticesIndex[1]]
+        v3 = self.vertices[verticesIndex[2]]
+
+        # Calculate slope for v2 and v3 to v1
+        mv2v1 = (v2.x - v1.x) / float(v2.y - v1.y) if (v2.y - v1.y) != 0 else 0
+        mv3v1 = (v3.x - v1.x) / float(v3.y - v1.y) if (v3.y - v1.y) != 0 else 0
+
+        # Sort by x value 
+        if mv2v1 > mv3v1:
+            verticesIndex[1], verticesIndex[2] = verticesIndex[2], verticesIndex[1]
+
+        # Create Face
+        face = Face(verticesIndex[0], verticesIndex[1], verticesIndex[2], color)
         self.faces.append(face)
+
 
     # Deletes all vertecies and faces
     def clear(self):

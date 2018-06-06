@@ -67,15 +67,25 @@ class Window(object):
     # TODO: Remove this function
     # This function is just used for testing
     # This generates a face when the mesh has more then 3 verticies
-    # A new face is instanced by the last three verticies in the verticies array
+    # A new face is instanced by the last three vertices in the vertices array
     # As soon as you add a new vertex to the mesh this function should be called
     def addedVertexCreateFace(self):
         verticesLength = len(self.mesh.vertices)
         if (verticesLength >= 3):
-            self.mesh.addFace(verticesLength - 3 ,
+            self.mesh.addFace(verticesLength - 3,
                               verticesLength - 2,
                               verticesLength - 1,
-                              Color.random())
+                              '#FFFFFF')
+
+            face = self.mesh.faces[-1]
+            verticesArray = [[self.mesh.vertices[face.vertices[0]].x,
+                              self.mesh.vertices[face.vertices[0]].y],
+                             [self.mesh.vertices[face.vertices[1]].x,
+                              self.mesh.vertices[face.vertices[1]].y],
+                             [self.mesh.vertices[face.vertices[2]].x,
+                              self.mesh.vertices[face.vertices[2]].y]]
+
+            face.color = Color.fromImage(self.canvasFrame.image, verticesArray)
             self.canvasFrame.drawFace(self.mesh, len(self.mesh.faces) - 1)
 
 
