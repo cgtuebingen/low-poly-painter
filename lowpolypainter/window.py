@@ -6,6 +6,7 @@ from PIL import ImageTk, Image
 # Local Modules
 from lowpolypainter.mesh import Mesh
 from lowpolypainter.color import Color
+from lowpolypainter.export import export
 
 # TODO: Design UI
 # TODO: Split buttons and canvas into different frames
@@ -62,6 +63,10 @@ class Window(object):
             y = np.random.randint(self.canvasFrame.frameHeight)
             self.mesh.addVertex(x, y)
             self.addedVertexCreateFace()
+            
+    # exports current mesh as svg image
+    def export(self):
+        export(self.mesh)
 
 
     # TODO: Remove this function
@@ -156,3 +161,7 @@ class ButtonFrame(Frame):
         # Clear Button
         self.clearButton = Button(self, text='Clear', command = parent.clear)
         self.clearButton.grid()
+        
+        # Export Button
+        self.exportButton = Button(self, text="Export", command = parent.export)
+        self.exportButton.grid()
