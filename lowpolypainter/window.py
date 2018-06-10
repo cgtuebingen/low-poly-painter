@@ -63,7 +63,7 @@ class Window(object):
             y = np.random.randint(self.canvasFrame.frameHeight)
             self.mesh.addVertex(x, y)
             self.addedVertexCreateFace()
-            
+
     # exports current mesh as svg image
     def export(self):
         export(self.mesh)
@@ -90,7 +90,7 @@ class Window(object):
                              [self.mesh.vertices[face.vertices[2]].x,
                               self.mesh.vertices[face.vertices[2]].y]]
 
-            face.color = Color.fromImage(self.canvasFrame.image, verticesArray)
+            face.color = Color.fromImage(self.canvasFrame.image, 0.05, verticesArray)
             self.canvasFrame.drawFace(self.mesh, len(self.mesh.faces) - 1)
 
 
@@ -161,7 +161,7 @@ class ButtonFrame(Frame):
         # Clear Button
         self.clearButton = Button(self, text='Clear', command = parent.clear)
         self.clearButton.grid()
-        
+
         # Export Button
         self.exportButton = Button(self, text="Export", command = parent.export)
         self.exportButton.grid()

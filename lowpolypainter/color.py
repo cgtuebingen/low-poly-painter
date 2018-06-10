@@ -1,5 +1,6 @@
 # Python Modules
 import numpy as np
+import math as math
 from PIL import Image
 
 # TODO: Set percentage of pixels for fromImage
@@ -22,8 +23,9 @@ class Color:
 
     @staticmethod
     # Generates color from image
+    # With percentage of pixels 0 < x <= 1
     # (!) Vertices must have anticlockwise order
-    def fromImage(image, vertices):
+    def fromImage(image, percentage, vertices):
 
         # Load image into array
         imageArray = np.array(image)
@@ -68,8 +70,11 @@ class Color:
                 xmin = int(mv2v1 * (row - v2y)) + v2x
                 xmax = int(mv3v1 * (row - v3y)) + v3x
 
+            # Set step size with percentage
+            stepSize = int(math.pow(percentage, -1))
+
             # Get every pixel from xmin to xmax
-            for col in range(xmin, xmax):
+            for col in range(xmin, xmax, stepSize):
                 pixelArray = pixelArray + imageArray[row][col]
                 pixelCounter += 1
 
