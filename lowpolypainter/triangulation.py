@@ -2,7 +2,143 @@ from __future__ import division
 import collections
 import math
 
-from mesh import Vertex
+from mesh import Vertex, Face
+
+"""auxiliary procedures
+"""
+
+"""
+Circle Class
+
+Description: Circle defind by center point and radius
+"""
+
+class Circle(object):
+    def __init__(self, middle, radius):
+        self.middle = middle
+        self.radius = radius
+    
+    #checks if point is in circle area
+    def check(self, point):
+        return(self.middle.distance(point)<=self.radius)
+        
+"""
+Vector Class
+
+Description: Vector with base "point" and direction (x/y)
+"""
+
+class Vector(object):
+    def __init__(self, point, x, y):
+        self.point = point
+        self.x = x
+        self.y = y
+    
+    #TODO: find a more elegant solution
+    #finds intersection of two vectors
+    def findIntersection(self, line):
+        x1 = self.point.x
+        x2 = line.point.x
+        y1 = self.point.y
+        y2 = line.point.y
+        c = self.x
+        d = self.y
+        e = line.x
+        f = line.y
+        if(self.parallel(line)):
+            return False
+        else:
+            if(c==0):
+                b = (float(x1-x2)/e)
+                result = Vertex(x2+b*e, y2+b*f)
+            else:
+                if(e==0):
+                    a = float(x2-x1)/c
+                    result = Vertex(x1+a*c, y1+a*d)
+                else:
+                    if(d==0):
+                        b = float(y1-y2)/f
+                        result = Vertex(x1+b*e, y2+b*f)
+                    else:
+                        if(f==0):
+                            a = float(y2-y1)/d
+                            result = Vertex(x1+a*c, y1+a*d)
+                        else:
+                            if((float(c*f)/d)==e):
+                                a = float(x2+(float(y1-y2)/f)*e-x1)/(c-float(d*e)/f)
+                                result = Vertex(x1+a*c, y1+a*d)
+                            else:
+                                b = float(x1+(float(y2-y1)/d)*c-x2)/(e-float(c*f)/d)
+                                result = Vertex(x2+b*e, y2+b*f)
+        return result
+    
+    #checks if two vectors are parallels
+    def parallel(self, line):
+        x1 = self.x
+        x2 = self.y
+        y1 = line.x
+        y2 = line.y
+        return ((x1 == y1 == 0) 
+                or (x2 == y2 == 0) 
+                or (x1 != 0 and y1 != 0 and float(x2)/x1 == float(y2)/y1) 
+                or (x2 != 0 and y2 != 0 and float(x1)/x2 == float(y1)/y2)
+                or (x1 == x2 == 0)
+                or (y1 == y2 == 0))
+
+"""
+Face Class
+Description: expands Face Class
+
+"""
+class Face(Face):
+    def __init__(self, vertexPos1, vertexPos2, vertexPos3, color):
+        self.vertices = [vertexPos1, vertexPos2, vertexPos3]
+        self.color = color
+        self.circle = self.findCircle()
+    
+    #circle containing the three vertices of the triangle
+    def findCircle(self):
+        x1 = self.vertices[0]
+        x2 = self.vertices[1]
+        x3 = self.vertices[2]
+        line1 = x1.mid(x2)
+        line2 = x1.mid(x3)
+        intersection = line1.findIntersection(line2)
+        radius = intersection.distance(x1)
+        circle = Circle(intersection, radius)
+        return circle
+
+"""
+Vertex Class
+Description: expands Vertex Class
+"""
+class Vertex(Vertex):
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+        
+    #distance of two vertices
+    def distance(self, point):
+        return ((self.x - point.x)**2 + (self.y - point.y)**2)**(float(1)/2)
+    
+    #median
+    def mid(self, point):
+        a = self.x - point.x
+        b = self.y - point.y
+        middle = Vertex(float(self.x + point.x)/2,float(self.y + point.y)/2)
+        return Vector(middle, b, a)
+    
+    #vector running through two given points
+    def drawLine(self, point):
+        x1 = self.x
+        y1 = self.y
+        x2 = point.x
+        y2 = point.y
+        return Vector(self, x2-x1, y2-y1)
+
+"""
+Delaunay triangulation starts here
+"""
 
 # creates a delaunay triangulation from a set of points saved in a mesh structure,
 # using the Bowyer-Watson algorithm
@@ -40,36 +176,10 @@ def bowyerWatson(mesh):
     return mesh
           
       
-# (!) Temporary Solution
-# TODO: add more robust solution
-#       solution can fail when having same x coordinate on at least two points
 # Checks if a point is within a circle that is constructed by three points
 def isInCircle(point, coordinates):
-    if coordinates[0].x == coordinates[1].x:
-        a = coordinates[0]
-        b = coordinates[2]
-        c = coordinates[1]
-    elif coordinates[1].x == coordinates[2].x:
-        a = coordinates[1]
-        b = coordinates[0]
-        c = coordinates[2]
-    else:
-        a = coordinates[0]
-        b = coordinates[1]
-        c = coordinates[2]
-    ma = (b.y - a.y) / (b.x - a.x)
-    if ma == 0:
-        ma = 0.0001
-    mb = (c.y - b.y) / (c.x - b.x)
-    if mb == 0:
-        mb = 0.0001
-    if mb - ma == 0:
-        ma += 0.0001
-    centerX = (ma*mb*(a.y-c.y) + mb * (a.x + b.x) - ma * (b.x + c.x)) / (2 * (mb - ma))
-    centerY = (-1 / ma) * (centerX - (a.x + b.x) * 0.5) + (a.y + b.y) * 0.5
-    center = Vertex(centerX, centerY)
-    radius = euclideanDistance(center,a)
-    return radius > euclideanDistance(center,point)
+    face = Face(coordinates[0], coordinates[1], coordinates[2], 0)
+    return face.circle.check(point)
 
 
 # filters edges that are used multiple times in a list of triangles, by adding all edges
