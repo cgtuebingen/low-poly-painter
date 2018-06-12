@@ -13,6 +13,7 @@ class Mesh(object):
 
     def __init__(self, width, height):
         self.faces = []
+        self.edges = []
         self.vertices = []
         self.width = width
         self.height = height
@@ -23,8 +24,14 @@ class Mesh(object):
         vertex = Vertex(x, y)
         self.vertices.append(vertex)
 
+    # Adds edge to mesh
+    def addEdge(self, vertexIndex1, vertexIndex2):
+        # Create Edge
+        edge = Edge(vertexIndex1, vertexIndex2)
+        self.edges.append(edge)
+
     # Adds face to mesh
-    # (!) Faces should be sorted anticlockwise
+    # (!) Rotates faces anticlockwise
     def addFace(self, vertexIndex1, vertexIndex2, vertexIndex3, color):
 
         # Sort vertices anticlockwise
@@ -40,7 +47,7 @@ class Mesh(object):
         mv2v1 = (v2.x - v1.x) / float(v2.y - v1.y) if (v2.y - v1.y) != 0 else 0
         mv3v1 = (v3.x - v1.x) / float(v3.y - v1.y) if (v3.y - v1.y) != 0 else 0
 
-        # Sort by x value 
+        # Sort by x value
         if mv2v1 > mv3v1:
             verticesIndex[1], verticesIndex[2] = verticesIndex[2], verticesIndex[1]
 
@@ -52,6 +59,7 @@ class Mesh(object):
     # Deletes all vertecies and faces
     def clear(self):
         self.faces = []
+        self.edges = []
         self.vertices = []
 
 
@@ -67,6 +75,19 @@ class Vertex(object):
     def __init__(self, x, y):
         self.x = x
         self.y = y
+
+
+"""
+Edge Class
+
+Description:
+Stores a edge of the mesh, which contains two vertecies
+"""
+
+class Edge(object):
+
+    def __init__(self, vertexPos1, vertexPos2):
+        self.vertices = [vertexPos1, vertexPos2]
 
 
 """

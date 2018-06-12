@@ -17,11 +17,11 @@ class Circle(object):
     def __init__(self, middle, radius):
         self.middle = middle
         self.radius = radius
-    
+
     #checks if point is in circle area
     def check(self, point):
         return(self.middle.distance(point)<=self.radius)
-        
+
 """
 Vector Class
 
@@ -33,7 +33,7 @@ class Vector(object):
         self.point = point
         self.x = x
         self.y = y
-    
+
     #TODO: find a more elegant solution
     #finds intersection of two vectors
     def findIntersection(self, line):
@@ -71,16 +71,16 @@ class Vector(object):
                                 b = float(x1+(float(y2-y1)/d)*c-x2)/(e-float(c*f)/d)
                                 result = Vertex(x2+b*e, y2+b*f)
         return result
-    
+
     #checks if two vectors are parallels
     def parallel(self, line):
         x1 = self.x
         x2 = self.y
         y1 = line.x
         y2 = line.y
-        return ((x1 == y1 == 0) 
-                or (x2 == y2 == 0) 
-                or (x1 != 0 and y1 != 0 and float(x2)/x1 == float(y2)/y1) 
+        return ((x1 == y1 == 0)
+                or (x2 == y2 == 0)
+                or (x1 != 0 and y1 != 0 and float(x2)/x1 == float(y2)/y1)
                 or (x2 != 0 and y2 != 0 and float(x1)/x2 == float(y1)/y2)
                 or (x1 == x2 == 0)
                 or (y1 == y2 == 0))
@@ -95,18 +95,18 @@ class Vertex(Vertex):
     def __init__(self, x, y):
         self.x = x
         self.y = y
-        
+
     #distance of two vertices
     def distance(self, point):
         return ((self.x - point.x)**2 + (self.y - point.y)**2)**(float(1)/2)
-    
+
     #median
     def mid(self, point):
         a = self.x - point.x
         b = self.y - point.y
         middle = Vertex(float(self.x + point.x)/2,float(self.y + point.y)/2)
         return Vector(middle, b, a)
-    
+
     #vector running through two given points
     def drawLine(self, point):
         x1 = self.x
@@ -153,8 +153,8 @@ def bowyerWatson(mesh):
     # removes all triangles that share at least one vertex with the super-triangle
     mesh = removeSuperVertices(mesh)
     return mesh
-          
-      
+
+
 # Checks if a point is within a circle that is constructed by three points
 def isInCircle(point, coordinates):
         x1 = coordinates[0]
@@ -177,7 +177,7 @@ def notSharedEdges(badTriangles):
         res.append((badTriangles[i].vertices[0], badTriangles[i].vertices[2]))
         res.append((badTriangles[i].vertices[1], badTriangles[i].vertices[2]))
     return removeDoubleElements(res)
-    
+
 
 # removes a given triangle from a list of faces
 def remove(triangle, faces):
@@ -187,7 +187,7 @@ def remove(triangle, faces):
             del faces[i]
         i += 1
     return faces
-    
+
 
 # calculates the euclidean Distance between two points
 def euclideanDistance(a,b):
@@ -238,8 +238,8 @@ def removeSuperVertices(mesh):
 #
 # generates a triangle that "should" be large enough to contain all vertices.
 def addSuperTriangle(mesh):
-    mesh.vertices = [Vertex(-6000,0), 
-                     Vertex(6000,0), 
+    mesh.vertices = [Vertex(-6000,0),
+                     Vertex(6000,0),
                      Vertex(0,12000)] + mesh.vertices
     mesh.addTriangle(0,1,2)
     return mesh

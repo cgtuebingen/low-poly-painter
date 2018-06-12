@@ -44,7 +44,9 @@ class Window(object):
 
     # Clear mesh and canvas
     def clear(self):
-        self.canvasFrame.deleteFaces(0, len(self.mesh.faces))
+        self.canvasFrame.deleteObjects('point', 0,  len(self.mesh.vertices))
+        self.canvasFrame.deleteObjects('line', 0,  len(self.mesh.edges))
+        self.canvasFrame.deleteObjects('triangle', 0,  len(self.mesh.faces))
         self.mesh.clear()
 
     # Canvas is clicked at position
@@ -76,6 +78,7 @@ class Window(object):
     # As soon as you add a new vertex to the mesh this function should be called
     def addedVertexCreateFace(self):
         verticesLength = len(self.mesh.vertices)
+        # FACE
         if (verticesLength >= 3):
             self.mesh.addFace(verticesLength - 3,
                               verticesLength - 2,
@@ -91,7 +94,15 @@ class Window(object):
                               self.mesh.vertices[face.vertices[2]].y]]
 
             face.color = Color.fromImage(self.canvasFrame.image, 0.05, verticesArray)
-            self.canvasFrame.drawFace(self.mesh, len(self.mesh.faces) - 1)
+            self.canvasFrame.drawTriangle(self.mesh, len(self.mesh.faces) - 1)
+        # EDGE
+        if (verticesLength >= 2):
+            self.mesh.addEdge(verticesLength - 2,
+                              verticesLength - 1)
+            self.canvasFrame.drawLine(self.mesh, len(self.mesh.edges) - 1)
+
+        # VERTEX
+        self.canvasFrame.drawPoint(self.mesh, len(self.mesh.vertices) - 1)
 
 
 """
@@ -121,7 +132,27 @@ class CanvasFrame(Frame):
         self.canvas.bind("<Button>", parent.click)
         self.canvas.grid()
 
-    def drawFace(self, mesh, index):
+    def drawPoint(self, mesh, index):
+        radius = 2
+        color = '#0000FF'
+        vertex = mesh.vertices[index]
+        self.canvas.create_oval(vertex.x - radius,
+                                vertex.y - radius,
+                                vertex.x + radius,
+                                vertex.y + radius,
+                                 fill = color, tag = ('point', str(index)))
+
+    def drawLine(self, mesh, index):
+        color = '#0000FF'
+        edge = mesh.edges[index]
+        vertex_1 = mesh.vertices[edge.vertices[0]]
+        vertex_2 = mesh.vertices[edge.vertices[1]]
+        self.canvas.create_line(vertex_1.x, vertex_1.y,
+                                vertex_2.x, vertex_2.y,
+                                 fill = color, tag = ('line', str(index)))
+        self.canvas.tag_lower('line&&' + str(index), 'point&&0')
+
+    def drawTriangle(self, mesh, index):
         face = mesh.faces[index]
         vertex_1 = mesh.vertices[face.vertices[0]]
         vertex_2 = mesh.vertices[face.vertices[1]]
@@ -129,18 +160,15 @@ class CanvasFrame(Frame):
         self.canvas.create_polygon(vertex_1.x, vertex_1.y,
                                    vertex_2.x, vertex_2.y,
                                    vertex_3.x, vertex_3.y,
-                                   fill = face.color, tag = 'face_' + str(index))
+                                   fill = face.color, tag = ('triangle', str(index)))
+        self.canvas.tag_lower('triangle&&' + str(index), 'line&&0')
 
-    def drawFaces(self, mesh, start_index, end_index):
-        for index in range(start_index, end_index):
-            self.drawFace(mesh, index)
+    def deleteObject(self, object, index):
+        self.canvas.delete(object + '&&' + str(index))
 
-    def deleteFace(self, index):
-        self.canvas.delete('face_' + str(index))
-
-    def deleteFaces(self, start_index, end_index):
-        for index in range(start_index, end_index):
-            self.deleteFace(index)
+    def deleteObjects(self, object, startIndex, endIndex):
+        for index in range(startIndex, endIndex):
+            self.deleteObject(object, index)
 
 
 """
