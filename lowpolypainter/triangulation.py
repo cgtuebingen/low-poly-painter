@@ -85,28 +85,7 @@ class Vector(object):
                 or (x1 == x2 == 0)
                 or (y1 == y2 == 0))
 
-"""
-Face Class
-Description: expands Face Class
 
-"""
-class Face(Face):
-    def __init__(self, vertexPos1, vertexPos2, vertexPos3, color):
-        self.vertices = [vertexPos1, vertexPos2, vertexPos3]
-        self.color = color
-        self.circle = self.findCircle()
-    
-    #circle containing the three vertices of the triangle
-    def findCircle(self):
-        x1 = self.vertices[0]
-        x2 = self.vertices[1]
-        x3 = self.vertices[2]
-        line1 = x1.mid(x2)
-        line2 = x1.mid(x3)
-        intersection = line1.findIntersection(line2)
-        radius = intersection.distance(x1)
-        circle = Circle(intersection, radius)
-        return circle
 
 """
 Vertex Class
@@ -178,8 +157,15 @@ def bowyerWatson(mesh):
       
 # Checks if a point is within a circle that is constructed by three points
 def isInCircle(point, coordinates):
-    face = Face(coordinates[0], coordinates[1], coordinates[2], 0)
-    return face.circle.check(point)
+        x1 = coordinates[0]
+        x2 = coordinates[1]
+        x3 = coordinates[2]
+        line1 = x1.mid(x2)
+        line2 = x1.mid(x3)
+        intersection = line1.findIntersection(line2)
+        radius = intersection.distance(x1)
+        circle = Circle(intersection, radius)
+        return circle.check(point)
 
 
 # filters edges that are used multiple times in a list of triangles, by adding all edges
