@@ -30,7 +30,6 @@ class Vector3(object):
         raise TypeError("mult: int, float or Vector3")
 
     __mul__ = mult
-    __rmul__ = __mul__
 
     def add(self, other):
         if isinstance(other, Vector3):            
@@ -46,3 +45,19 @@ class Vector3(object):
         raise TypeError("sub: Vector3")
 
     __sub__ = sub
+
+    def toString(self):
+        return "(" + str(self.x) + ";" + str(self.y) + ";" + str(self.z) + ")"
+
+    __str__ = toString
+
+    def __getitem__(self, index):
+        if not isinstance(index, int):
+            raise TypeError("__getitem__: int")
+        if(index == 0):
+            return self.x
+        if(index == 1):
+            return self.y
+        if(index == 2):
+            return self.z
+        raise ValueError("__getitem__: [0,2]")
