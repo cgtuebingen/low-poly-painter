@@ -78,10 +78,6 @@ class Vertex(object):
         self.x = x
         self.y = y
 
-    def Vector3(self):
-        return Vector3.Point2(self.x, self.y)
-
-
 """
 Edge Class
 
