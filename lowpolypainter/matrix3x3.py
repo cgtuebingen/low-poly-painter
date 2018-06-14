@@ -30,6 +30,10 @@ class Matrix3x3(object):
             return Matrix3x3(Vector3(x,0,0), Vector3(0,y,0), Vector3(0,0,1))
         raise TypeError("Scale: int or float")
 
+    @staticmethod
+    def Identity():
+        return Matrix3x3(Vector3(1,0,0),Vector3(0,1,0),Vector3(0,0,1))
+
     def mult(self, other):
         if isinstance(other, Vector3):
             return Vector3(other.dot(self.r0), other.dot(self.r1), other.dot(self.r2))

@@ -79,7 +79,7 @@ class Window(object):
     # A new face is instanced by the last three vertices in the vertices array
     # As soon as you add a new vertex to the mesh this function should be called
     def addedVertexCreateFace(self):
-        testProjection = Matrix3x3.Scale(1.5, 1.5)
+        zoomProjection = Matrix3x3.Identity()
         verticesLength = len(self.mesh.vertices)
         # FACE
         if (verticesLength >= 3):
@@ -97,15 +97,15 @@ class Window(object):
                               self.mesh.vertices[face.vertices[2]].y]]
 
             face.color = Color.fromImage(self.canvasFrame.image, 0.05, verticesArray)
-            self.canvasFrame.drawTriangle(self.mesh, len(self.mesh.faces) - 1, testProjection)
+            self.canvasFrame.drawTriangle(self.mesh, len(self.mesh.faces) - 1, zoomProjection)
         # EDGE
         if (verticesLength >= 2):
             self.mesh.addEdge(verticesLength - 2,
                               verticesLength - 1)
-            self.canvasFrame.drawLine(self.mesh, len(self.mesh.edges) - 1, testProjection)
+            self.canvasFrame.drawLine(self.mesh, len(self.mesh.edges) - 1, zoomProjection)
 
         # VERTEX
-        self.canvasFrame.drawPoint(self.mesh, len(self.mesh.vertices) - 1, testProjection)
+        self.canvasFrame.drawPoint(self.mesh, len(self.mesh.vertices) - 1, zoomProjection)
 
 
 """
