@@ -54,7 +54,8 @@ class Window(object):
 
     # Canvas is clicked at position
     def click(self, event):
-        self.mesh.addVertex(event.x, event.y)
+        vertex = self.zoom.FromViewport([event.x, event.y])
+        self.mesh.addVertex(vertex[0], vertex[1])
 
         # TODO: Remove this call
         self.addedVertexCreateFace()
