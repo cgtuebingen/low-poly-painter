@@ -7,6 +7,8 @@ from PIL import ImageTk, Image
 from lowpolypainter.mesh import Mesh
 from lowpolypainter.color import Color
 from lowpolypainter.export import export
+from matrix3x3 import Matrix3x3
+from vector3 import Vector3
 
 # TODO: Design UI
 # TODO: Split buttons and canvas into different frames
@@ -77,6 +79,7 @@ class Window(object):
     # A new face is instanced by the last three vertices in the vertices array
     # As soon as you add a new vertex to the mesh this function should be called
     def addedVertexCreateFace(self):
+        zoomProjection = Matrix3x3.Identity()
         verticesLength = len(self.mesh.vertices)
         # FACE
         if (verticesLength >= 3):
@@ -94,15 +97,15 @@ class Window(object):
                               self.mesh.vertices[face.vertices[2]].y]]
 
             face.color = Color.fromImage(self.canvasFrame.image, 0.05, verticesArray)
-            self.canvasFrame.drawTriangle(self.mesh, len(self.mesh.faces) - 1)
+            self.canvasFrame.drawTriangle(self.mesh, len(self.mesh.faces) - 1, zoomProjection)
         # EDGE
         if (verticesLength >= 2):
             self.mesh.addEdge(verticesLength - 2,
                               verticesLength - 1)
-            self.canvasFrame.drawLine(self.mesh, len(self.mesh.edges) - 1)
+            self.canvasFrame.drawLine(self.mesh, len(self.mesh.edges) - 1, zoomProjection)
 
         # VERTEX
-        self.canvasFrame.drawPoint(self.mesh, len(self.mesh.vertices) - 1)
+        self.canvasFrame.drawPoint(self.mesh, len(self.mesh.vertices) - 1, zoomProjection)
 
 
 """
@@ -132,31 +135,31 @@ class CanvasFrame(Frame):
         self.canvas.bind("<Button>", parent.click)
         self.canvas.grid()
 
-    def drawPoint(self, mesh, index):
+    def drawPoint(self, mesh, index, projection):
         radius = 2
         color = '#0000FF'
-        vertex = mesh.vertices[index]
+        vertex = projection * mesh.vertices[index].Vector3()
         self.canvas.create_oval(vertex.x - radius,
                                 vertex.y - radius,
                                 vertex.x + radius,
                                 vertex.y + radius,
                                  fill = color, tag = ('point', str(index)))
 
-    def drawLine(self, mesh, index):
+    def drawLine(self, mesh, index, projection):
         color = '#0000FF'
         edge = mesh.edges[index]
-        vertex_1 = mesh.vertices[edge.vertices[0]]
-        vertex_2 = mesh.vertices[edge.vertices[1]]
+        vertex_1 = projection * mesh.vertices[edge.vertices[0]].Vector3()
+        vertex_2 = projection * mesh.vertices[edge.vertices[1]].Vector3()
         self.canvas.create_line(vertex_1.x, vertex_1.y,
                                 vertex_2.x, vertex_2.y,
                                  fill = color, tag = ('line', str(index)))
         self.canvas.tag_lower('line&&' + str(index), 'point&&0')
 
-    def drawTriangle(self, mesh, index):
+    def drawTriangle(self, mesh, index, projection):
         face = mesh.faces[index]
-        vertex_1 = mesh.vertices[face.vertices[0]]
-        vertex_2 = mesh.vertices[face.vertices[1]]
-        vertex_3 = mesh.vertices[face.vertices[2]]
+        vertex_1 = projection * mesh.vertices[face.vertices[0]].Vector3()
+        vertex_2 = projection * mesh.vertices[face.vertices[1]].Vector3()
+        vertex_3 = projection * mesh.vertices[face.vertices[2]].Vector3()
         self.canvas.create_polygon(vertex_1.x, vertex_1.y,
                                    vertex_2.x, vertex_2.y,
                                    vertex_3.x, vertex_3.y,
