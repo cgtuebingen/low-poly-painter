@@ -126,8 +126,6 @@ class CanvasLine:
         # A new line could create a face
         self.checkFaceCreated()
 
-        self.canvas.tag_bind(self.id, "<Button>", func=self.click)
-
         self.deleted = False
 
     def click(self, event):
@@ -151,6 +149,9 @@ class CanvasLine:
         self.canvas.itemconfigure(self.id, fill=COLOR_LINE_HIGHLIGHT)
         self.canvas.tag_raise(self.id, TAG_LINE)
 
+    def deactivate(self):
+        self.canvas.itemconfigure(self.id, fill=COLOR_LINE_DEFAULT)
+
     def draw(self):
         # Delete old
         if self.id != -1:
@@ -160,7 +161,10 @@ class CanvasLine:
                                           self.points[1].x, self.points[1].y,
                                           tag=TAG_LINE,
                                           fill=COLOR_LINE_DEFAULT,
-                                          width=2)
+                                          width=4)
+
+        # Bind mouse click event
+        self.canvas.tag_bind(self.id, "<Button>", func=self.click)
 
         # Lines should all be below points
         self.canvas.tag_lower(self.id, TAG_POINT)
