@@ -2,6 +2,7 @@
 # TODO: Delete vertecies or faces one by one
 
 from vector3 import Vector3
+from operator import attrgetter
 
 """
 Mesh Class
@@ -25,6 +26,7 @@ class Mesh(object):
         # Create Vertex
         vertex = Vertex(x, y)
         self.vertices.append(vertex)
+        return len(self.vertices) - 1
 
     # Adds edge to mesh
     def addEdge(self, vertexIndex1, vertexIndex2):
@@ -38,7 +40,7 @@ class Mesh(object):
 
         # Sort vertices anticlockwise
         verticesIndex = [vertexIndex1, vertexIndex2, vertexIndex3]
-        verticesIndex.sort(key = lambda i: self.vertices[i].y, reverse = False)
+        verticesIndex = sorted(verticesIndex, key=lambda i: - self.vertices[i].y * self.height - self.vertices[i].x, reverse = False)
 
         # Current vertices sorted by y
         v1 = self.vertices[verticesIndex[0]]
@@ -50,7 +52,7 @@ class Mesh(object):
         mv3v1 = (v3.x - v1.x) / float(v3.y - v1.y) if (v3.y - v1.y) != 0 else 0
 
         # Sort by x value
-        if mv2v1 > mv3v1:
+        if (mv2v1 > mv3v1) or ((mv2v1 == 0) and not(v2.x - v1.x == 0)):
             verticesIndex[1], verticesIndex[2] = verticesIndex[2], verticesIndex[1]
 
         # Create Face
