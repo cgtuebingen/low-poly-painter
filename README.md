@@ -15,7 +15,7 @@
 1. Clone the repository
 2. **Optional:** Create a new virtual environment in this folder, e.g.  
 `virtualenv --python=D:\Python27\python.exe env`  
-(Use ./env/Scripts/activate or deactivate to enable/disable this virtualEnv)
+(Use `source env/Scripts/activate` or deactivate to enable/disable this virtualEnv)
 3. `pip install numpy scipy pillow svgwrite `
 4. Change to cloned directory  
 5. Run the program: `python lowpolypainter.py lenna.jpg`
