@@ -8,9 +8,9 @@ TAG_POINT = "point"
 TAG_LINE = "line"
 TAG_FACE = "face"
 COLOR_POINT_DEFAULT = "#0000ff"
-COLOR_POINT_HIGHLIGHT = "#ff0000"
+COLOR_POINT_SELECTED = "#ff0000"
 COLOR_LINE_DEFAULT = "#000"
-COLOR_LINE_HIGHLIGHT = "#ff0000"
+COLOR_LINE_SELECTED = "#ff0000"
 
 
 class CanvasPoint:
@@ -20,41 +20,55 @@ class CanvasPoint:
     This class handles the creation, movement, selection and updating of points and their connected lines.
     It contains the event handlers
     """
+    RADIUS = 4
 
-    def __init__(self, x, y, canvas, canvasFrame):
+    def __init__(self, x, y, canvasFrame):
         self.x = x
         self.y = y
-        self.canvas = canvas
+
+        self.canvas = canvasFrame.canvas
         self.canvasFrame = canvasFrame
-        radius = 4
+
+        # Stores all lines that use this point
+        # This way an update to the point can also update these lines
         self.connectedLines = []
-        self.id = canvas.create_oval(x - radius,
-                                     y - radius,
-                                     x + radius,
-                                     y + radius,
-                                     fill=COLOR_POINT_DEFAULT,
-                                     tag=TAG_POINT)
-        self.canvasFrame.highlightPoint(self)
+
+        self.id = -1
+        self.draw()
+
+        self.canvasFrame.selectPoint(self)
 
         self.moved = False
-
-        self.canvas.tag_bind(self.id, sequence="<Button>", func=self.click)
-
-        self.canvas.tag_bind(self.id, sequence="<B1-Motion>", func=self.move)
-
-        self.canvas.tag_bind(self.id, sequence="<ButtonRelease-1>", func=self.finalizeMove)
 
     def click(self, event):
         # Click to select point or shift-click to connect to this point
         shiftMask = 0x0001
         self.canvasFrame.mouseEventHandled = True
-        if (event.state & shiftMask) and (self.canvasFrame.highlightedPoint is not None):
-            self.canvasFrame.addLine(self, self.canvasFrame.highlightedPoint)
+        if (event.state & shiftMask) and (self.canvasFrame.selectedPoint is not None):
+            self.canvasFrame.addLine(self, self.canvasFrame.selectedPoint)
             return
-        self.canvasFrame.highlightPoint(self)
+        self.canvasFrame.selectPoint(self)
 
-    def highlight(self):
-        self.canvas.itemconfigure(self.id, fill=COLOR_POINT_HIGHLIGHT)
+    def draw(self):
+        # Delete old
+        if self.id != -1:
+            self.canvas.delete(self.id)
+
+        radius = CanvasPoint.RADIUS
+        self.id = self.canvas.create_oval(self.x - radius,
+                                          self.y - radius,
+                                          self.x + radius,
+                                          self.y + radius,
+                                          fill=COLOR_POINT_DEFAULT,
+                                          tag=TAG_POINT)
+
+        # Event handlers have to be rebound if the point is redrawn
+        self.canvas.tag_bind(self.id, sequence="<Button>", func=self.click)
+        self.canvas.tag_bind(self.id, sequence="<B1-Motion>", func=self.move)
+        self.canvas.tag_bind(self.id, sequence="<ButtonRelease-1>", func=self.finalizeMove)
+
+    def select(self):
+        self.canvas.itemconfigure(self.id, fill=COLOR_POINT_SELECTED)
         self.canvas.tag_raise(self.id, TAG_POINT)
 
     def deactivate(self):
@@ -64,7 +78,7 @@ class CanvasPoint:
         x = event.x
         y = event.y
 
-        # Check if mouse out of bounds
+        # Confine coordinates to image size
         if x < 0:
             x = 0
         elif x >= self.canvasFrame.frameWidth:
@@ -85,12 +99,23 @@ class CanvasPoint:
             line.update()
 
     def finalizeMove(self, event):
+        """
+        A moved point, and therefore often moved lines and faces, should not recalculate the color of the face
+        for each movement but only once after the movement ended.
+        :param event:
+        :return:
+        """
         if self.moved:
             for line in self.connectedLines:
                 line.update(recalcColor=True)
         self.moved = False
 
     def hasConnectingLine(self, point):
+        """
+        Check if any connected line connects to point.
+        :param point:
+        :return:
+        """
         for line in self.connectedLines:
             if line.isConnectedTo(point):
                 return True
@@ -100,27 +125,30 @@ class CanvasPoint:
         self.canvasFrame.points.remove(self)
         self.canvas.delete(self.id)
 
+        # All lines that use this point, have to be deleted
+        # Copy the list, because deleting a line removes it from the connectedLines list
         deleteQueue = self.connectedLines[:]
         for line in deleteQueue:
             line.delete()
 
 
 class CanvasLine:
-    def __init__(self, canvasPoint1, canvasPoint2, canvas, canvasFrame):
-
-        # Should only ever contain two points
+    def __init__(self, canvasPoint1, canvasPoint2, canvasFrame):
+        # The two line points
         self.points = (canvasPoint1, canvasPoint2)
 
         # Set references to this line in points
         canvasPoint1.connectedLines.append(self)
         canvasPoint2.connectedLines.append(self)
 
-        self.canvas = canvas
+        self.canvas = canvasFrame.canvas
         self.canvasFrame = canvasFrame
 
         self.id = -1
         self.draw()
 
+        # Stores all faces that use this line
+        # This way an update to this line can also update all dependent faces
         self.faces = []
 
         # A new line could create a face
@@ -129,10 +157,33 @@ class CanvasLine:
         self.deleted = False
 
     def click(self, event):
-        self.canvasFrame.highlightLine(self)
+        shiftMask = 0x0001
         self.canvasFrame.mouseEventHandled = True
 
+        selectedPoint = self.canvasFrame.selectedPoint
+
+        # Press shift to place points on lines
+        # Automatically splits line and adds the 2 or 3 lines
+        if event.state & shiftMask:
+            point = self.canvasFrame.addPoint(event.x, event.y)
+
+            # If there is a selected point, then also add a line to it
+            if selectedPoint is not None:
+                self.canvasFrame.addLine(point, selectedPoint)
+            self.canvasFrame.addLine(point, self.points[0])
+            self.canvasFrame.addLine(point, self.points[1])
+
+            self.delete()
+        else:
+            self.canvasFrame.selectLine(self)
+
     def checkFaceCreated(self):
+        """
+        If an added line creates a triangle, then add the corresponding face.
+        :return:
+        """
+
+        # Checks if one point of this line can be reached over 2 connected lines from the other point
         for line1 in self.points[0].connectedLines:
             if line1 is self:
                 continue
@@ -143,10 +194,10 @@ class CanvasLine:
 
             for line2 in point.connectedLines:
                 if line2.isConnectedTo(self.points[1]):
-                    face = self.canvasFrame.addFace(self, line1, line2)
+                    self.canvasFrame.addFace(self, line1, line2)
 
-    def highlight(self):
-        self.canvas.itemconfigure(self.id, fill=COLOR_LINE_HIGHLIGHT)
+    def select(self):
+        self.canvas.itemconfigure(self.id, fill=COLOR_LINE_SELECTED)
         self.canvas.tag_raise(self.id, TAG_LINE)
 
     def deactivate(self):
@@ -193,10 +244,11 @@ class CanvasLine:
 
 
 class CanvasFace:
-    def __init__(self, line1, line2, line3, canvas, canvasFrame):
+    def __init__(self, line1, line2, line3, canvasFrame):
+        # Lines
         self.lines = (line1, line2, line3)
 
-        self.canvas = canvas
+        self.canvas = canvasFrame.canvas
         self.canvasFrame = canvasFrame
 
         self.color = "#000"
@@ -205,7 +257,7 @@ class CanvasFace:
         self.id = -1
         self.draw()
 
-        # Add reference to lines
+        # Add reference to all 3 lines
         for line in self.lines:
             line.faces.append(self)
 
@@ -229,6 +281,10 @@ class CanvasFace:
         self.canvas.tag_lower(self.id, TAG_LINE)
 
     def getAutoColor(self):
+        """
+        Calculates color based on the pixels of the image below this face
+        :return:
+        """
         coords = self.getCoordinates()
         self.color = Color.fromImage(self.canvasFrame.image, 1, coords)
 
@@ -258,6 +314,10 @@ class CanvasFace:
         return points
 
     def getCoordinates(self):
+        """
+        Get the coordinates of the corners in anti-clockwise order.
+        :return:
+        """
         points = self.getPoints()
         yxSorted = sorted(points, key=attrgetter("y", "x"))
 

@@ -90,17 +90,17 @@ class CanvasFrame(Frame):
 
         # Canvas Button
         self.canvas.bind("<Button>", self.click)
-        self.canvas.bind_all("<Key-Delete>", self.deleteHighlighted)
+        self.canvas.bind_all("<Key-Delete>", self.deleteSelected)
         self.canvas.grid()
 
         # Lists for the points/lines/faces
         self.points = []
-        self.highlightedPoint = None
+        self.selectedPoint = None
         self.lines = []
-        self.highlightedLine = None
+        self.selectedLine = None
         self.faces = []
 
-        self.highlightedPoint = None
+        self.selectedPoint = None
 
         self.mouseEventHandled = False
 
@@ -110,7 +110,7 @@ class CanvasFrame(Frame):
     def click(self, event):
         """
         Handles the clicking on the canvas to add new points.
-        Will automatically add a line from the last highlighted point if CTRL is not pressed.
+        Will automatically add a line from the last selected point if CTRL is not pressed.
         :param event:
         :return: None
         """
@@ -122,13 +122,13 @@ class CanvasFrame(Frame):
 
         # If an element of the canvas is clicked that has its own event handler, then it will set this property
         if not self.mouseEventHandled:
-            prevHighlightedPoint = self.highlightedPoint
-            self.points.append(CanvasPoint(event.x, event.y, self.canvas, self))
+            prevSelectedPoint = self.selectedPoint
+            self.addPoint(event.x, event.y)
 
             # Pressing CTRL prevents the automatic line
             ctrlMask = 0x0004
-            if (prevHighlightedPoint is not None) and not (event.state & ctrlMask):
-                self.lines.append(CanvasLine(prevHighlightedPoint, self.highlightedPoint, self.canvas, self))
+            if (prevSelectedPoint is not None) and not (event.state & ctrlMask):
+                self.addLine(prevSelectedPoint, self.selectedPoint)
 
         self.mouseEventHandled = False
         self.clickedPoint = None
@@ -140,48 +140,53 @@ class CanvasFrame(Frame):
         self.canvas.itemconfigure(TAG_FACE, state=state)
         self.currentFaceState = state
 
-    def deleteHighlighted(self, event):
+    def deleteSelected(self, event):
         print("Delete")
-        if self.highlightedPoint is not None:
-            self.highlightedPoint.delete()
-            self.highlightedPoint = None
+        if self.selectedPoint is not None:
+            self.selectedPoint.delete()
+            self.selectedPoint = None
 
-        if self.highlightedLine is not None:
-            self.highlightedLine.delete()
-            self.highlightedLine = None
+        if self.selectedLine is not None:
+            self.selectedLine.delete()
+            self.selectedLine = None
 
     def addFace(self, line1, line2, line3):
-        face = CanvasFace(line1, line2, line3, self.canvas, self)
+        face = CanvasFace(line1, line2, line3, self)
         self.faces.append(face)
         return face
 
     def addLine(self, point1, point2):
-        # Check if line to highlighted point already exists
+        # Check if line to selected point already exists
         for line in point1.connectedLines:
             if line.isConnectedTo(point2):
                 return line
-        line = CanvasLine(point1, point2, self.canvas, self)
+        line = CanvasLine(point1, point2, self)
         self.lines.append(line)
         return line
 
-    def deactivateHighlighted(self):
-        if self.highlightedPoint is not None:
-            self.highlightedPoint.deactivate()
-        self.highlightedPoint = None
+    def addPoint(self, x, y):
+        point = CanvasPoint(x, y, self)
+        self.points.append(point)
+        return point
 
-        if self.highlightedLine is not None:
-            self.highlightedLine.deactivate()
-        self.highlightedLine = None
+    def deactivateSelected(self):
+        if self.selectedPoint is not None:
+            self.selectedPoint.deactivate()
+        self.selectedPoint = None
 
-    def highlightPoint(self, point):
-        self.deactivateHighlighted()
-        point.highlight()
-        self.highlightedPoint = point
+        if self.selectedLine is not None:
+            self.selectedLine.deactivate()
+        self.selectedLine = None
 
-    def highlightLine(self, line):
-        self.deactivateHighlighted()
-        line.highlight()
-        self.highlightedLine = line
+    def selectPoint(self, point):
+        self.deactivateSelected()
+        point.select()
+        self.selectedPoint = point
+
+    def selectLine(self, line):
+        self.deactivateSelected()
+        line.select()
+        self.selectedLine = line
 
     def toMesh(self):
         mesh = Mesh(self.frameWidth, self.frameHeight)
@@ -247,7 +252,7 @@ class CanvasFrame(Frame):
         self.canvas.delete(TAG_POINT)
         self.canvas.delete(TAG_LINE)
         self.canvas.delete(TAG_FACE)
-        self.highlightedPoint = None
+        self.selectedPoint = None
 
 
 class ButtonFrame(Frame):
@@ -284,7 +289,7 @@ class TextFrame(Frame):
 
         self.howToLabel = Label(self, text="""Place, select and move points and lines with the mouse.
 A line to the next point will automatically be created, as long as CTRL is not pressed.
-To connect two points with a line, hold the SHIFT button.
+To connect two points with a line, or to split a line in two, hold the SHIFT button.
 If a line creates one or more triangles, then they will be automatically added.
 Delete selected objects with DEL.
 Toggle the visibility of the faces with SPACE.""", anchor=NW, justify=LEFT)
