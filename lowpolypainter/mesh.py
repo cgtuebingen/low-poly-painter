@@ -1,7 +1,6 @@
 # TODO: Add better function to insert new faces
 # TODO: Delete vertecies or faces one by one
 
-from vector3 import Vector3
 from operator import attrgetter
 
 """
