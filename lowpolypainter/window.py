@@ -5,6 +5,7 @@ from PIL import ImageTk, Image
 
 # Local Modules
 from lowpolypainter.mesh import Mesh
+from lowpolypainter.color import Color
 from lowpolypainter.export import export
 from lowpolypainter.triangulation import bowyerWatson
 from lowpolypainter.CanvasObjects import *
@@ -92,6 +93,9 @@ class CanvasFrame(Frame):
         self.canvas.bind("<Button>", self.click)
         self.canvas.bind_all("<Key-Delete>", self.deleteSelected)
         self.canvas.grid()
+
+        # Color Object
+        self.color = Color(np.array(self.image), 0.05, 0.5)
 
         # Lists for the points/lines/faces
         self.points = []

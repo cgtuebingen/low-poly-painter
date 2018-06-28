@@ -1,9 +1,8 @@
+from __future__ import division
+
 # Python Modules
 import numpy as np
 import math as math
-from PIL import Image
-
-# TODO: Set percentage of pixels for fromImage
 
 """
 Color Class
@@ -13,82 +12,89 @@ Generates color for faces and returns HEX string.
 """
 
 class Color:
-    @staticmethod
+    def __init__(self, array, percentageX, percentageY):
+        self.imageArray = array
+        self.height = len(self.imageArray)
+        self.width = len(self.imageArray[0])
+        self.flattenImageArray = array.ravel()
+        self.stepX = int(math.pow(percentageX, -1))
+        self.stepY = int(math.pow(percentageY, -1))
+
     # Generates random color
-    def random():
+    def random(self):
         r = '%02x'%np.random.randint(255)
         g = '%02x'%np.random.randint(255)
         b = '%02x'%np.random.randint(255)
         return '#' + r + g + b
 
-    @staticmethod
+    # Generates color from vertices
+    def fromPoints(self, vertices):
+
+        r, g, b = 0, 0, 0
+        length = len(vertices)
+
+        # Get pixel value from vertex
+        for i in range(length):
+            x = vertices[i][0]
+            y = vertices[i][1]
+            count = 3 * (y * self.height + x)
+            r += self.flattenImageArray[count]
+            g += self.flattenImageArray[count + 1]
+            b += self.flattenImageArray[count + 2]
+
+        # RGB HEX string
+        rs = '%02x'%int(r / length)
+        gs = '%02x'%int(g / length)
+        bs = '%02x'%int(b / length)
+
+        return '#' + rs + gs + bs
+
     # Generates color from image
-    # With percentage of pixels 0 < x <= 1
     # (!) Vertices must have anticlockwise order
-    def fromImage(image, percentage, vertices):
+    def fromImage(self, vertices):
+        # Vertices x and y
+        v1x, v2x, v3x = vertices[0][0], vertices[1][0], vertices[2][0]
+        v1y, v2y, v3y = vertices[0][1], vertices[1][1], vertices[2][1]
 
-        # Load image into array
-        imageArray = np.array(image)
+        # Calculate slope for each edge
+        mv2v1 = (v2x - v1x) / (v2y - v1y) if (v2y - v1y) != 0 else 0
+        mv3v1 = (v3x - v1x) / (v3y - v1y) if (v3y - v1y) != 0 else 0
+        mv3v2 = (v3x - v2x) / (v3y - v2y) if (v3y - v2y) != 0 else 0
 
-        # Vertex1 x and y
-        v1x = vertices[0][0]
-        v1y = vertices[0][1]
+        # RGB values and pixel counter
+        r, g, b = 0, 0, 0
+        pcounter = 0
 
-        # Vertex2 x and y
-        v2x = vertices[1][0]
-        v2y = vertices[1][1]
-
-        # Vertex3 x and y
-        v3x = vertices[2][0]
-        v3y = vertices[2][1]
-
-        # Find max and min values of triangle
-        xmin = v2x
-        xmax = v3x
         ymin = v1y
         ymax = v2y if v2y > v3y else v3y
 
-        # Calculate slope for each edge
-        mv2v1 = (v2x - v1x) / float(v2y - v1y) if (v2y - v1y) != 0 else 0
-        mv3v1 = (v3x - v1x) / float(v3y - v1y) if (v3y - v1y) != 0 else 0
-        mv3v2 = (v3x - v2x) / float(v3y - v2y) if (v3y - v2y) != 0 else 0
-
-        # Stores value and number of pixels in triangle
-        pixelArray = np.zeros(3)
-        pixelCounter = 0
-
         # Get every pixel from ymin to ymax
-        for row in range(ymin, ymax):
-            # Calculate col range for each row
+        for row in range(ymin, ymax, self.stepY):
             if row >= v2y:
-                xmin = int(mv3v2 * (row - v3y)) + v3x
+                xmin = int(mv3v2 * (row - v3y)) + v3x - 1
                 xmax = int(mv3v1 * (row - v3y)) + v3x
             elif row >= v3y:
-                xmin = int(mv2v1 * (row - v2y)) + v2x
+                xmin = int(mv2v1 * (row - v2y)) + v2x - 1
                 xmax = int(mv3v2 * (row - v3y)) + v3x
             else:
-                xmin = int(mv2v1 * (row - v2y)) + v2x
+                xmin = int(mv2v1 * (row - v2y)) + v2x - 1
                 xmax = int(mv3v1 * (row - v3y)) + v3x
 
-            # Set step size with percentage
-            stepSize = int(math.pow(percentage, -1))
-
             # Get every pixel from xmin to xmax
-            for col in range(xmin, xmax, stepSize):
-                pixelArray = pixelArray + imageArray[row][col]
-                pixelCounter += 1
+            for col in range(xmin, xmax, self.stepX):
+                count = 3 * (row * self.height + col)
+                r += self.flattenImageArray[count]
+                g += self.flattenImageArray[count + 1]
+                b += self.flattenImageArray[count + 2]
+                pcounter += 1
 
-        # TODO: Remove this just for debugging
         # Triangle created without area
-        if pixelCounter == 0:
-            return '#FFFFFF'
-
-        # Calculate average pixel value
-        pixelArray = np.divide(pixelArray, pixelCounter)
-
-        # Create RGB HEX string
-        r = '%02x'%int(pixelArray[0])
-        g = '%02x'%int(pixelArray[1])
-        b = '%02x'%int(pixelArray[2])
-
-        return '#' + r + g + b
+        # Generate color from vertices
+        if pcounter != 0:
+            # RGB HEX string
+            rs = '%02x'%(r / pcounter)
+            gs = '%02x'%(g / pcounter)
+            bs = '%02x'%(b / pcounter)
+            return '#' + rs + gs + bs
+        else:
+            return self.fromPoints(vertices)

@@ -1,9 +1,6 @@
 # Python modules
 from operator import attrgetter
 
-# Local modules
-from lowpolypainter.color import Color
-
 TAG_POINT = "point"
 TAG_LINE = "line"
 TAG_FACE = "face"
@@ -286,7 +283,7 @@ class CanvasFace:
         :return:
         """
         coords = self.getCoordinates()
-        self.color = Color.fromImage(self.canvasFrame.image, 1, coords)
+        self.color = self.canvasFrame.color.fromImage(coords)
 
     def update(self, recalcColor):
         if recalcColor:
