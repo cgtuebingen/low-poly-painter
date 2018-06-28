@@ -19,12 +19,13 @@ class CanvasPoint:
     """
     RADIUS = 4
 
-    def __init__(self, x, y, canvasFrame):
+    def __init__(self, x, y, gui, parent):
         self.x = x
         self.y = y
 
-        self.canvas = canvasFrame.canvas
-        self.canvasFrame = canvasFrame
+        self.canvas = gui.canvas
+        self.gui = gui
+        self.parent = parent
 
         # Stores all lines that use this point
         # This way an update to the point can also update these lines
@@ -33,18 +34,18 @@ class CanvasPoint:
         self.id = -1
         self.draw()
 
-        self.canvasFrame.selectPoint(self)
+        self.gui.selectPoint(self)
 
         self.moved = False
 
     def click(self, event):
         # Click to select point or shift-click to connect to this point
         shiftMask = 0x0001
-        self.canvasFrame.mouseEventHandled = True
-        if (event.state & shiftMask) and (self.canvasFrame.selectedPoint is not None):
-            self.canvasFrame.addLine(self, self.canvasFrame.selectedPoint)
+        self.gui.mouseEventHandled = True
+        if (event.state & shiftMask) and (self.gui.selectedPoint is not None):
+            self.parent.addLine(self, self.gui.selectedPoint)
             return
-        self.canvasFrame.selectPoint(self)
+        self.gui.selectPoint(self)
 
     def draw(self):
         # Delete old
@@ -78,13 +79,13 @@ class CanvasPoint:
         # Confine coordinates to image size
         if x < 0:
             x = 0
-        elif x >= self.canvasFrame.frameWidth:
-            x = self.canvasFrame.frameWidth - 1
+        elif x >= self.gui.frameWidth:
+            x = self.gui.frameWidth - 1
 
         if y < 0:
             y = 0
-        elif y >= self.canvasFrame.frameWidth:
-            y = self.canvasFrame.frameWidth - 1
+        elif y >= self.gui.frameWidth:
+            y = self.gui.frameWidth - 1
 
         self.moved = True
         self.canvas.move(self.id, x - self.x, y - self.y)
@@ -92,8 +93,10 @@ class CanvasPoint:
         self.x = x
         self.y = y
 
+        # Updating the lines and therefore the faces would trigger an auto color recalculation
+        # If this is fast enough, then it can be done in real time and not just after the movement ended
         for line in self.connectedLines:
-            line.update()
+            line.update(recalcColor=True)
 
     def finalizeMove(self, event):
         """
@@ -118,8 +121,19 @@ class CanvasPoint:
                 return True
         return False
 
+    def getConnectingLine(self, point):
+        """
+        Check if any connected line connects to point and return it.
+        :param point:
+        :return: line or None
+        """
+        for line in self.connectedLines:
+            if line.isConnectedTo(point):
+                return line
+        return None
+
     def delete(self):
-        self.canvasFrame.points.remove(self)
+        self.parent.points.remove(self)
         self.canvas.delete(self.id)
 
         # All lines that use this point, have to be deleted
@@ -130,7 +144,7 @@ class CanvasPoint:
 
 
 class CanvasLine:
-    def __init__(self, canvasPoint1, canvasPoint2, canvasFrame):
+    def __init__(self, canvasPoint1, canvasPoint2, gui, parent):
         # The two line points
         self.points = (canvasPoint1, canvasPoint2)
 
@@ -138,8 +152,9 @@ class CanvasLine:
         canvasPoint1.connectedLines.append(self)
         canvasPoint2.connectedLines.append(self)
 
-        self.canvas = canvasFrame.canvas
-        self.canvasFrame = canvasFrame
+        self.canvas = gui.canvas
+        self.gui = gui
+        self.parent = parent
 
         self.id = -1
         self.draw()
@@ -155,24 +170,24 @@ class CanvasLine:
 
     def click(self, event):
         shiftMask = 0x0001
-        self.canvasFrame.mouseEventHandled = True
+        self.gui.mouseEventHandled = True
 
-        selectedPoint = self.canvasFrame.selectedPoint
+        selectedPoint = self.gui.selectedPoint
 
         # Press shift to place points on lines
         # Automatically splits line and adds the 2 or 3 lines
         if event.state & shiftMask:
-            point = self.canvasFrame.addPoint(event.x, event.y)
+            point = self.parent.addPoint(event.x, event.y)
 
             # If there is a selected point, then also add a line to it
             if selectedPoint is not None:
-                self.canvasFrame.addLine(point, selectedPoint)
-            self.canvasFrame.addLine(point, self.points[0])
-            self.canvasFrame.addLine(point, self.points[1])
+                self.parent.addLine(point, selectedPoint)
+            self.parent.addLine(point, self.points[0])
+            self.parent.addLine(point, self.points[1])
 
             self.delete()
         else:
-            self.canvasFrame.selectLine(self)
+            self.gui.selectLine(self)
 
     def checkFaceCreated(self):
         """
@@ -191,7 +206,7 @@ class CanvasLine:
 
             for line2 in point.connectedLines:
                 if line2.isConnectedTo(self.points[1]):
-                    self.canvasFrame.addFace(self, line1, line2)
+                    self.parent.addFace(self, line1, line2)
 
     def select(self):
         self.canvas.itemconfigure(self.id, fill=COLOR_LINE_SELECTED)
@@ -228,7 +243,7 @@ class CanvasLine:
 
     def delete(self):
         if not self.deleted:
-            self.canvasFrame.lines.remove(self)
+            self.parent.lines.remove(self)
             self.canvas.delete(self.id)
 
             deleteQueue = self.faces[:]
@@ -241,14 +256,15 @@ class CanvasLine:
 
 
 class CanvasFace:
-    def __init__(self, line1, line2, line3, canvasFrame):
+    def __init__(self, line1, line2, line3, gui, parent):
         # Lines
         self.lines = (line1, line2, line3)
 
-        self.canvas = canvasFrame.canvas
-        self.canvasFrame = canvasFrame
+        self.canvas = gui.canvas
+        self.gui = gui
+        self.parent = parent
 
-        self.color = "#000"
+        self.color = "#000000"
         self.getAutoColor()
 
         self.id = -1
@@ -272,7 +288,7 @@ class CanvasFace:
                                              coords[2][0], coords[2][1],
                                              fill=self.color,
                                              tag=TAG_FACE,
-                                             state=self.canvasFrame.currentFaceState)
+                                             state=self.gui.currentFaceState)
 
         # Faces should be below lines and points
         self.canvas.tag_lower(self.id, TAG_LINE)
@@ -283,7 +299,7 @@ class CanvasFace:
         :return:
         """
         coords = self.getCoordinates()
-        self.color = self.canvasFrame.color.fromImage(coords)
+        self.color = self.gui.getColorFromImage(coords)
 
     def update(self, recalcColor):
         if recalcColor:
@@ -292,7 +308,7 @@ class CanvasFace:
 
     def delete(self):
         if not self.deleted:
-            self.canvasFrame.faces.remove(self)
+            self.parent.faces.remove(self)
             self.canvas.delete(self.id)
             for line in self.lines:
                 line.faces.remove(self)

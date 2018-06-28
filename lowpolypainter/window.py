@@ -6,10 +6,11 @@ from PIL import ImageTk, Image
 # Local Modules
 from lowpolypainter.mesh import Mesh
 from lowpolypainter.color import Color
-from lowpolypainter.export import export
+from lowpolypainter.export import exportFromCanvasObjectsMesh
 from lowpolypainter.triangulation import bowyerWatson
 from lowpolypainter.CanvasObjects import *
 from zoomTransformer import ZoomTransformer
+from CanvasObjectsMesh import CanvasObjectsMesh
 
 
 # TODO: Design UI
@@ -56,7 +57,7 @@ class Window(object):
 
     # exports current mesh as svg image
     def export(self):
-        export(self.canvasFrame.toMesh())
+        exportFromCanvasObjectsMesh(self.canvasFrame.canvasObjectsMesh)
 
     def triangulate(self):
         mesh = self.canvasFrame.toMesh()
@@ -88,27 +89,25 @@ class CanvasFrame(Frame):
         self.frameHeight = self.canvasBackground.height()
         self.canvas = Canvas(self, width=self.frameWidth, height=self.frameHeight)
         self.canvas.create_image(1, 1, image=self.canvasBackground, anchor=NW)
-
-        # Canvas Button
-        self.canvas.bind("<Button>", self.click)
-        self.canvas.bind_all("<Key-Delete>", self.deleteSelected)
         self.canvas.grid()
 
         # Color Object
-        self.color = Color(np.array(self.image), 0.05, 0.5)
+        self.color = Color(np.array(self.image), 0.5, 0.5)
 
-        # Lists for the points/lines/faces
-        self.points = []
+        # Mesh
+        self.canvasObjectsMesh = CanvasObjectsMesh(self)
+
+        # Selection
         self.selectedPoint = None
-        self.lines = []
         self.selectedLine = None
-        self.faces = []
-
-        self.selectedPoint = None
 
         self.mouseEventHandled = False
 
         self.currentFaceState = NORMAL
+
+        # Events
+        self.canvas.bind("<Button>", self.click)
+        self.canvas.bind_all("<Key-Delete>", self.deleteSelected)
         self.canvas.bind_all("<space>", func=self.toggleFaces)
 
     def click(self, event):
@@ -135,7 +134,18 @@ class CanvasFrame(Frame):
                 self.addLine(prevSelectedPoint, self.selectedPoint)
 
         self.mouseEventHandled = False
-        self.clickedPoint = None
+
+    def addFace(self, line1, line2, line3):
+        return self.canvasObjectsMesh.addFace(line1, line2, line3)
+
+    def addFaceFromPoints(self, point1, point2, point3):
+        return self.canvasObjectsMesh.addFace(point1, point2, point3)
+
+    def addLine(self, point1, point2):
+        return self.canvasObjectsMesh.addLine(point1, point2)
+
+    def addPoint(self, x, y):
+        return self.canvasObjectsMesh.addPoint(x, y)
 
     def toggleFaces(self, event):
         state = NORMAL
@@ -145,7 +155,6 @@ class CanvasFrame(Frame):
         self.currentFaceState = state
 
     def deleteSelected(self, event):
-        print("Delete")
         if self.selectedPoint is not None:
             self.selectedPoint.delete()
             self.selectedPoint = None
@@ -153,25 +162,6 @@ class CanvasFrame(Frame):
         if self.selectedLine is not None:
             self.selectedLine.delete()
             self.selectedLine = None
-
-    def addFace(self, line1, line2, line3):
-        face = CanvasFace(line1, line2, line3, self)
-        self.faces.append(face)
-        return face
-
-    def addLine(self, point1, point2):
-        # Check if line to selected point already exists
-        for line in point1.connectedLines:
-            if line.isConnectedTo(point2):
-                return line
-        line = CanvasLine(point1, point2, self)
-        self.lines.append(line)
-        return line
-
-    def addPoint(self, x, y):
-        point = CanvasPoint(x, y, self)
-        self.points.append(point)
-        return point
 
     def deactivateSelected(self):
         if self.selectedPoint is not None:
@@ -192,72 +182,17 @@ class CanvasFrame(Frame):
         line.select()
         self.selectedLine = line
 
+    def getColorFromImage(self, coords):
+        return self.color.fromImage(coords)
+
     def toMesh(self):
-        mesh = Mesh(self.frameWidth, self.frameHeight)
-        pointIndices = []
-
-        # Add all vertices
-        for point in self.points:
-            i = mesh.addVertex(point.x, point.y)
-            pointIndices.append(i)
-
-        # Add all lines
-        for line in self.lines:
-            point1 = line.points[0]
-            point2 = line.points[1]
-
-            i1 = pointIndices[self.points.index(point1)]
-            i2 = pointIndices[self.points.index(point2)]
-
-            mesh.addEdge(i1, i2)
-
-        # Add all faces
-        for face in self.faces:
-            points = face.getPoints()
-            i1 = pointIndices[self.points.index(points[0])]
-            i2 = pointIndices[self.points.index(points[1])]
-            i3 = pointIndices[self.points.index(points[2])]
-
-            face.getAutoColor()
-
-            mesh.addFace(i1, i2, i3, face.color)
-
-        print(len(mesh.vertices), len(mesh.edges), len(mesh.faces))
-
-        return mesh
+        return self.canvasObjectsMesh.toMesh()
 
     def fromMesh(self, mesh):
-        self.clear()
-
-        # Points
-        for point in mesh.vertices:
-            self.points.append(CanvasPoint(point.x, point.y, self.canvas, self))
-
-        # Lines
-        for line in mesh.edges:
-            self.lines.append(
-                (CanvasLine(self.points[line.vertices[0]], self.points[line.vertices[1]], self.canvas, self)))
-
-        # if the edges of the face where not in the edges list, then add them now
-        for face in mesh.faces:
-            points = []
-            for i in range(3):
-                points.append(self.points[face.vertices[i]])
-
-            # Check that all lines of the face are there and if not, then create them
-            for i, j in [(0, 1), (1, 2), (2, 0)]:
-                if not points[i].hasConnectingLine(points[j]):
-                    self.addLine(points[i], points[j])
+        self.canvasObjectsMesh.fromMesh(mesh)
 
     def clear(self):
-        self.points = []
-        self.lines = []
-        self.faces = []
-        self.canvas.delete(TAG_POINT)
-        self.canvas.delete(TAG_LINE)
-        self.canvas.delete(TAG_FACE)
-        self.selectedPoint = None
-
+        self.canvasObjectsMesh.clear()
 
 class ButtonFrame(Frame):
     """
