@@ -127,8 +127,9 @@ class CanvasFrame(Frame):
 
         # If an element of the canvas is clicked that has its own event handler, then it will set this property
         if not self.mouseEventHandled:
+            vertex = self.parent.zoom.FromViewport([event.x, event.y])
             prevSelectedPoint = self.selectedPoint
-            self.addPoint(event.x, event.y)
+            self.addPoint(vertex[0], vertex[1])
 
             # Pressing CTRL prevents the automatic line
             ctrlMask = 0x0004
