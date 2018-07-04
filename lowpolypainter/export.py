@@ -12,12 +12,12 @@ def exportFrame(frame, mesh, width, height):
     
     entryWidth = 25
                        
-    # creates a textfield to enter filename               )
+    # creates a textfield to enter filename               
     entry = Entry(exportFrame, width=entryWidth)
     entry.focus_set()
     entry.pack() 
     
-    # acceptButton-callback.
+    # acceptButton-callback
     def accept(event=None):
         exportFromCanvasObjectsMesh(entry.get(), mesh, width, height)
         exportFrame.destroy()
