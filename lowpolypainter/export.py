@@ -7,22 +7,37 @@ from Tkinter import *
 def exportFrame(frame, mesh, width, height):
     # creates a new frame
     exportFrame = Toplevel(frame)
+    exportFrame.resizable(width=False, height=False)
+    
     
     entryWidth = 25
+                       
+    # creates a textfield to enter filename               )
+    entry = Entry(exportFrame, width=entryWidth)
+    entry.focus_set()
+    entry.pack() 
     
-    # creates a textfield to enter filename
-    e = Entry(exportFrame, width=entryWidth)
-    e.focus_set()
-    e.pack()
-    
-    def saveButton(event=None):
-        exportFromCanvasObjectsMesh(e.get(), mesh, width, height)
+    # acceptButton-callback.
+    def accept(event=None):
+        exportFromCanvasObjectsMesh(entry.get(), mesh, width, height)
         exportFrame.destroy()
         
+        
     # binds the Enter key to saveButton    
-    exportFrame.bind('<Return>',saveButton)
-    b = Button(exportFrame, text="OK", command=saveButton)
-    b.pack()
+    exportFrame.bind('<Return>',accept)
+    
+    # accept button 
+    acceptButton = Button(exportFrame, text="accept", command=accept)
+    acceptButton.pack()
+    
+    # sets the position of the toplevel
+    exportFrame.update()
+    exportFrame_x = frame.winfo_rootx() + (frame.winfo_width()/2) - (exportFrame.winfo_width() / 2)
+    exportFrame_y = frame.winfo_rooty() + (frame.winfo_height()/2) 
+    exportFrame.geometry("+%d+%d" % (exportFrame_x,exportFrame_y))
+    
+        
+    
     
     
 def exportFromCanvasObjectsMesh(filename, mesh, width, height):
@@ -48,3 +63,4 @@ def exportFromCanvasObjectsMesh(filename, mesh, width, height):
         img.add(img.polygon(points=points, fill=color))
     # save image
     img.save()
+    
