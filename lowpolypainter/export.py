@@ -1,9 +1,14 @@
 # Python Modules
 import svgwrite
-import os
 from Tkinter import *
+import tkFileDialog
 
 
+def exportDialog(mesh, width, height):
+    filename = tkFileDialog.asksaveasfilename(initialdir = "/",title = "Select file",filetypes = (("svg files","*.svg"),("all files","*.*")))
+    exportFromCanvasObjectsMesh(filename, mesh, width, height)
+    
+    
 def exportFrame(frame, mesh, width, height):
     # creates a new frame
     exportFrame = Toplevel(frame)
@@ -41,14 +46,7 @@ def exportFrame(frame, mesh, width, height):
     
     
 def exportFromCanvasObjectsMesh(filename, mesh, width, height):
-    # checks if ./graphics/-directory already exists
-    try:
-        if not os.path.exists('./graphics/'):
-            os.makedirs('./graphics/')
-    except OSError:
-        print ('Error: Creating ./graphics/')
-    
-    img = svgwrite.Drawing('./graphics/' + str(filename) + '.svg', size=(str(width), str(height)))
+    img = svgwrite.Drawing(filename + '.svg', size=(str(width), str(height)))
     for face in mesh.faces:
         # vertices for triangle
         points = face.getCoordinates()
@@ -64,3 +62,4 @@ def exportFromCanvasObjectsMesh(filename, mesh, width, height):
     # save image
     img.save()
     
+
