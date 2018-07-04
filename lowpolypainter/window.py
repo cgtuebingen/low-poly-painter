@@ -6,7 +6,7 @@ from PIL import ImageTk, Image
 # Local Modules
 from lowpolypainter.mesh import Mesh
 from lowpolypainter.color import Color
-from lowpolypainter.export import exportFrame
+from lowpolypainter.export import exportDialog
 from lowpolypainter.triangulation import bowyerWatson
 from lowpolypainter.CanvasObjects import *
 from zoomTransformer import ZoomTransformer
@@ -57,7 +57,7 @@ class Window(object):
 
     # exports current mesh as svg image
     def export(self):
-        exportFrame(self.frame, self.canvasFrame.canvasObjectsMesh, self.canvasFrame.frameWidth, self.canvasFrame.frameHeight)
+        exportDialog(self.canvasFrame.canvasObjectsMesh, self.canvasFrame.frameWidth, self.canvasFrame.frameHeight)
 
     def triangulate(self):
         mesh = self.canvasFrame.toMesh()
