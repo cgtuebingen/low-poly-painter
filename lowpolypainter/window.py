@@ -6,20 +6,25 @@ from PIL import ImageTk, Image
 # Local Modules
 from lowpolypainter.mesh import Mesh
 from lowpolypainter.color import Color
-from lowpolypainter.export import export
+from lowpolypainter.export import exportDialog
+from lowpolypainter.triangulation import bowyerWatson
+from lowpolypainter.CanvasObjects import *
 from zoomTransformer import ZoomTransformer
+from CanvasObjectsMesh import CanvasObjectsMesh
+
 
 # TODO: Design UI
 # TODO: Split buttons and canvas into different frames
 # TODO: Maybe create diffrent modules for canvas and buttons
 
-"""
-Window Class
 
-Description:
-Contains canvas and roots the application.
-"""
 class Window(object):
+    """
+    Window Class
+
+    Description:
+    Contains canvas and roots the application.
+    """
 
     def __init__(self, inputimage):
         self.root = Tk()
@@ -27,11 +32,11 @@ class Window(object):
         self.zoom = ZoomTransformer()
 
         # Settings
-        self.root.config(bg = 'black')
+        self.root.config(bg='black')
         self.root.title('Low Poly Painter')
 
         # Frame
-        self.frame = Frame(self.root, bg = 'white')
+        self.frame = Frame(self.root, bg='white')
         self.frame.grid()
 
         # Canvas Frame
@@ -42,84 +47,37 @@ class Window(object):
         self.buttonFrame = ButtonFrame(self)
         self.buttonFrame.grid()
 
-        # Mesh
-        self.mesh = Mesh(self.canvasFrame.frameWidth, self.canvasFrame.frameHeight)
+        # HowTo text
+        self.textFrame = TextFrame(self)
+        self.textFrame.grid()
 
     # Clear mesh and canvas
     def clear(self):
-        self.canvasFrame.deleteObjects('point', 0,  len(self.mesh.vertices))
-        self.canvasFrame.deleteObjects('line', 0,  len(self.mesh.edges))
-        self.canvasFrame.deleteObjects('triangle', 0,  len(self.mesh.faces))
-        self.mesh.clear()
-
-    # Canvas is clicked at position
-    def click(self, event):
-        vertex = self.zoom.FromViewport([event.x, event.y])
-        self.mesh.addVertex(vertex[0], vertex[1])
-
-        # TODO: Remove this call
-        self.addedVertexCreateFace()
-
-    # Create random mesh
-    # TODO: Remove this function
-    def random(self):
-        count = 10
-        for x in range(count):
-            x = np.random.randint(self.canvasFrame.frameWidth)
-            y = np.random.randint(self.canvasFrame.frameHeight)
-            self.mesh.addVertex(x, y)
-            self.addedVertexCreateFace()
+        self.canvasFrame.clear()
 
     # exports current mesh as svg image
     def export(self):
-        export(self.mesh)
+        exportDialog(self.canvasFrame.canvasObjectsMesh, self.canvasFrame.frameWidth, self.canvasFrame.frameHeight)
+
+    def triangulate(self):
+        mesh = self.canvasFrame.toMesh()
+        # TODO: Add triangulate call here
+        # mesh = bowyerWatson(mesh)
+        self.canvasFrame.fromMesh(mesh)
 
 
-    # TODO: Remove this function
-    # This function is just used for testing
-    # This generates a face when the mesh has more then 3 verticies
-    # A new face is instanced by the last three vertices in the vertices array
-    # As soon as you add a new vertex to the mesh this function should be called
-    def addedVertexCreateFace(self):
-        verticesLength = len(self.mesh.vertices)
-        # FACE
-        if (verticesLength >= 3):
-            self.mesh.addFace(verticesLength - 3,
-                              verticesLength - 2,
-                              verticesLength - 1,
-                              '#FFFFFF')
-
-            face = self.mesh.faces[-1]
-            verticesArray = [[self.mesh.vertices[face.vertices[0]].x,
-                              self.mesh.vertices[face.vertices[0]].y],
-                             [self.mesh.vertices[face.vertices[1]].x,
-                              self.mesh.vertices[face.vertices[1]].y],
-                             [self.mesh.vertices[face.vertices[2]].x,
-                              self.mesh.vertices[face.vertices[2]].y]]
-
-            face.color = Color.fromImage(self.canvasFrame.image, 0.05, verticesArray)
-            self.canvasFrame.drawTriangle(self.mesh, len(self.mesh.faces) - 1, self.zoom)
-        # EDGE
-        if (verticesLength >= 2):
-            self.mesh.addEdge(verticesLength - 2,
-                              verticesLength - 1)
-            self.canvasFrame.drawLine(self.mesh, len(self.mesh.edges) - 1, self.zoom)
-
-        # VERTEX
-        self.canvasFrame.drawPoint(self.mesh, len(self.mesh.vertices) - 1, self.zoom)
-
-
-"""
-Canvas Frame Class
-
-Description:
-Contains the loaded image and a button.
-The button detects the position clicked on the canvas.
-"""
 class CanvasFrame(Frame):
+    """
+    Canvas Frame Class
+
+    Description:
+    Contains the loaded image and sets the mouse button click event
+    """
 
     def __init__(self, parent, inputimage, *args, **kwargs):
         Frame.__init__(self, parent.frame)
+
+        self.parent = parent
 
         # Load Image
         filepath = 'lowpolypainter/resources/images/' + inputimage
@@ -129,77 +87,151 @@ class CanvasFrame(Frame):
         # Create Canvas
         self.frameWidth = self.canvasBackground.width()
         self.frameHeight = self.canvasBackground.height()
-        self.canvas = Canvas(self, width = self.frameWidth, height = self.frameHeight)
-        self.canvas.create_image(0, 0, image = self.canvasBackground, anchor = NW)
-
-        # Canvas Button
-        self.canvas.bind("<Button>", parent.click)
+        self.canvas = Canvas(self, width=self.frameWidth, height=self.frameHeight)
+        self.canvas.create_image(1, 1, image=self.canvasBackground, anchor=NW)
         self.canvas.grid()
 
-    def drawPoint(self, mesh, index, zoom):
-        radius = 2
-        color = '#0000FF'
-        vertex = mesh.vertices[index]
-        vertex = zoom.ToViewport([vertex.x, vertex.y])
-        self.canvas.create_oval(vertex[0] - radius,
-                                vertex[1] - radius,
-                                vertex[0] + radius,
-                                vertex[1] + radius,
-                                 fill = color, tag = ('point', str(index)))
+        # Color Object
+        self.color = Color(np.array(self.image), 0.5, 0.5)
 
-    def drawLine(self, mesh, index, zoom):
-        color = '#0000FF'
-        edge = mesh.edges[index]
-        vertex_1 = mesh.vertices[edge.vertices[0]]
-        vertex_2 = mesh.vertices[edge.vertices[1]]
-        vertex_1 = zoom.ToViewport([vertex_1.x, vertex_1.y])
-        vertex_2 = zoom.ToViewport([vertex_2.x, vertex_2.y])
-        self.canvas.create_line(vertex_1[0], vertex_1[1],
-                                vertex_2[0], vertex_2[1],
-                                 fill = color, tag = ('line', str(index)))
-        self.canvas.tag_lower('line&&' + str(index), 'point&&0')
+        # Mesh
+        self.canvasObjectsMesh = CanvasObjectsMesh(self)
 
-    def drawTriangle(self, mesh, index, zoom):
-        face = mesh.faces[index]
-        vertex_1 = mesh.vertices[face.vertices[0]]
-        vertex_2 = mesh.vertices[face.vertices[1]]
-        vertex_3 = mesh.vertices[face.vertices[2]]
-        vertex_1 = zoom.ToViewport([vertex_1.x, vertex_1.y])
-        vertex_2 = zoom.ToViewport([vertex_2.x, vertex_2.y])
-        vertex_3 = zoom.ToViewport([vertex_3.x, vertex_3.y])
-        self.canvas.create_polygon(vertex_1[0], vertex_1[1],
-                                   vertex_2[0], vertex_2[1],
-                                   vertex_3[0], vertex_3[1],
-                                   fill = face.color, tag = ('triangle', str(index)))
-        self.canvas.tag_lower('triangle&&' + str(index), 'line&&0')
+        # Selection
+        self.selectedPoint = None
+        self.selectedLine = None
 
-    def deleteObject(self, object, index):
-        self.canvas.delete(object + '&&' + str(index))
+        self.mouseEventHandled = False
 
-    def deleteObjects(self, object, startIndex, endIndex):
-        for index in range(startIndex, endIndex):
-            self.deleteObject(object, index)
+        self.currentFaceState = NORMAL
 
+        # Events
+        self.canvas.bind("<Button>", self.click)
+        self.canvas.bind_all("<Key-Delete>", self.deleteSelected)
+        self.canvas.bind_all("<space>", func=self.toggleFaces)
 
-"""
-Button Frame Class
+    def click(self, event):
+		#vertex = self.zoom.FromViewport([event.x, event.y])
+        #self.mesh.addVertex(vertex[0], vertex[1])
+        """
+        Handles the clicking on the canvas to add new points.
+        Will automatically add a line from the last selected point if CTRL is not pressed.
+        :param event:
+        :return: None
+        """
 
-Description:
-Contains two buttons for clearing and testing.
-"""
+        # Ignore events out of bounds
+        if (event.x < 0) or (event.y < 0) or (event.x >= self.frameWidth) or (
+                event.y >= self.frameHeight):
+            return
+
+        # If an element of the canvas is clicked that has its own event handler, then it will set this property
+        if not self.mouseEventHandled:
+            prevSelectedPoint = self.selectedPoint
+            self.addPoint(event.x, event.y)
+
+            # Pressing CTRL prevents the automatic line
+            ctrlMask = 0x0004
+            if (prevSelectedPoint is not None) and not (event.state & ctrlMask):
+                self.addLine(prevSelectedPoint, self.selectedPoint)
+
+        self.mouseEventHandled = False
+
+    def addFace(self, line1, line2, line3):
+        return self.canvasObjectsMesh.addFace(line1, line2, line3)
+
+    def addFaceFromPoints(self, point1, point2, point3):
+        return self.canvasObjectsMesh.addFace(point1, point2, point3)
+
+    def addLine(self, point1, point2):
+        return self.canvasObjectsMesh.addLine(point1, point2)
+
+    def addPoint(self, x, y):
+        return self.canvasObjectsMesh.addPoint(x, y)
+
+    def toggleFaces(self, event):
+        state = NORMAL
+        if self.currentFaceState is NORMAL:
+            state = HIDDEN
+        self.canvas.itemconfigure(TAG_FACE, state=state)
+        self.currentFaceState = state
+
+    def deleteSelected(self, event):
+        if self.selectedPoint is not None:
+            self.selectedPoint.delete()
+            self.selectedPoint = None
+
+        if self.selectedLine is not None:
+            self.selectedLine.delete()
+            self.selectedLine = None
+
+    def deactivateSelected(self):
+        if self.selectedPoint is not None:
+            self.selectedPoint.deactivate()
+        self.selectedPoint = None
+
+        if self.selectedLine is not None:
+            self.selectedLine.deactivate()
+        self.selectedLine = None
+
+    def selectPoint(self, point):
+        self.deactivateSelected()
+        point.select()
+        self.selectedPoint = point
+
+    def selectLine(self, line):
+        self.deactivateSelected()
+        line.select()
+        self.selectedLine = line
+
+    def getColorFromImage(self, coords):
+        return self.color.fromImage(coords)
+
+    def toMesh(self):
+        return self.canvasObjectsMesh.toMesh()
+
+    def fromMesh(self, mesh):
+        self.canvasObjectsMesh.fromMesh(mesh)
+
+    def clear(self):
+        self.canvasObjectsMesh.clear()
+
 class ButtonFrame(Frame):
+    """
+    Button Frame Class
+
+    Description:
+    Contains two buttons for clearing and testing.
+    """
 
     def __init__(self, parent, *args, **kwargs):
         Frame.__init__(self, parent.frame)
 
-        # Test Button
-        self.testButton = Button(self, text='Random', command = parent.random)
-        self.testButton.grid()
-
         # Clear Button
-        self.clearButton = Button(self, text='Clear', command = parent.clear)
+        self.clearButton = Button(self, text='Clear', command=parent.clear)
         self.clearButton.grid()
 
         # Export Button
-        self.exportButton = Button(self, text="Export", command = parent.export)
+        self.exportButton = Button(self, text="Export", command=parent.export)
         self.exportButton.grid()
+
+        # Triangulation Button
+        self.triangulationButton = Button(self, text="Triangulize", command=parent.triangulate)
+        self.triangulationButton.grid()
+
+
+class TextFrame(Frame):
+    """
+    Contains how to for the user interface
+    """
+
+    def __init__(self, parent):
+        Frame.__init__(self, parent.frame)
+
+        self.howToLabel = Label(self, text="""Place, select and move points and lines with the mouse.
+A line to the next point will automatically be created, as long as CTRL is not pressed.
+To connect two points with a line, or to split a line in two, hold the SHIFT button.
+If a line creates one or more triangles, then they will be automatically added.
+Delete selected objects with DEL.
+Toggle the visibility of the faces with SPACE.""", anchor=NW, justify=LEFT)
+        self.howToLabel.grid()

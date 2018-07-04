@@ -4,14 +4,18 @@
 * **Python packages:**
     * Numpy
 	* Tkinter (Should be installed by default)
+	* Pillow (or other PIL versions)
+	* Scipy
+	* SVGwrite
 
 ## Recommended
 * **VirtualEnv:** A python tool to create separate environments with different python versions and packages.
 
 ## How to run
 1. Clone the repository
-2. **Optional:** Create a new virtual environment in this folder, e.g. `virtualenv --python=D:\Python27\python.exe env`
-(Use ./env/Scripts/activate or deactivate to enable/disable this virtualEnv)
-3. `pip install numpy scipy svgwrite Matplotlib `
+2. **Optional:** Create a new virtual environment in this folder, e.g.  
+`virtualenv --python=D:\Python27\python.exe env`  
+(Use `source env/bin/activate` or deactivate to enable/disable this virtualEnv)
+3. `pip install numpy scipy pillow svgwrite `
 4. Change to cloned directory  
-5. Run the program: `python lowpolypainter.py "lenna.jpg"`
+5. Run the program: `python lowpolypainter.py lenna.jpg`

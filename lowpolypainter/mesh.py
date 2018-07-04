@@ -1,7 +1,7 @@
 # TODO: Add better function to insert new faces
 # TODO: Delete vertecies or faces one by one
 
-from vector3 import Vector3
+from operator import attrgetter
 
 """
 Mesh Class
@@ -25,6 +25,7 @@ class Mesh(object):
         # Create Vertex
         vertex = Vertex(x, y)
         self.vertices.append(vertex)
+        return len(self.vertices) - 1
 
     # Adds edge to mesh
     def addEdge(self, vertexIndex1, vertexIndex2):
@@ -36,7 +37,7 @@ class Mesh(object):
     # (!) Rotates faces anticlockwise
     def addFace(self, vertexIndex1, vertexIndex2, vertexIndex3, color):
 
-        # Sort vertices anticlockwise
+        # Sort array by y value
         verticesIndex = [vertexIndex1, vertexIndex2, vertexIndex3]
         verticesIndex.sort(key = lambda i: self.vertices[i].y, reverse = False)
 
@@ -45,15 +46,18 @@ class Mesh(object):
         v2 = self.vertices[verticesIndex[1]]
         v3 = self.vertices[verticesIndex[2]]
 
-        # Calculate slope for v2 and v3 to v1
-        mv2v1 = (v2.x - v1.x) / float(v2.y - v1.y) if (v2.y - v1.y) != 0 else 0
-        mv3v1 = (v3.x - v1.x) / float(v3.y - v1.y) if (v3.y - v1.y) != 0 else 0
+        if v1.y == v2.y:
+            if v1.x < v2.x:
+                v1, v2 = v2, v1
+                verticesIndex[0], verticesIndex[1] = verticesIndex[1], verticesIndex[0]
 
-        # Sort by x value
-        if mv2v1 > mv3v1:
+        # Calculate winding order
+        rotation = (v2.y - v1.y)*(v3.x - v2.x) - (v3.y - v2.y)*(v2.x - v1.x)
+
+        if rotation < 0:
             verticesIndex[1], verticesIndex[2] = verticesIndex[2], verticesIndex[1]
 
-        # Create Face
+        # Create face when value isn't collinear
         face = Face(verticesIndex[0], verticesIndex[1], verticesIndex[2], color)
         self.faces.append(face)
 
