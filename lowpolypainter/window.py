@@ -2,6 +2,8 @@
 import numpy as np
 from Tkinter import *
 from PIL import ImageTk, Image
+import time
+from random import randint
 
 # Local Modules
 from lowpolypainter.mesh import Mesh
@@ -64,6 +66,69 @@ class Window(object):
         # TODO: Add triangulate call here
         # mesh = bowyerWatson(mesh)
         self.canvasFrame.fromMesh(mesh)
+
+    def addMultipleElements(self):
+        NUM_POINTS = 10000
+        NUM_FACES = 10000
+
+        width = self.canvasFrame.frameWidth
+        height = self.canvasFrame.frameHeight
+        mesh = Mesh(width, height)
+
+        t = time.time()
+        for i in range(NUM_POINTS):
+            mesh.addVertex(randint(1, width), randint(1, height))
+
+        for i in range(NUM_FACES):
+            i1 = randint(0, NUM_POINTS - 1)
+            i2 = i1
+            i3 = i1
+
+            while i1 == i2:
+                i2 = randint(0, NUM_POINTS - 1)
+
+            while i1 == i3 or i2 == i3:
+                i3 = randint(0, NUM_POINTS - 1)
+
+            mesh.addFace(i1, i2, i3, "#fff")
+
+        print("Time to add faces to mesh:", time.time() - t)
+        t = time.time()
+        self.canvasFrame.fromMesh(mesh)
+        print("Time to add faces to canvas:", time.time() - t)
+
+    def addMultipleElementsCanvasMesh(self):
+        NUM_POINTS = 10000
+        NUM_FACES = 10000
+
+        width = self.canvasFrame.frameWidth
+        height = self.canvasFrame.frameHeight
+
+        canvasMesh = self.canvasFrame.canvasObjectsMesh
+
+        self.canvasFrame.clear()
+
+        t = time.time()
+        for i in range(NUM_POINTS):
+            canvasMesh.addPoint(randint(1, width), randint(1, height))
+
+        for i in range(NUM_FACES):
+            i1 = randint(0, NUM_POINTS - 1)
+            i2 = i1
+            i3 = i1
+
+            while i1 == i2:
+                i2 = randint(0, NUM_POINTS - 1)
+
+            while i1 == i3 or i2 == i3:
+                i3 = randint(0, NUM_POINTS - 1)
+
+            p1 = canvasMesh.points[i1]
+            p2 = canvasMesh.points[i2]
+            p3 = canvasMesh.points[i2]
+            canvasMesh.addFaceFromPoints(p1, p2, p3)
+
+        print("Time to add faces to CanvasMesh:", time.time() - t)
 
 
 class CanvasFrame(Frame):
@@ -217,6 +282,13 @@ class ButtonFrame(Frame):
         self.triangulationButton = Button(self, text="Triangulize", command=parent.triangulate)
         self.triangulationButton.grid()
 
+        # Test add multiple Button
+        self.addButton = Button(self, text="Add multiple elements Mesh", command=parent.addMultipleElements)
+        self.addButton.grid()
+
+        # Test add multiple Button
+        self.add2Button = Button(self, text="Add multiple elements CanvasMesh", command=parent.addMultipleElementsCanvasMesh)
+        self.add2Button.grid()
 
 class TextFrame(Frame):
     """
