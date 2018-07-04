@@ -2,10 +2,19 @@
 import svgwrite
 from Tkinter import *
 import tkFileDialog
+import os, errno
 
 
 def exportDialog(mesh, width, height):
-    filename = tkFileDialog.asksaveasfilename(initialdir = "/",title = "Select file",filetypes = (("svg files","*.svg"),("all files","*.*")))
+    defaultDirectory = './graphics/'
+
+    try:
+        os.makedirs(defaultDirectory)
+    except OSError as e:
+        if e.errno != errno.EEXIST:
+            raise
+            
+    filename = tkFileDialog.asksaveasfilename(initialdir = defaultDirectory,title = "Select file",filetypes = (("svg files","*.svg"),("all files","*.*")))
     exportFromCanvasObjectsMesh(filename, mesh, width, height)
     
     
