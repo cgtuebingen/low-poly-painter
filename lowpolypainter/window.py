@@ -179,6 +179,8 @@ class CanvasFrame(Frame):
         self.canvas.bind_all("<space>", func=self.toggleFaces)
 
     def click(self, event):
+		#vertex = self.zoom.FromViewport([event.x, event.y])
+        #self.mesh.addVertex(vertex[0], vertex[1])
         """
         Handles the clicking on the canvas to add new points.
         Will automatically add a line from the last selected point if CTRL is not pressed.
@@ -193,8 +195,9 @@ class CanvasFrame(Frame):
 
         # If an element of the canvas is clicked that has its own event handler, then it will set this property
         if not self.mouseEventHandled:
+            vertex = self.parent.zoom.FromViewport([event.x, event.y])
             prevSelectedPoint = self.selectedPoint
-            self.addPoint(event.x, event.y)
+            self.addPoint(int(vertex[0]), int(vertex[1]))
 
             # Pressing CTRL prevents the automatic line
             ctrlMask = 0x0004

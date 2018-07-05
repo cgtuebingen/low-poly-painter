@@ -52,11 +52,13 @@ class CanvasPoint:
         if self.id != -1:
             self.canvas.delete(self.id)
 
+        vertex = self.parent.gui.parent.zoom.ToViewport([self.x, self.y])
+
         radius = CanvasPoint.RADIUS
-        self.id = self.canvas.create_oval(self.x - radius,
-                                          self.y - radius,
-                                          self.x + radius,
-                                          self.y + radius,
+        self.id = self.canvas.create_oval(vertex[0] - radius,
+                                          vertex[1] - radius,
+                                          vertex[0] + radius,
+                                          vertex[1] + radius,
                                           fill=COLOR_POINT_DEFAULT,
                                           tag=TAG_POINT)
 

@@ -82,7 +82,7 @@ class Color:
 
             # Get every pixel from xmin to xmax
             for col in range(xmin, xmax, self.stepX):
-                count = 3 * (row * self.height + col)
+                count = 3 * (row * self.width + col)
                 r += self.flattenImageArray[count]
                 g += self.flattenImageArray[count + 1]
                 b += self.flattenImageArray[count + 2]
