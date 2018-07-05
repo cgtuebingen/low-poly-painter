@@ -179,8 +179,8 @@ class CanvasFrame(Frame):
         self.canvas.bind_all("<space>", func=self.toggleFaces)
 
     def click(self, event):
-		#vertex = self.zoom.FromViewport([event.x, event.y])
-        #self.mesh.addVertex(vertex[0], vertex[1])
+        # vertex = self.zoom.FromViewport([event.x, event.y])
+        # self.mesh.addVertex(vertex[0], vertex[1])
         """
         Handles the clicking on the canvas to add new points.
         Will automatically add a line from the last selected point if CTRL is not pressed.
