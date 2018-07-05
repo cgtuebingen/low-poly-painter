@@ -129,7 +129,7 @@ class CanvasFrame(Frame):
         if not self.mouseEventHandled:
             vertex = self.parent.zoom.FromViewport([event.x, event.y])
             prevSelectedPoint = self.selectedPoint
-            self.addPoint(vertex[0], vertex[1])
+            self.addPoint(int(vertex[0]), int(vertex[1]))
 
             # Pressing CTRL prevents the automatic line
             ctrlMask = 0x0004
