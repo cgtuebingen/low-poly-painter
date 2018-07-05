@@ -20,21 +20,18 @@ class CanvasObjectsMesh:
         return face
 
     def addFaceFromPoints(self, point1, point2, point3):
-        # Get lines if the exist
-        line1 = point1.getConnectingLine(point2)
-        line2 = point1.getConnectingLine(point3)
-        line3 = point2.getConnectingLine(point3)
+        # addLine checks if they already exist
+        line1 = self.addLine(point1, point2)
+        line2 = self.addLine(point1, point3)
+        line3 = self.addLine(point2, point3)
 
-        # Else create them
-        if line1 is None:
-            line1 = self.addLine(point1, point2)
-        if line2 is None:
-            line2 = self.addLine(point1, point3)
-        if line3 is None:
-            line3 = self.addLine(point2, point3)
+        faces1 = set(line1.faces)
+        faces2 = set(line2.faces)
+        faces3 = set(line3.faces)
 
-        face = CanvasFace(line1, line2, line3, self.gui, self)
-        self.faces.append(face)
+        # Get the face, all 3 lines have in common
+        face = list(faces1 & faces2 & faces3)[0]
+
         return face
 
     def addLine(self, point1, point2):
@@ -104,9 +101,9 @@ class CanvasObjectsMesh:
                 points.append(self.points[face.vertices[i]])
 
             # Check that all lines of the face are there and if not, then create them
+            # This check is performed in the addLine method
             for i, j in [(0, 1), (1, 2), (2, 0)]:
-                if not points[i].hasConnectingLine(points[j]):
-                    self.addLine(points[i], points[j])
+                self.addLine(points[i], points[j])
 
     def clear(self):
         # Empty the lists
