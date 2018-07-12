@@ -251,10 +251,6 @@ class CanvasLine:
 
         isValid = self.checkValidLine()
 
-        # If invalid, then no face updates are necessary
-        if not isValid:
-            return False
-
         for face in self.faces:
             face.update(recalcColor)
 
