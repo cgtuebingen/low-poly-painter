@@ -49,6 +49,13 @@ class CanvasObjectsMesh:
         self.points.append(point)
         return point
 
+    def getLineByID(self, id):
+        for line in self.lines:
+            if line.id == id:
+                return line
+
+        return None
+
     def toMesh(self):
         mesh = Mesh(self.gui.frameWidth, self.gui.frameHeight)
         pointIndices = []

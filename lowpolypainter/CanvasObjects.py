@@ -173,6 +173,7 @@ class CanvasLine:
         self.checkFaceCreated()
 
         # Highlight this line if it is currently invalid by crossing other lines
+        self.intersectingLines = set()
         self.checkValidLine()
 
         self.deleted = False
@@ -261,25 +262,6 @@ class CanvasLine:
 
     def isConnectedTo(self, point):
         return point in self.points
-
-    def checkValidLine(self):
-        ids = self.getPossibleIntersectingLines()
-
-        isValid = True
-        for id in ids:
-            x3, y3, x4, y4 = self.canvas.coords(id)
-            if self.isIntersectingLine(x3, y3, x4, y4):
-                isValid = False
-                break
-
-        if isValid:
-            self.canvas.itemconfigure(self.id, fill=COLOR_LINE_DEFAULT)
-        else:
-            # Invalid lines should be on top
-            self.canvas.tag_raise(self.id, TAG_LINE)
-            self.canvas.itemconfigure(self.id, fill=COLOR_LINE_INVALID)
-
-        return isValid
 
     def isIntersectingLine(self, x3, y3, x4, y4):
         x1, y1, x2, y2 = self.getCoords()
@@ -376,6 +358,55 @@ class CanvasLine:
                     overlappingLines.remove(line.id)
 
         return overlappingLines
+
+    def checkValidLine(self):
+        possibleIDs = self.getPossibleIntersectingLines()
+
+        currentIntersectingLines = []
+
+        # Check, which lines actually intersect
+        isValid = True
+        for id in possibleIDs:
+            x3, y3, x4, y4 = self.canvas.coords(id)
+            if self.isIntersectingLine(x3, y3, x4, y4):
+                oldLine = self.parent.getLineByID(id)
+                currentIntersectingLines.append(oldLine)
+                isValid = False
+
+        # Check if some lines stopped intersecting and if yes, notify the other line
+        # Remove all lines we already know about from the list
+        oldIntersectingLines = self.intersectingLines.copy()
+        for oldLine in oldIntersectingLines:
+            if not oldLine in currentIntersectingLines:
+                self.removeIntersectionWithLine(oldLine)
+                oldLine.removeIntersectionWithLine(self)
+            else:
+                currentIntersectingLines.remove(oldLine)
+
+        # Add all lines that are new to the list of intersecting lines
+        for line in currentIntersectingLines:
+            self.addIntersectionWithLine(line)
+            line.addIntersectionWithLine(self)
+
+        return isValid
+
+    def setValid(self, isValid):
+        if isValid:
+            self.canvas.itemconfigure(self.id, fill=COLOR_LINE_DEFAULT)
+        else:
+            # Invalid lines should be on top
+            self.canvas.tag_raise(self.id, TAG_LINE)
+            self.canvas.itemconfigure(self.id, fill=COLOR_LINE_INVALID)
+
+    def addIntersectionWithLine(self, line):
+        self.intersectingLines.add(line)
+        if len(self.intersectingLines) == 1:
+            self.setValid(False)
+
+    def removeIntersectionWithLine(self, line):
+        self.intersectingLines.remove(line)
+        if len(self.intersectingLines) == 0:
+            self.setValid(True)
 
     def getCoords(self):
         x1 = self.points[0].x
