@@ -68,8 +68,8 @@ class Window(object):
         self.canvasFrame.fromMesh(mesh)
 
     def addMultipleElements(self):
-        NUM_POINTS = 5000
-        NUM_FACES = 5000
+        NUM_POINTS = 2000
+        NUM_FACES = 2000
 
         width = self.canvasFrame.frameWidth
         height = self.canvasFrame.frameHeight
@@ -100,8 +100,8 @@ class Window(object):
         print("Num faces: ", len(self.canvasFrame.canvasObjectsMesh.faces))
 
     def addMultipleElementsCanvasMesh(self):
-        NUM_POINTS = 5000
-        NUM_FACES = 5000
+        NUM_POINTS = 2000
+        NUM_FACES = 2000
 
         width = self.canvasFrame.frameWidth
         height = self.canvasFrame.frameHeight

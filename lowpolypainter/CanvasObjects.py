@@ -8,6 +8,7 @@ COLOR_POINT_DEFAULT = "#0000ff"
 COLOR_POINT_SELECTED = "#ff0000"
 COLOR_LINE_DEFAULT = "#000"
 COLOR_LINE_SELECTED = "#ff0000"
+COLOR_LINE_INVALID = "#ff7c19"
 
 
 class CanvasPoint:
@@ -64,7 +65,7 @@ class CanvasPoint:
 
         # Event handlers have to be rebound if the point is redrawn
         self.canvas.tag_bind(self.id, sequence="<Button>", func=self.click)
-        self.canvas.tag_bind(self.id, sequence="<B1-Motion>", func=self.move)
+        self.canvas.tag_bind(self.id, sequence="<B1-Motion>", func=self.moveEventListener)
         self.canvas.tag_bind(self.id, sequence="<ButtonRelease-1>", func=self.finalizeMove)
 
     def select(self):
@@ -74,31 +75,34 @@ class CanvasPoint:
     def deactivate(self):
         self.canvas.itemconfigure(self.id, fill=COLOR_POINT_DEFAULT)
 
-    def move(self, event):
-        x = event.x
-        y = event.y
+    def moveEventListener(self, event):
+        self.move(event.x, event.y)
+
+    def move(self, xNew, yNew):
+        xOld = self.x
+        yOld = self.y
 
         # Confine coordinates to image size
-        if x < 0:
-            x = 0
-        elif x >= self.gui.frameWidth:
-            x = self.gui.frameWidth - 1
+        if xNew <= 0:
+            xNew = 1
+        elif xNew > self.gui.frameWidth:
+            xNew = self.gui.frameWidth - 1
 
-        if y < 0:
-            y = 0
-        elif y >= self.gui.frameWidth:
-            y = self.gui.frameWidth - 1
-
-        self.moved = True
-        self.canvas.move(self.id, x - self.x, y - self.y)
-
-        self.x = x
-        self.y = y
+        if yNew <= 0:
+            yNew = 1
+        elif yNew > self.gui.frameWidth:
+            yNew = self.gui.frameWidth - 1
 
         # Updating the lines and therefore the faces would trigger an auto color recalculation
         # If this is fast enough, then it can be done in real time and not just after the movement ended
         for line in self.connectedLines:
-            line.update(recalcColor=True)
+            valid = line.update(recalcColor=True)
+
+        self.moved = True
+        self.canvas.move(self.id, xNew - self.x, yNew - self.y)
+
+        self.x = xNew
+        self.y = yNew
 
     def finalizeMove(self, event):
         """
@@ -168,6 +172,9 @@ class CanvasLine:
         # A new line could create a face
         self.checkFaceCreated()
 
+        # Highlight this line if it is currently invalid by crossing other lines
+        self.checkValidLine()
+
         self.deleted = False
 
     def click(self, event):
@@ -211,6 +218,8 @@ class CanvasLine:
                     self.parent.addFace(self, line1, line2)
 
     def select(self):
+        x0, y0, x1, y1 = self.canvas.coords(self.id)
+        print(x0, y0, x1, y1)
         self.canvas.itemconfigure(self.id, fill=COLOR_LINE_SELECTED)
         self.canvas.tag_raise(self.id, TAG_LINE)
 
@@ -235,13 +244,145 @@ class CanvasLine:
         self.canvas.tag_lower(self.id, TAG_POINT)
 
     def update(self, recalcColor=False):
-        self.draw()
+        # Update position
+        x1, y1, x2, y2 = self.getCoords()
+        self.canvas.coords(self.id, x1, y1, x2, y2)
+
+        isValid = self.checkValidLine()
+
+        # If invalid, then no face updates are necessary
+        if not isValid:
+            return False
 
         for face in self.faces:
             face.update(recalcColor)
 
+        return True
+
     def isConnectedTo(self, point):
         return point in self.points
+
+    def checkValidLine(self):
+        ids = self.getPossibleIntersectingLines()
+
+        isValid = True
+        for id in ids:
+            x3, y3, x4, y4 = self.canvas.coords(id)
+            if self.isIntersectingLine(x3, y3, x4, y4):
+                isValid = False
+                break
+
+        if isValid:
+            self.canvas.itemconfigure(self.id, fill=COLOR_LINE_DEFAULT)
+        else:
+            # Invalid lines should be on top
+            self.canvas.tag_raise(self.id, TAG_LINE)
+            self.canvas.itemconfigure(self.id, fill=COLOR_LINE_INVALID)
+
+        return isValid
+
+    def isIntersectingLine(self, x3, y3, x4, y4):
+        x1, y1, x2, y2 = self.getCoords()
+
+        a = float(x2 - x1)
+        b = float(x4 - x3)
+        c = float(y2 - y1)
+        d = float(y4 - y3)
+
+        s = None
+        t = None
+
+        if a == 0 and c == 0:
+            # is a line of length zero
+            t1 = (x1 - x3) / b
+            t2 = (y1 - y3) / d
+            return t1 == t2
+        elif b == 0 and d == 0:
+            # is a line of length zero
+            s1 = (x3 - x1) / a
+            s2 = (y3 - y1) / c
+            return s1 == s2
+        elif a == 0 and b == 0:
+            return x1 == x3
+        elif c == 0 and d == 0:
+            return y1 == y3
+        elif a == 0:
+            t = (x1 - x3) / b
+            s = (y3 - y1 + d * t) / c
+        elif b == 0:
+            s = (x3 - x1) / a
+            t = (y1 - y3 + c * s) / d
+        elif c == 0:
+            t = (y1 - y3) / d
+            s = (x3 - x1 + b * t) / a
+        elif d == 0:
+            s = (y3 - y1) / c
+            t = (x1 - x3 + a * s) / b
+        else:
+            if (d - c * b / a) != 0:
+                t = (y1 + c * x3 / a - c * x1 / a - y3) / (d - c * b / a)
+                s = (x3 + b * t - x1) / a
+            elif (b - a * d / c) != 0:
+                t = (x1 + a * y3 / c - a * y1 / c - x3) / (b - a * d / c)
+                s = (x3 + b * t - x1) / a
+            elif (c - d * a / b) != 0:
+                s = (y3 + d * x1 / b - d * x3 / b - y1) / (c - d * a / b)
+                t = (x1 + a * s - x3) / b
+            elif (a - b * c / d) != 0:
+                s = (x3 + b * y1 / d - b * y3 / d - x1) / (a - b * c / d)
+                t = (x1 + a * s - x3) / b
+
+        #print(s, t)
+
+        isOnLine1 = (s >= 0) and (s <= 1)
+        isOnLine2 = (t >= 0) and (t <= 1)
+
+        # if isOnLine1 and isOnLine2:
+        #    self.parent.addPoint(x1 + s * a, y1 + s * c)
+
+        return isOnLine1 and isOnLine2
+
+    def getPossibleIntersectingLines(self, interpolationSteps = 10):
+        """
+        Checks rectangles along the path for overlapping lines on the canvas.
+        :param interpolationSteps: Split the rectangle into multiple smaller rectangles.
+        :return:
+        """
+        x1, y1, x2, y2 = self.getCoords()
+
+        xStep = (x2 - x1) / float(interpolationSteps)
+        yStep = (y2 - y1) / float(interpolationSteps)
+
+        overlappingIDs = []
+
+        for i in range(interpolationSteps):
+            xRect = x1 + xStep * i
+            yRect = y1 + yStep * i
+            ids = self.canvas.find_overlapping(xRect, yRect, xRect + xStep, yRect + yStep)
+            overlappingIDs += ids
+
+        overlappingIDs = set(overlappingIDs)
+
+        overlappingLines = []
+        for id in overlappingIDs:
+            tags = self.canvas.gettags(id)
+            if TAG_LINE in tags:
+                overlappingLines.append(id)
+
+        # remove connected lines as they cant be intersected
+        for point in self. points:
+            for line in point.connectedLines:
+                if line.id in overlappingLines:
+                    overlappingLines.remove(line.id)
+
+        return overlappingLines
+
+    def getCoords(self):
+        x1 = self.points[0].x
+        x2 = self.points[1].x
+        y1 = self.points[0].y
+        y2 = self.points[1].y
+        return x1, y1, x2, y2
 
     def delete(self):
         if not self.deleted:
@@ -346,7 +487,7 @@ class CanvasFace:
         mv3v1 = (v3.x - v1.x) / float(v3.y - v1.y) if (v3.y - v1.y) != 0 else 0
 
         # Sort by slope
-        if (mv2v1 > mv3v1) or ((mv2v1 == 0) and not(v2.x - v1.x == 0)):
+        if (mv2v1 > mv3v1) or ((mv2v1 == 0) and not (v2.x - v1.x == 0)):
             yxSorted[1], yxSorted[2] = yxSorted[2], yxSorted[1]
 
         coords = [(point.x, point.y) for point in yxSorted]
