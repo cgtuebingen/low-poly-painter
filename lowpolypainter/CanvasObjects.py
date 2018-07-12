@@ -220,7 +220,6 @@ class CanvasLine:
 
     def select(self):
         x0, y0, x1, y1 = self.canvas.coords(self.id)
-        print(x0, y0, x1, y1)
         self.canvas.itemconfigure(self.id, fill=COLOR_LINE_SELECTED)
         self.canvas.tag_raise(self.id, TAG_LINE)
 
@@ -421,6 +420,11 @@ class CanvasLine:
                 face.delete()
             for point in self.points:
                 point.connectedLines.remove(self)
+
+            deleteQueue = self.intersectingLines.copy()
+            for intersectingLine in deleteQueue:
+                self.removeIntersectionWithLine(intersectingLine)
+                intersectingLine.removeIntersectionWithLine(self)
 
         self.deleted = True
 
