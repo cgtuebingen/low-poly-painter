@@ -24,6 +24,7 @@ def main(argv):
     else:
         inputimage = argv[0]
         window = Window(inputimage)
+        window.loadMeshData()
         window.root.mainloop()
 
 if __name__ == "__main__":

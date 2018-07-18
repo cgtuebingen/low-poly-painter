@@ -4,6 +4,8 @@ from Tkinter import *
 from PIL import ImageTk, Image
 import time
 from random import randint
+import cPickle as pickle
+import os.path
 
 # Local Modules
 from lowpolypainter.mesh import Mesh
@@ -13,7 +15,6 @@ from lowpolypainter.triangulation import bowyerWatson
 from lowpolypainter.CanvasObjects import *
 from zoomTransformer import ZoomTransformer
 from CanvasObjectsMesh import CanvasObjectsMesh
-
 
 # TODO: Design UI
 # TODO: Split buttons and canvas into different frames
@@ -32,6 +33,8 @@ class Window(object):
         self.root = Tk()
 
         self.zoom = ZoomTransformer()
+
+        self.inputimage = inputimage
 
         # Settings
         self.root.config(bg='black')
@@ -60,6 +63,23 @@ class Window(object):
     # exports current mesh as svg image
     def export(self):
         exportDialog(self.canvasFrame.canvasObjectsMesh, self.canvasFrame.frameWidth, self.canvasFrame.frameHeight)
+
+    # saves mesh data in a .py file by using cPickle
+    def saveMeshData(self):
+        path = 'lowpolypainter/resources/stored_mesh_data/' + self.inputimage + '.py'
+        file = open(path, 'w')
+        mesh = self.canvasFrame.canvasObjectsMesh.toMesh()
+        pickle.dump(mesh, file)
+        file.close()
+
+    # loads mesh data from inputimage related .py file by using cPickle
+    def loadMeshData(self):
+        path = 'lowpolypainter/resources/stored_mesh_data/' + self.inputimage + '.py'
+        if os.path.isfile(path):
+            file = open(path, 'r')
+            mesh = pickle.load(file)
+            file.close()
+            self.canvasFrame.canvasObjectsMesh.fromMesh(mesh)
 
     def triangulate(self):
         mesh = self.canvasFrame.toMesh()
@@ -295,6 +315,10 @@ class ButtonFrame(Frame):
         # Test add multiple Button
         self.add2Button = Button(self, text="Add multiple elements CanvasMesh", command=parent.addMultipleElementsCanvasMesh)
         self.add2Button.grid()
+
+        # Save button
+        self.saveButton = Button(self, text="Save", command=parent.saveMeshData)
+        self.saveButton.grid()
 
 class TextFrame(Frame):
     """
