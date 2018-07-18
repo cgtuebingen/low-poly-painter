@@ -15,6 +15,7 @@ from lowpolypainter.triangulation import bowyerWatson
 from lowpolypainter.CanvasObjects import *
 from zoomTransformer import ZoomTransformer
 from CanvasObjectsMesh import CanvasObjectsMesh
+from lowpolypainter.Colorwheel import Colorwheel
 
 # TODO: Design UI
 # TODO: Split buttons and canvas into different frames
@@ -152,6 +153,13 @@ class Window(object):
 
         print("Time to add faces to CanvasMesh:", time.time() - t)
         print("Num faces: ", len(canvasMesh.faces))
+
+    # TODO Add Faceselection and recoloring
+    def colorwheel(self):
+        cw = Tk()
+        app = Colorwheel(master=cw)
+        app.mainloop()
+        cw.destroy()
 
 
 class CanvasFrame(Frame):
@@ -315,6 +323,10 @@ class ButtonFrame(Frame):
         # Test add multiple Button
         self.add2Button = Button(self, text="Add multiple elements CanvasMesh", command=parent.addMultipleElementsCanvasMesh)
         self.add2Button.grid()
+
+        # Colorwheel Button
+        self.clearButton = Button(self, text='Colorwheel', command=parent.colorwheel)
+        self.clearButton.grid()
 
         # Save button
         self.saveButton = Button(self, text="Save", command=parent.saveMeshData)
