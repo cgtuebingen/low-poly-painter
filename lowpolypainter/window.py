@@ -325,8 +325,8 @@ class ButtonFrame(Frame):
         self.add2Button.grid()
 
         # Colorwheel Button
-        self.clearButton = Button(self, text='Colorwheel', command=parent.colorwheel)
-        self.clearButton.grid()
+        self.colorWheelButton = Button(self, text='Colorwheel', command=parent.colorwheel)
+        self.colorWheelButton.grid()
 
         # Save button
         self.saveButton = Button(self, text="Save", command=parent.saveMeshData)
