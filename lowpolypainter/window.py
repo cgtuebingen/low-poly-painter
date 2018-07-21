@@ -67,7 +67,10 @@ class Window(object):
 
     # saves mesh data in a .py file by using cPickle
     def saveMeshData(self):
-        path = 'lowpolypainter/resources/stored_mesh_data/' + self.inputimage + '.py'
+        directory = './lowpolypainter/resources/stored_mesh_data'
+        path = directory + '/' + self.inputimage + '.py'
+        if not os.path.exists(directory):
+            os.makedirs(directory)
         file = open(path, 'w')
         mesh = self.canvasFrame.canvasObjectsMesh.toMesh()
         pickle.dump(mesh, file)
