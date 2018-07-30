@@ -13,14 +13,14 @@ def exportDialog(mesh, width, height):
     except OSError as e:
         if e.errno != errno.EEXIST:
             raise
-            
+
     filename = tkFileDialog.asksaveasfilename(initialdir = defaultDirectory,title = "Select file",filetypes = (("svg files","*.svg"),("all files","*.*")))
     exportFromCanvasObjectsMesh(filename, mesh, width, height)
-    
-        
-    
-    
-    
+
+
+
+
+
 def exportFromCanvasObjectsMesh(filename, mesh, width, height):
     img = svgwrite.Drawing(filename + '.svg', size=(str(width), str(height)))
     for face in mesh.faces:
@@ -37,5 +37,3 @@ def exportFromCanvasObjectsMesh(filename, mesh, width, height):
         img.add(img.polygon(points=points, fill=color))
     # save image
     img.save()
-    
-
