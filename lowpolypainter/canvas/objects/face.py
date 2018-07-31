@@ -91,7 +91,7 @@ class Face:
     # Calculate if a given Point is inside the current face
     # Using a given a rectangle as raw approximation and barycentric coordinates for fine tuning.
     def pointInside(self, point):
-        coords = self.getCoordinates()
+        coords = self.getCoordinates(self.getVertices())
         if (coords[0][0]>point[0] and coords[1][0]>point[0] and coords[2][0]>point[0]):
             return False
         if (coords[0][0]<point[0] and coords[1][0]<point[0] and coords[2][0]<point[0]):

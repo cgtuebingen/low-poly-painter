@@ -111,6 +111,7 @@ class CanvasFrame(Frame):
             object.deselect()
 
     def clear(self):
+        self.selectedFace = [False, None]
         self.mesh.clear()
 
     """ CANNY """
