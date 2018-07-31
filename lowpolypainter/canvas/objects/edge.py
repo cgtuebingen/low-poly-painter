@@ -18,33 +18,32 @@ COLOR_INVALID = "#ff7c19"
 MASK_SHIFT = 0x0001
 
 class Edge:
-    def __init__(self, vert1, vert2, frame, mesh, interscect=True, faceCreate=True):
+    def __init__(self, vert1, vert2, frame, user=True):
         # Information
         self.id = -1
         self.faces = []
-        self.verts = (vert1, vert2)
-
-        # Part of faces
-        self.faces = []
+        self.verts = [vert1, vert2]
+        self.intersectingEdges = set()
 
         # Dependencies
-        self.mesh = mesh
-        self.frame = frame
-        self.canvas = frame.canvas
+        self.parent = frame
 
         # Update
-        self.draw()
         vert1.edges.append(self)
         vert2.edges.append(self)
 
+        # User clicked canvas
+        if not user:
+            return
+
+        # Update
+        self.draw()
+
         # Intersect
-        self.intersectingEdges = set()
-        if (interscect):
-            self.checkValidEdge()
+        self.checkValidEdge()
 
         # Face Create
-        if (faceCreate):
-            self.createFace()
+        self.createFace()
 
     """ EVENTS """
     def click(self, event):
@@ -52,45 +51,48 @@ class Edge:
         Shift click on Edge: Place vertex on edge
         Default click on vertex: Sets edge as selected
         '''
-        self.frame.mouseEvent = True
+        self.parent.mouseEvent = True
 
         if (event.state & MASK_SHIFT):
-            vert = self.mesh.addVertex([event.x, event.y])
+            vert = self.parent.mesh.addVertex([event.x, event.y])
 
+            # TODO: IF SELCTED IS VERTEX
             if isinstance(self.frame.selected, Vertex):
-                self.mesh.addEdge(vert, self.frame.selected)
-            self.mesh.addEdge(vert, self.verts[0])
-            self.mesh.addEdge(vert, self.verts[1])
+                self.parent.mesh.addEdge(vert, self.parent.selected)
+            self.parent.mesh.addEdge(vert, self.verts[0])
+            self.parent.mesh.addEdge(vert, self.verts[1])
             self.delete()
         else:
             self.select()
             self.frame.select(self)
 
     """ GENERAL """
-    def draw(self):
-        self.id = self.canvas.create_line(self.verts[0].coords[0],
-                                          self.verts[0].coords[1],
-                                          self.verts[1].coords[0],
-                                          self.verts[1].coords[1],
-                                          tag=TAG_EDGE, fill=COLOR_DEFAULT,
-                                          width=WIDTH)
+    def draw(self, user=True):
+        self.id = self.parent.canvas.create_line(self.verts[0].coords[0],
+                                                 self.verts[0].coords[1],
+                                                 self.verts[1].coords[0],
+                                                 self.verts[1].coords[1],
+                                                 tag=TAG_EDGE,
+                                                 fill=COLOR_DEFAULT,
+                                                 width=WIDTH)
 
-        self.canvas.tag_bind(self.id, "<Button>", func=self.click)
-        self.canvas.tag_lower(self.id, TAG_VERTEX)
+        self.parent.canvas.tag_bind(self.id, "<Button>", func=self.click)
+        if (user):
+            self.parent.canvas.tag_lower(self.id, TAG_VERTEX)
 
     def select(self):
-        self.canvas.itemconfigure(self.id, fill=COLOR_SELECTED)
-        self.canvas.tag_raise(self.id, TAG_EDGE)
+        self.parent.canvas.itemconfigure(self.id, fill=COLOR_SELECTED)
+        self.parent.canvas.tag_raise(self.id, TAG_EDGE)
 
     def deselect(self):
-        self.canvas.itemconfigure(self.id, fill=COLOR_DEFAULT)
+        self.parent.canvas.itemconfigure(self.id, fill=COLOR_DEFAULT)
 
     def move(self):
-        self.canvas.coords(self.id, self.verts[0].coords[0],
-                                    self.verts[0].coords[1],
-                                    self.verts[1].coords[0],
-                                    self.verts[1].coords[1])
-        self.checkValidEdge()
+        self.parent.canvas.coords(self.id, self.verts[0].coords[0],
+                                           self.verts[0].coords[1],
+                                           self.verts[1].coords[0],
+                                           self.verts[1].coords[1])
+         # self.checkValidEdge()
         for face in self.faces:
             face.move()
 
@@ -107,12 +109,12 @@ class Edge:
         for edge in queue:
             edge.removeIntersectionWithEdge(self)
 
-        self.mesh.edges.remove(self)
-        self.canvas.delete(self.id)
+        self.parent.mesh.edges.remove(self)
+        self.parent.canvas.delete(self.id)
 
     """ VERTEX """
     def hasVertex(self, vert):
-        return vert in  self.verts
+        return vert in self.verts
 
     """ FACE """
     def createFace(self):
@@ -129,7 +131,7 @@ class Edge:
 
             for edge2 in vert.edges:
                 if edge2.hasVertex(self.verts[1]):
-                    self.mesh.addFace(self, edge1, edge2)
+                    self.parent.mesh.addFace(self, edge1, edge2)
 
     """ INTERSECT """
     def isIntersectingEdge(self, x3, y3, x4, y4):
@@ -209,14 +211,14 @@ class Edge:
         for i in range(interpolationSteps):
             xRect = x1 + xStep * i
             yRect = y1 + yStep * i
-            ids = self.canvas.find_overlapping(xRect, yRect, xRect + xStep, yRect + yStep)
+            ids = self.parent.canvas.find_overlapping(xRect, yRect, xRect + xStep, yRect + yStep)
             overlappingIDs += ids
 
         overlappingIDs = set(overlappingIDs)
 
         overlappingEdges = []
         for id in overlappingIDs:
-            tags = self.canvas.gettags(id)
+            tags = self.parent.canvas.gettags(id)
             if TAG_EDGE in tags:
                 overlappingEdges.append(id)
 
@@ -236,9 +238,9 @@ class Edge:
         # Check, which Edges actually intersect
         isValid = True
         for id in possibleIDs:
-            x3, y3, x4, y4 = self.canvas.coords(id)
+            x3, y3, x4, y4 = self.parent.canvas.coords(id)
             if self.isIntersectingEdge(x3, y3, x4, y4):
-                oldEdge = self.mesh.getEdgeByID(id)
+                oldEdge = self.parent.mesh.getEdgeByID(id)
                 currentintersectingEdges.append(oldEdge)
                 isValid = False
 
@@ -261,11 +263,11 @@ class Edge:
 
     def setValid(self, isValid):
         if isValid:
-            self.canvas.itemconfigure(self.id, fill=COLOR_DEFAULT)
+            self.parent.canvas.itemconfigure(self.id, fill=COLOR_DEFAULT)
         else:
             # Invalid Edges should be on top
-            self.canvas.tag_raise(self.id, TAG_EDGE)
-            self.canvas.itemconfigure(self.id, fill=COLOR_INVALID)
+            self.parent.canvas.tag_raise(self.id, TAG_EDGE)
+            self.parent.canvas.itemconfigure(self.id, fill=COLOR_INVALID)
 
     def addIntersectionWithEdge(self, Edge):
         self.intersectingEdges.add(Edge)

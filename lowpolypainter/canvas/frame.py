@@ -1,4 +1,5 @@
 # Python Modules
+import time
 import numpy as np
 from Tkinter import *
 from PIL import ImageTk, Image
@@ -114,14 +115,37 @@ class CanvasFrame(Frame):
 
     """ CANNY """
     def canny(self):
+        start0 = time.clock()
         canny = Canny(self.inputimage)
         canny.generateCorners()
         canny.generateCanny(99, 100)
         triangle = canny.generateDelaunay()
+        end0 = time.clock()
 
-        self.mesh.addVertex(canny.points[0])
-        self.mesh.addVertex(canny.points[1])
-        self.mesh.addVertex(canny.points[2])
-        self.mesh.addVertex(canny.points[3])
-        self.mesh.addVertex(canny.points[4])
-        self.mesh.addVertex(canny.points[5])
+        start1 = time.clock()
+        for tris in triangle:
+            self.mesh.faceToVertexGeneration(canny.points[tris[0]],
+                                             canny.points[tris[1]],
+                                             canny.points[tris[2]])
+        end1 = time.clock()
+
+        start2 = time.clock()
+        for face in self.mesh.faces:
+            face.draw(False)
+        end2 = time.clock()
+
+        start3 = time.clock()
+        for edge in self.mesh.edges:
+            edge.draw(False)
+        end3 = time.clock()
+
+        start4 = time.clock()
+        for vert in self.mesh.vertices:
+            vert.draw()
+        end4 = time.clock()
+
+        print 'Delaunay', end0 - start0
+        print 'Mesh Generation', end1 - start1
+        print 'Draw Face', end2 - start2
+        print 'Draw Edge', end3 - start3
+        print 'Draw Vert', end4 - start4

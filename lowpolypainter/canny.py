@@ -23,10 +23,9 @@ class Canny(object):
 
     def generateCorners(self):
         # Added corners serve for better look
-        # TODO: Add points on image edges
         height, width = self.image.shape[:2]
-        self.points = np.vstack([self.points,
-                                [[0,0],[0,height],[width,0],[width,height]]])
+        self.points = np.vstack([self.points,[[0,0],[0,height-1]]])
+        self.points = np.vstack([self.points,[[width-1,0],[width-1,height-1]]])
 
     def generateCanny(self, treshhold1, treshhold2):
         # Generate canny points
