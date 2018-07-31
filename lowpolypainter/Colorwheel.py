@@ -7,9 +7,9 @@ from tkColorChooser import askcolor
 class Colorwheel(Frame):
     # TODO: use given Colors
     activecol = "yellow"
-    lowestcol = "red"
-    mediancol = "#ff0080"
-    highestcol = "green"
+    lowestcol = "white"
+    mediancol = "white"
+    highestcol = "white"
     activeColorCanvasWidth=50
     activeColorCanvasHeight=50
 

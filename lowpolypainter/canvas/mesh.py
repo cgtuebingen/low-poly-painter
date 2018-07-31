@@ -103,3 +103,12 @@ class Mesh:
         edges = meshArray[1]
         for edge in edges:
             self.addEdge(self.vertices[edge[0]], self.vertices[edge[1]])
+
+    """ FaceSelectingCheck """
+    def insideAFace(self, points):
+        if not self.faces:
+            return [False, None]
+        for fa in self.faces:
+            if fa.pointInside(points):
+               return [True, fa.id]
+        return [False, None]

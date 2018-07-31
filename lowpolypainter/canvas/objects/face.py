@@ -81,3 +81,25 @@ class Face:
             verts[1], verts[2] = verts[2], verts[1]
 
         return verts
+
+
+    # Calculate if a given Point is inside the current face
+    # Using a given a rectangle as raw approximation and barycentric coordinates for fine tuning.
+    def pointInside(self, point):
+        coords = self.getCoordinates()
+        if (coords[0][0]>point[0] and coords[1][0]>point[0] and coords[2][0]>point[0]):
+            return False
+        if (coords[0][0]<point[0] and coords[1][0]<point[0] and coords[2][0]<point[0]):
+            return False
+        if (coords[0][1] > point[1] and coords[1][1] > point[1] and coords[2][1] > point[1]):
+            return False
+        if (coords[0][1] < point[1] and coords[1][1] < point[1] and coords[2][1] < point[1]):
+            return False
+        else:
+            alpha = float(float((coords[1][1] - coords[2][1]) * (point[0] - coords[2][0]) + (coords[2][0] - coords[1][0]) * (point[1] - coords[2][1])) / float((coords[1][1] - coords[2][1]) * (coords[0][0] - coords[2][0]) + (coords[2][0] - coords[1][0]) * (coords[0][1] - coords[2][1])))
+            beta = float(float((coords[2][1] - coords[0][1]) * (point[0] - coords[2][0]) + (coords[0][0] - coords[2][0]) * (point[1] - coords[2][1])) / float((coords[1][1] - coords[2][1]) * (coords[0][0] - coords[2][0]) + (coords[2][0] - coords[1][0]) * (coords[0][1] - coords[2][1])))
+            gamma = float(float(1.0)-alpha-beta)
+            if((alpha>0)and(beta>0)and(gamma>0)):
+                return True
+            else:
+                return False

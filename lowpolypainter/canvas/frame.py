@@ -41,6 +41,8 @@ class CanvasFrame(Frame):
         # Color Object
         self.color = Color(np.array(self.image), 0.5, 0.5)
 
+        self.selectedFace = [False, None]
+
         # Mesh
         self.mesh = Mesh(self)
 
@@ -68,6 +70,12 @@ class CanvasFrame(Frame):
         """
         eventPoint = [event.x, event.y]
         if self.inBounds(eventPoint) and not self.mouseEvent:
+            if (event.state & CTRL_MASK):
+                iaf = self.mesh.insideAFace(eventPoint)
+                if iaf[0]:
+                    self.selectedFace = iaf
+                    return
+            self.selectedFace=[False, None]
             previousSelected = self.selected
             self.mesh.addVertex([event.x, event.y])
             if (previousSelected is not None) and not (event.state & CTRL_MASK):

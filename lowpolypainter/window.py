@@ -47,6 +47,10 @@ class Window(object):
         self.textFrame = TextFrame(self)
         self.textFrame.grid()
 
+        # Colorwheel Speicherplaetze
+        self.colorWheelSafePoint1 = "white"
+        self.colorWheelSafePoint2 = "white"
+
     def clear(self):
         self.canvasFrame.clear()
 
@@ -64,8 +68,13 @@ class Window(object):
 
 
 
-    # TODO Add Faceselection and recoloring
+    # TODO Recoloring and connect with face Selection
     def colorwheel(self):
+        if not self.canvasFrame.selectedFace[0]:
+            print "no face selected"
+            return
+        if self.canvasFrame.selectedFace[0]:
+            print self.canvasFrame.selectedFace[1]
         cw = Tk()
         app = Colorwheel(master=cw)
         app.mainloop()
@@ -112,6 +121,8 @@ class TextFrame(Frame):
 
         self.howToLabel = Label(self, text="""Place, select and move points and lines with the mouse.
 A line to the next point will automatically be created, as long as CTRL is not pressed.
+CTRL is also used to select faces.
+Please note that there is no visualisation if you select any face and the colorwheel is not connected yet.
 To connect two points with a line, or to split a line in two, hold the SHIFT button.
 If a line creates one or more triangles, then they will be automatically added.
 Delete selected objects with DEL.
