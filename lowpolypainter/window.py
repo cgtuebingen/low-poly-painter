@@ -48,8 +48,9 @@ class Window(object):
         self.textFrame.grid()
 
         # Colorwheel Speicherplaetze
-        self.colorWheelSafePoint1 = "white"
-        self.colorWheelSafePoint2 = "white"
+        self.colorWheelSafePoint1 = "black"
+        self.colorWheelSafePoint2 = "black"
+        self.colorWheelSafePoint3 = "black"
 
     def clear(self):
         self.canvasFrame.clear()
@@ -73,12 +74,13 @@ class Window(object):
         if not self.canvasFrame.selectedFace[0]:
             print "no face selected"
             return
-        if self.canvasFrame.selectedFace[0]:
-            print self.canvasFrame.selectedFace[1]
+        facenumber = self.canvasFrame.selectedFace[1]
         cw = Tk()
-        app = Colorwheel(master=cw)
-        app.mainloop()
+        cw.title("Colorwheel")
+        app = Colorwheel(self, facenumber, self.colorWheelSafePoint1, self.colorWheelSafePoint2, self.colorWheelSafePoint3, cw)
+        cw.mainloop()
         cw.destroy()
+        self.canvasFrame.selectedFace[0]=False
 
 class ButtonFrame(Frame):
     """

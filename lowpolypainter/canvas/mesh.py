@@ -59,6 +59,12 @@ class Mesh:
         self.faces.append(face)
         return face
 
+    def getFaceByID(self, id):
+        for face in self.faces:
+            if face.id == id:
+                return face
+        return None
+
     def addFaceFromPoints(self, vert1, vert2, vert3):
         edge1 = self.addEdge(vert1, vert2)
         edge2 = self.addEdge(vert1, vert3)
