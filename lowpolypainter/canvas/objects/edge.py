@@ -68,10 +68,11 @@ class Edge:
 
     """ GENERAL """
     def draw(self, user=True):
-        self.id = self.parent.canvas.create_line(self.verts[0].coords[0],
-                                                 self.verts[0].coords[1],
-                                                 self.verts[1].coords[0],
-                                                 self.verts[1].coords[1],
+        vertVisualCoords = [self.verts[0].getVisualCoords(), self.verts[1].getVisualCoords()]
+        self.id = self.parent.canvas.create_line(vertVisualCoords[0][0],
+                                                 vertVisualCoords[0][1],
+                                                 vertVisualCoords[1][0],
+                                                 vertVisualCoords[1][1],
                                                  tag=TAG_EDGE,
                                                  fill=COLOR_DEFAULT,
                                                  width=WIDTH)
@@ -79,6 +80,13 @@ class Edge:
         self.parent.canvas.tag_bind(self.id, "<Button>", func=self.click)
         if (user):
             self.parent.canvas.tag_lower(self.id, TAG_VERTEX)
+
+    def updatePosition(self):
+        vertVisualCoords = [self.verts[0].getVisualCoords(), self.verts[1].getVisualCoords()]
+        self.parent.canvas.coords(self.id, vertVisualCoords[0][0],
+                                           vertVisualCoords[0][1],
+                                           vertVisualCoords[1][0],
+                                           vertVisualCoords[1][1])
 
     def select(self):
         self.parent.canvas.itemconfigure(self.id, fill=COLOR_SELECTED)
@@ -88,10 +96,7 @@ class Edge:
         self.parent.canvas.itemconfigure(self.id, fill=COLOR_DEFAULT)
 
     def move(self):
-        self.parent.canvas.coords(self.id, self.verts[0].coords[0],
-                                           self.verts[0].coords[1],
-                                           self.verts[1].coords[0],
-                                           self.verts[1].coords[1])
+        self.updatePosition()
          # self.checkValidEdge()
         for face in self.faces:
             face.move()

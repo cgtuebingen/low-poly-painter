@@ -34,23 +34,32 @@ class Face:
 
     """ GENERAL """
     def draw(self, user=True):
-        self.id = self.parent.canvas.create_polygon(self.coords[0][0], self.coords[0][1],
-                                             self.coords[1][0], self.coords[1][1],
-                                             self.coords[2][0], self.coords[2][1],
+        vertVisualCoords = [    self.parent.parent.zoom.ToViewport(self.coords[0]),
+                                self.parent.parent.zoom.ToViewport(self.coords[1]),
+                                self.parent.parent.zoom.ToViewport(self.coords[2])]
+        self.id = self.parent.canvas.create_polygon(vertVisualCoords[0][0], vertVisualCoords[0][1],
+                                             vertVisualCoords[1][0], vertVisualCoords[1][1],
+                                             vertVisualCoords[2][0], vertVisualCoords[2][1],
                                              fill=self.color,
                                              tag=TAG_FACE,
                                              state=self.parent.faceState)
         if (user):
             self.parent.canvas.tag_lower(self.id, TAG_EDGE)
 
+    def updatePosition(self):
+        self.coords = self.getCoordinates(self.getVertices())
+        vertVisualCoords = [    self.parent.parent.zoom.ToViewport(self.coords[0]),
+                                self.parent.parent.zoom.ToViewport(self.coords[1]),
+                                self.parent.parent.zoom.ToViewport(self.coords[2])]
+        self.parent.canvas.coords(self.id,  vertVisualCoords[0][0], vertVisualCoords[0][1],
+                                            vertVisualCoords[1][0], vertVisualCoords[1][1],
+                                            vertVisualCoords[2][0], vertVisualCoords[2][1])
+
     def getColorFromImage(self):
         return self.parent.color.fromImage(self.coords)
 
     def move(self):
-        self.coords = self.getCoordinates(self.getVertices())
-        self.parent.canvas.coords(self.id, self.coords[0][0], self.coords[0][1],
-                                           self.coords[1][0], self.coords[1][1],
-                                           self.coords[2][0], self.coords[2][1])
+        self.updatePosition()
         self.color = self.getColorFromImage()
         self.parent.canvas.itemconfig(self.id, fill=self.color)
 

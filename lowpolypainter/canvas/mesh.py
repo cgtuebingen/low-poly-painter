@@ -34,6 +34,10 @@ class Mesh:
     def updatePositions(self):
         for vertex in self.vertices:
             vertex.updatePosition()
+        for edge in self.edges:
+            edge.updatePosition()
+        for face in self.faces:
+            face.updatePosition()
 
     """ VERTEX """
     def addVertex(self, coords):

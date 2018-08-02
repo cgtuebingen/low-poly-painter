@@ -59,7 +59,8 @@ class Vertex:
         self.parent.select(self)
 
     def moveHandle(self, event):
-        self.move(self.moveInBounds([event.x, event.y]))
+        zoomedCoords = self.parent.parent.zoom.FromViewport([event.x, event.y])
+        self.move(self.moveInBounds([int(zoomedCoords[0]), int(zoomedCoords[1])]))
 
     def releaseHandle(self, event):
         # Merge verts when droped on same position
@@ -131,8 +132,7 @@ class Vertex:
         self.parent.canvas.delete(self.id)
 
     def getVisualCoords(self):
-        ret = self.parent.parent.zoom.ToViewport(self.coords)
-        return [int(ret[0]), int(ret[1])]
+        return self.parent.parent.zoom.ToViewport(self.coords)
 
     """ EDGE """
     def getEdge(self, vert):
