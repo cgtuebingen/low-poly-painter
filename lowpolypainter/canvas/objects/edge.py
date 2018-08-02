@@ -90,7 +90,7 @@ class Edge:
         self.parent.canvas.tag_raise(self.id, TAG_EDGE)
 
     def deselect(self):
-        self.parent.canvas.itemconfigure(self.id, fill=COLOR_DEFAULT)
+        self.parent.canvas.itemconfigure(self.id, fill=self.getColor())
 
     def move(self):
         self.parent.canvas.coords(self.id, self.verts[0].coords[0],
