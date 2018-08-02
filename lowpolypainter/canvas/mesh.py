@@ -67,6 +67,12 @@ class Mesh:
         self.faces.append(face)
         return face
 
+    def getFaceByID(self, id):
+        for face in self.faces:
+            if face.id == id:
+                return face
+        return None
+
     def addFaceFromPoints(self, vert1, vert2, vert3):
         edge1 = self.addEdge(vert1, vert2)
         edge2 = self.addEdge(vert1, vert3)
@@ -167,11 +173,13 @@ class Mesh:
         for edge in edges:
             self.addEdge(self.vertices[edge[0]], self.vertices[edge[1]])
 
-    """ FaceSelectingCheck """
+
+    # Unused but keeping it as an alternative for now.
     def insideAFace(self, points):
         if not self.faces:
             return [False, None]
         for fa in self.faces:
             if fa.pointInside(points):
-               return [True, fa.id]
+                return [True, fa.id]
+        print(end - start)
         return [False, None]

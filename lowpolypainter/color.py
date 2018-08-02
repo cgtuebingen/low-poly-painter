@@ -3,6 +3,7 @@ from __future__ import division
 # Python Modules
 import numpy as np
 import math as math
+from bresenham import bresenham
 
 """
 Color Class
@@ -19,6 +20,16 @@ class Color:
         self.flattenImageArray = array.ravel()
         self.stepX = int(math.pow(percentageX, -1))
         self.stepY = int(math.pow(percentageY, -1))
+
+    # Converts hexadecimal color value to rgb values
+    def hexToRGB(self,hex):
+        rgb = tuple(map(ord,hex[1:].decode('hex')))
+        return rgb
+
+    # Converts rgb color values to hexadecimal
+    def rgbToHex(self,r,g,b):
+        hex = '#{:02x}{:02x}{:02x}'.format(int(r),int(g),int(b))
+        return hex
 
     # Generates random color
     def random(self):
@@ -42,12 +53,29 @@ class Color:
             g += self.flattenImageArray[count + 1]
             b += self.flattenImageArray[count + 2]
 
-        # RGB HEX string
-        rs = '%02x'%int(r / length)
-        gs = '%02x'%int(g / length)
-        bs = '%02x'%int(b / length)
+        return self.rgbToHex(int(r/length),int(g/length),int(b/length))
 
-        return '#' + rs + gs + bs
+    def grayColorFromImage(self, edgevert1, edgevert2):
+
+        v1x, v2x = edgevert1.coords[0], edgevert2.coords[0]
+        v1y, v2y = edgevert1.coords[1] , edgevert2.coords[1]
+
+        # bresenham algorithm calculates all integer points coords on a line in between two points
+        bresenhampoints = list(bresenham(v1x,v1y,v2x,v2y))
+        # if more than 30 integer points are in between x and y do only choose every third (efficiency)
+        if len(bresenhampoints) > 30:
+            bresenhampoints = bresenhampoints[0::3]
+
+        color_rgb = self.hexToRGB(self.fromPoints(bresenhampoints))
+        r, g, b = color_rgb[0], color_rgb[1], color_rgb[2]
+        average_rgb_val = round((r+g+b) / 3)
+
+        # invert the average rgb value and set new rgb values to the same value for grey color
+        r_grey = 255 - average_rgb_val
+        g_grey = 255 - average_rgb_val
+        b_grey = 255 - average_rgb_val
+
+        return self.rgbToHex(r_grey, g_grey, b_grey)
 
     # Generates color from image
     # (!) Vertices must have anticlockwise order

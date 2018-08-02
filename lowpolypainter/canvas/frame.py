@@ -32,12 +32,18 @@ class CanvasFrame(Frame):
         self.image = Image.open(filepath)
         self.background = ImageTk.PhotoImage(self.image)
 
+        # Center Canvas 
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_rowconfigure(2, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(2, weight=1)
+
         # Create Canvas
         self.width = self.background.width()
         self.height = self.background.height()
         self.canvas = Canvas(self, width=self.width, height=self.height)
         self.canvas.create_image(1, 1, image=self.background, anchor=NW)
-        self.canvas.grid()
+        self.canvas.grid(row=1, column=1, sticky=NSEW)
 
         # Color Object
         self.color = Color(np.array(self.image), 0.5, 0.5)
@@ -71,12 +77,6 @@ class CanvasFrame(Frame):
         """
         eventPoint = [event.x, event.y]
         if self.inBounds(eventPoint) and not self.mouseEvent:
-            if (event.state & CTRL_MASK):
-                iaf = self.mesh.insideAFace(eventPoint)
-                if iaf[0]:
-                    self.selectedFace = iaf
-                    return
-            self.selectedFace=[False, None]
             previousSelected = self.selected
             zoomedCoords = self.parent.zoom.FromViewport([event.x, event.y])
             self.mesh.addVertex([int(zoomedCoords[0]), int(zoomedCoords[1])])

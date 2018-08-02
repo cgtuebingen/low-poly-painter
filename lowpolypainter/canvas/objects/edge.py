@@ -10,7 +10,7 @@ TAG_FACE = "f"
 WIDTH = 2
 
 # COLOR
-COLOR_DEFAULT = "#000000"
+COLOR_DEFAULT = "#161616"
 COLOR_SELECTED = "#ff0000"
 COLOR_INVALID = "#ff7c19"
 
@@ -24,6 +24,7 @@ class Edge:
         self.faces = []
         self.verts = [vert1, vert2]
         self.intersectingEdges = set()
+        self.color = COLOR_DEFAULT
 
         # Dependencies
         self.parent = frame
@@ -56,17 +57,21 @@ class Edge:
         if (event.state & MASK_SHIFT):
             vert = self.parent.mesh.addVertex([event.x, event.y])
 
-            # TODO: IF SELCTED IS VERTEX
-            if isinstance(self.frame.selected, Vertex):
+            # TODO: IF SELECTED IS VERTEX
+            if isinstance(self.parent.selected, Vertex):
                 self.parent.mesh.addEdge(vert, self.parent.selected)
             self.parent.mesh.addEdge(vert, self.verts[0])
             self.parent.mesh.addEdge(vert, self.verts[1])
             self.delete()
         else:
             self.select()
-            self.frame.select(self)
+            self.parent.select(self)
 
     """ GENERAL """
+    def getColor(self):
+        # calculate gray edge color from rgb values of points in between edge points
+        return self.parent.color.grayColorFromImage(self.verts[0], self.verts[1])
+
     def draw(self, user=True):
         vertVisualCoords = [self.verts[0].getVisualCoords(), self.verts[1].getVisualCoords()]
         self.id = self.parent.canvas.create_line(vertVisualCoords[0][0],
@@ -74,7 +79,7 @@ class Edge:
                                                  vertVisualCoords[1][0],
                                                  vertVisualCoords[1][1],
                                                  tag=TAG_EDGE,
-                                                 fill=COLOR_DEFAULT,
+                                                 fill=self.getColor(),
                                                  width=WIDTH)
 
         self.parent.canvas.tag_bind(self.id, "<Button>", func=self.click)
@@ -93,7 +98,7 @@ class Edge:
         self.parent.canvas.tag_raise(self.id, TAG_EDGE)
 
     def deselect(self):
-        self.parent.canvas.itemconfigure(self.id, fill=COLOR_DEFAULT)
+        self.parent.canvas.itemconfigure(self.id, fill=self.getColor())
 
     def move(self):
         self.updatePosition()

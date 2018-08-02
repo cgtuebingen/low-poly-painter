@@ -7,7 +7,8 @@ TAG_FACE = "f"
 RADIUS = 4
 
 # COLOR
-COLOR_DEFAULT = "#0000ff"
+COLOR_BORDER = "#FFFFFF"
+COLOR_DEFAULT = "#3B99FC"
 COLOR_SELECTED = "#ff0000"
 
 # MASK
@@ -78,6 +79,7 @@ class Vertex:
                                           visualCoords[1] - RADIUS,
                                           visualCoords[0] + RADIUS,
                                           visualCoords[1] + RADIUS,
+                                          outline = COLOR_BORDER,
                                           fill = COLOR_DEFAULT,
                                           tag = TAG_VERTEX)
 
