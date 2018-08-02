@@ -59,6 +59,12 @@ class Mesh:
         self.faces.append(face)
         return face
 
+    def getFaceByID(self, id):
+        for face in self.faces:
+            if face.id == id:
+                return face
+        return None
+
     def addFaceFromPoints(self, vert1, vert2, vert3):
         edge1 = self.addEdge(vert1, vert2)
         edge2 = self.addEdge(vert1, vert3)
@@ -85,6 +91,7 @@ class Mesh:
         self.parent.canvas.delete(TAG_EDGE)
         self.parent.canvas.delete(TAG_FACE)
         self.parent.selected = None
+
 
     def faceToVertexGeneration(self, point1, point2, point3):
         # Fast way to generate given face by points
@@ -157,3 +164,12 @@ class Mesh:
         edges = meshArray[1]
         for edge in edges:
             self.addEdge(self.vertices[edge[0]], self.vertices[edge[1]])
+
+    """ FaceSelectingCheck """
+    def insideAFace(self, points):
+        if not self.faces:
+            return [False, None]
+        for fa in self.faces:
+            if fa.pointInside(points):
+               return [True, fa.id]
+        return [False, None]
