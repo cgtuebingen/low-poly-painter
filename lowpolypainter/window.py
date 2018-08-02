@@ -78,7 +78,7 @@ class Window(object):
 
 
     # TODO Recoloring and connect with face Selection
-    def colorwheel(self):
+    def colorwheel(self, event=None):
         if not self.canvasFrame.selectedFace[0]:
             print "no face selected"
             return
