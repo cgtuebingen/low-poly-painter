@@ -57,14 +57,14 @@ class Edge:
             vert = self.parent.mesh.addVertex([event.x, event.y])
 
             # TODO: IF SELCTED IS VERTEX
-            if isinstance(self.frame.selected, Vertex):
+            if isinstance(self.parent.selected, Vertex):
                 self.parent.mesh.addEdge(vert, self.parent.selected)
             self.parent.mesh.addEdge(vert, self.verts[0])
             self.parent.mesh.addEdge(vert, self.verts[1])
             self.delete()
         else:
             self.select()
-            self.frame.select(self)
+            self.parent.select(self)
 
     """ GENERAL """
     def draw(self, user=True):

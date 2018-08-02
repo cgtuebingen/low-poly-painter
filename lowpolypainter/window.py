@@ -3,6 +3,7 @@ import time
 import numpy as np
 from Tkinter import *
 from PIL import ImageTk, Image
+import tkMessageBox
 
 # Local Modules
 from store import save, load
@@ -68,16 +69,13 @@ class Window(object):
         self.canvasFrame.canny()
 
 
-
-    # TODO Recoloring and connect with face Selection
     def colorwheel(self):
         if not self.canvasFrame.selectedFace[0]:
-            print "no face selected"
+            tkMessageBox.showinfo("Error", "No face selected!")
             return
-        facenumber = self.canvasFrame.selectedFace[1]
         cw = Tk()
         cw.title("Colorwheel")
-        app = Colorwheel(self, facenumber, self.colorWheelSafePoint1, self.colorWheelSafePoint2, self.colorWheelSafePoint3, cw)
+        app = Colorwheel(self, cw)
         cw.mainloop()
         cw.destroy()
         self.canvasFrame.selectedFace[0]=False
@@ -123,8 +121,8 @@ class TextFrame(Frame):
 
         self.howToLabel = Label(self, text="""Place, select and move points and lines with the mouse.
 A line to the next point will automatically be created, as long as CTRL is not pressed.
-CTRL is also used to select faces.
-Please note that there is no visualisation if you select any face and the colorwheel is not connected yet.
+Faces are selected by simply clicking on them.
+Please note that there is no visualisation if you select any face.
 To connect two points with a line, or to split a line in two, hold the SHIFT button.
 If a line creates one or more triangles, then they will be automatically added.
 Delete selected objects with DEL.

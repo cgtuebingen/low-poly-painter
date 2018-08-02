@@ -5,6 +5,7 @@ TAG_FACE = "f"
 
 # COLOR
 COLOR_DEFAULT = "#000000"
+COLOR_SELECTED = "#ff0000"
 
 class Face:
     def __init__(self, edge1, edge2, edge3, frame, user=True):
@@ -13,6 +14,7 @@ class Face:
         self.coords = []
         self.color = COLOR_DEFAULT
         self.edges = (edge1, edge2, edge3)
+        self.colorLock = False
 
         # Update
         edge1.faces.append(self)
@@ -40,6 +42,7 @@ class Face:
                                              fill=self.color,
                                              tag=TAG_FACE,
                                              state=self.parent.faceState)
+        self.parent.canvas.tag_bind(self.id, "<Button>", func=self.click)
         if (user):
             self.parent.canvas.tag_lower(self.id, TAG_EDGE)
 
@@ -51,7 +54,8 @@ class Face:
         self.parent.canvas.coords(self.id, self.coords[0][0], self.coords[0][1],
                                            self.coords[1][0], self.coords[1][1],
                                            self.coords[2][0], self.coords[2][1])
-        self.color = self.getColorFromImage()
+        if not self.colorLock:
+            self.color = self.getColorFromImage()
         self.parent.canvas.itemconfig(self.id, fill=self.color)
 
 
@@ -87,7 +91,15 @@ class Face:
 
         return verts
 
+    # New faceselection Method
+    # TODO Make Faceselection Visible
+    def click(self, event):
+        self.parent.mouseEvent = True
+        self.parent.selectedFace[0] = True
+        self.parent.selectedFace[1] = self.id
 
+
+    # No Use right now but maybe some day.
     # Calculate if a given Point is inside the current face
     # Using a given a rectangle as raw approximation and barycentric coordinates for fine tuning.
     def pointInside(self, point):
@@ -101,10 +113,14 @@ class Face:
         if (coords[0][1] < point[1] and coords[1][1] < point[1] and coords[2][1] < point[1]):
             return False
         else:
-            alpha = float(float((coords[1][1] - coords[2][1]) * (point[0] - coords[2][0]) + (coords[2][0] - coords[1][0]) * (point[1] - coords[2][1])) / float((coords[1][1] - coords[2][1]) * (coords[0][0] - coords[2][0]) + (coords[2][0] - coords[1][0]) * (coords[0][1] - coords[2][1])))
-            beta = float(float((coords[2][1] - coords[0][1]) * (point[0] - coords[2][0]) + (coords[0][0] - coords[2][0]) * (point[1] - coords[2][1])) / float((coords[1][1] - coords[2][1]) * (coords[0][0] - coords[2][0]) + (coords[2][0] - coords[1][0]) * (coords[0][1] - coords[2][1])))
-            gamma = float(float(1.0)-alpha-beta)
-            if((alpha>0)and(beta>0)and(gamma>0)):
+            if float(float(float(coords[1][1] - coords[2][1]) * float(coords[0][0] - coords[2][0])) + float(float(coords[2][0] - coords[1][0]) * float(coords[0][1] - coords[2][1])))==0:
+                return False
+            if float(float(float(coords[1][1] - coords[2][1]) * float(coords[0][0] - coords[2][0])) + float(float(coords[2][0] - coords[1][0]) * float(coords[0][1] - coords[2][1])))==0:
+                return False
+            alpha = float(float(float(float(coords[1][1] - coords[2][1]) * float(point[0] - coords[2][0])) + float(float(coords[2][0] - coords[1][0]) * float(point[1] - coords[2][1]))) / float(float(float(coords[1][1] - coords[2][1]) * float(coords[0][0] - coords[2][0])) + float(float(coords[2][0] - coords[1][0]) * float(coords[0][1] - coords[2][1]))))
+            beta = float(float(float(float(coords[2][1] - coords[0][1]) * float(point[0] - coords[2][0])) + float(float(coords[0][0] - coords[2][0]) * float(point[1] - coords[2][1]))) / float(float(float(coords[1][1] - coords[2][1]) * float(coords[0][0] - coords[2][0])) + float(float(coords[2][0] - coords[1][0]) * float(coords[0][1] - coords[2][1]))))
+            gamma = float(float(float(1.0)-float(alpha)-float(beta)))
+            if((float(alpha)>float(0))and(float(beta)>float(0))and(float(gamma)>float(0))):
                 return True
             else:
                 return False

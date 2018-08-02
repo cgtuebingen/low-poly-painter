@@ -1,12 +1,9 @@
 from Tkinter import *
 from tkColorChooser import askcolor
 
-from canvas.mesh import Mesh
-
-# TODO: First add Face selection, then give the Colorwheels some Colors of the Face
-# TODO: Add return Function to return the new Color.
 class Colorwheel(Frame):
 
+    # Buttonfunctions
     def firstColorUse(self):
         self.activecol = self.firstColor
         self.redraw()
@@ -35,15 +32,21 @@ class Colorwheel(Frame):
         self.thirdColorButtonUse.configure(bg=self.thirdColor)
 
 
-
+    # Menuebuttons
     def confirm(self):
         # print self.activecol
-        self.mesh.getFaceByID(self.fn).color=self.activecol
-        self.mesh.getFaceByID(self.fn).draw()
+        face = self.mesh.getFaceByID(self.fn)
+        face.color=self.activecol
+        if self.locking.get():
+            face.colorLock = True
+        else:
+            face.colorLock = False
+        self.window.canvasFrame.canvas.itemconfig(self.fn, fill=self.activecol)
         self.window.colorWheelSafePoint1 = self.firstColor
         self.window.colorWheelSafePoint2 = self.secondColor
         self.window.colorWheelSafePoint3 = self.thirdColor
         self.cw.quit()
+
     def refine(self):
         self.activecol = askcolor(self.activecol)[1]
         self.redraw()
@@ -51,9 +54,25 @@ class Colorwheel(Frame):
     def redraw(self):
         self.canvas.create_rectangle(0, 0, self.activeColorCanvasWidth+1, self.activeColorCanvasHeight+1, fill=self.activecol)
 
+    def unlockAndRestore(self):
+        face = self.mesh.getFaceByID(self.fn)
+        face.colorLock = False
+        self.LOCKBUTTON.deselect()
+        self.toggleLock()
+        self.activecol=face.getColorFromImage()
+        face.color = self.activecol
+        self.window.canvasFrame.canvas.itemconfig(self.fn, fill=self.activecol)
+        self.redraw()
 
+    # Workaround for the checkbox
+    def toggleLock(self):
+        if self.locking.get():
+            self.locking.set(0)
+        else:
+            self.locking.set(1)
+
+    # Completly overloaded. Will rework this before holidays
     def createWidgets(self):
-
         self.activeColorCanvasWidth = 50
         self.activeColorCanvasHeight = 50
         self.canvas = Canvas(self.topFrame, width=self.activeColorCanvasWidth, height=self.activeColorCanvasHeight)
@@ -84,25 +103,34 @@ class Colorwheel(Frame):
         self.thirdColorButtonUse = Button(self.thirdColorFrame, text="Use", fg="white", bg=self.thirdColor, width=8, height=2, command=self.thirdColorUse)
         self.thirdColorButtonUse.pack()
 
-
         self.menueFrame = Frame(self.bottomFrame)
         self.menueFrame.pack(side=LEFT)
-        self.CONFIRM = Button(self.menueFrame, text="Bestaetigen", command=self.confirm)
+        self.CONFIRM = Button(self.menueFrame, text="Confirm", command=self.confirm)
         self.CONFIRM.pack()
-        self.REFINE = Button(self.menueFrame, text="Anpassen", command=self.refine)
+        self.LOCKBUTTON = Checkbutton(self.menueFrame, text="Lock", variable=self.locking, onvalue=1, offvalue=0, command=self.toggleLock)
+        self.LOCKBUTTON.pack()
+        self.LOCKBUTTON.select()
+        self.toggleLock()
+
+        self.UNLOCK = Button(self.menueFrame, text="Unlock and Restore", command=self.unlockAndRestore)
+        self.UNLOCK.pack()
+        self.REFINE = Button(self.menueFrame, text="Edit", command=self.refine)
         self.REFINE.pack()
-        self.QUIT = Button(self.menueFrame, text="Abbrechen", command=self.cw.quit)
+
+
+        self.QUIT = Button(self.menueFrame, text="Abort", command=self.cw.quit)
         self.QUIT.pack()
 
-    def __init__(self, window, facenumber, c1,c2,c3, cw):
-        self.fn = facenumber
+    def __init__(self, window, cw):
         self.window = window
+        self.fn = self.window.canvasFrame.selectedFace[1]
         self.mesh = window.canvasFrame.mesh
         self.activecol = self.mesh.getFaceByID(self.fn).color
-        self.firstColor = c1
-        self.secondColor = c2
-        self.thirdColor = c3
+        self.firstColor = self.window.colorWheelSafePoint1
+        self.secondColor = self.window.colorWheelSafePoint2
+        self.thirdColor = self.window.colorWheelSafePoint3
         self.cw=cw
+        self.locking = IntVar()
 
         self.mainFrame = Frame(self.cw)
         self.mainFrame.pack()
