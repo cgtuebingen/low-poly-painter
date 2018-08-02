@@ -2,6 +2,7 @@
 
 # Python Modules
 import sys
+import ctypes
 
 # Local Modules
 from lowpolypainter.window import Window
@@ -18,6 +19,10 @@ Goto /lowpolypainter/window.py to start programming
 """
 
 def main(argv):
+    # Windows high res support?
+    if 'win' == sys.platform:
+        ctypes.windll.shcore.SetProcessDpiAwareness(1)
+
     if len(argv) != 1:
         print 'test.py <inputimage>'
         sys.exit(2)
