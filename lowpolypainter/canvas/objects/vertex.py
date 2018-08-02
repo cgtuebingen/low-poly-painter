@@ -72,16 +72,24 @@ class Vertex:
 
     """ GENERAL """
     def draw(self):
-        self.id = self.parent.canvas.create_oval(self.coords[0] - RADIUS,
-                                          self.coords[1] - RADIUS,
-                                          self.coords[0] + RADIUS,
-                                          self.coords[1] + RADIUS,
+        visualCoords = self.getVisualCoords()
+        self.id = self.parent.canvas.create_oval(visualCoords[0] - RADIUS,
+                                          visualCoords[1] - RADIUS,
+                                          visualCoords[0] + RADIUS,
+                                          visualCoords[1] + RADIUS,
                                           fill = COLOR_DEFAULT,
                                           tag = TAG_VERTEX)
 
         self.parent.canvas.tag_bind(self.id, sequence="<Button>", func=self.clickHandle)
         self.parent.canvas.tag_bind(self.id, sequence="<B1-Motion>", func=self.moveHandle)
         self.parent.canvas.tag_bind(self.id, sequence="<ButtonRelease-1>", func=self.releaseHandle)
+
+    def updatePosition(self):
+        visualCoords = self.getVisualCoords()
+        self.parent.canvas.coords(self.id, visualCoords[0] - RADIUS,
+                                          visualCoords[1] - RADIUS,
+                                          visualCoords[0] + RADIUS,
+                                          visualCoords[1] + RADIUS)
 
     def select(self):
         self.parent.canvas.itemconfigure(self.id, fill=COLOR_SELECTED)
@@ -91,9 +99,8 @@ class Vertex:
         self.parent.canvas.itemconfigure(self.id, fill=COLOR_DEFAULT)
 
     def move(self, vert):
-        moveVert = [vert[0] - self.coords[0], vert[1] - self.coords[1]]
-        self.parent.canvas.move(self.id, moveVert[0], moveVert[1])
         self.coords = vert
+        self.updatePosition()
         self.moveEdges()
 
     def moveInBounds(self, vert):
@@ -122,6 +129,10 @@ class Vertex:
 
         self.parent.mesh.vertices.remove(self)
         self.parent.canvas.delete(self.id)
+
+    def getVisualCoords(self):
+        ret = self.parent.parent.zoom.ToViewport(self.coords)
+        return [int(ret[0]), int(ret[1])]
 
     """ EDGE """
     def getEdge(self, vert):

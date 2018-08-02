@@ -78,7 +78,8 @@ class CanvasFrame(Frame):
                     return
             self.selectedFace=[False, None]
             previousSelected = self.selected
-            self.mesh.addVertex([event.x, event.y])
+            zoomedCoords = self.parent.zoom.FromViewport([event.x, event.y])
+            self.mesh.addVertex([int(zoomedCoords[0]), int(zoomedCoords[1])])
             if (previousSelected is not None) and not (event.state & CTRL_MASK):
                 self.mesh.addEdge(previousSelected, self.selected)
         self.mouseEventHandled = False

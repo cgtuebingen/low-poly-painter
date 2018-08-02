@@ -31,6 +31,10 @@ class Mesh:
         # Image Vertices Array
         self.bvertices = np.zeros([self.parent.width, self.parent.height]).tolist()
 
+    def updatePositions(self):
+        for vertex in self.vertices:
+            vertex.updatePosition()
+
     """ VERTEX """
     def addVertex(self, coords):
         vert = Vertex(coords, self.parent)

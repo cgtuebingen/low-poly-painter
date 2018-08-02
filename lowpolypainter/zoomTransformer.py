@@ -12,3 +12,6 @@ class ZoomTransformer(object):
     def FromViewport(self, point):
         return numpy.resize(numpy.matmul(numpy.linalg.inv(self.matrix), [point[0], point[1], 1]), 2)
 
+    def ZoomAt(self, scale, position):
+        oms = 1-scale
+        self.matrix = numpy.matmul([[scale,0,position[0] * oms],[0,scale,position[1] * oms],[0,0,1]], self.matrix)

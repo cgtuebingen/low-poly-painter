@@ -35,6 +35,10 @@ class Window(object):
         self.frame = Frame(self.root, bg='white')
         self.frame.grid()
 
+        self.frame.bind_all("<MouseWheel>", self.mouse_wheel_wheel)
+        self.frame.bind_all("<Button-4>", self.mouse_wheel_button)
+        self.frame.bind_all("<Button-5>", self.mouse_wheel_button)
+
         # Canvas Frame
         self.canvasFrame = CanvasFrame(self, inputimage)
         self.canvasFrame.grid()
@@ -66,7 +70,18 @@ class Window(object):
     def triangulate(self):
         self.canvasFrame.canny()
 
+    def mouse_wheel_button(self, event):
+        if event.num == 4:
+            self.mouse_wheel(120, 0, 0)
+        elif event.num == 5:
+            self.mouse_wheel(-120, 0, 0)
 
+    def mouse_wheel_wheel(self, event):
+        self.mouse_wheel(event.delta, event.x, event.y)
+
+    def mouse_wheel(self, delta, x, y):
+        self.zoom.ZoomAt(2**(delta * 0.001), [x, y])
+        self.canvasFrame.mesh.updatePositions()
 
     # TODO Recoloring and connect with face Selection
     def colorwheel(self):
