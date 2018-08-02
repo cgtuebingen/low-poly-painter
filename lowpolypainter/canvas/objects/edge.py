@@ -24,6 +24,7 @@ class Edge:
         self.faces = []
         self.verts = [vert1, vert2]
         self.intersectingEdges = set()
+        self.color = COLOR_DEFAULT
 
         # Dependencies
         self.parent = frame
@@ -56,7 +57,7 @@ class Edge:
         if (event.state & MASK_SHIFT):
             vert = self.parent.mesh.addVertex([event.x, event.y])
 
-            # TODO: IF SELCTED IS VERTEX
+            # TODO: IF SELECTED IS VERTEX
             if isinstance(self.frame.selected, Vertex):
                 self.parent.mesh.addEdge(vert, self.parent.selected)
             self.parent.mesh.addEdge(vert, self.verts[0])
@@ -67,13 +68,17 @@ class Edge:
             self.frame.select(self)
 
     """ GENERAL """
+    def getColor(self):
+        # calculate gray edge color from rgb values of points in between edge points
+        return self.parent.color.grayColorFromImage(self.verts[0], self.verts[1])
+
     def draw(self, user=True):
         self.id = self.parent.canvas.create_line(self.verts[0].coords[0],
                                                  self.verts[0].coords[1],
                                                  self.verts[1].coords[0],
                                                  self.verts[1].coords[1],
                                                  tag=TAG_EDGE,
-                                                 fill=COLOR_DEFAULT,
+                                                 fill=self.getColor(),
                                                  width=WIDTH)
 
         self.parent.canvas.tag_bind(self.id, "<Button>", func=self.click)
