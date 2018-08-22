@@ -104,6 +104,9 @@ class Edge:
     def move(self):
         self.updatePosition()
         self.checkValidEdge()
+        self.color = self.getColor()
+        self.parent.canvas.itemconfig(self.id, fill=self.color)
+
         for face in self.faces:
             face.move()
 
