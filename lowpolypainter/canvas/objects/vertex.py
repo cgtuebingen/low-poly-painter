@@ -5,6 +5,7 @@ TAG_FACE = "f"
 
 # SIZE
 RADIUS = 2
+LARGE_RADIUS = 5
 
 # COLOR
 COLOR_BORDER = "#FFFFFF"
@@ -70,6 +71,8 @@ class Vertex:
             self.firstMove = False
         zoomedCoords = self.parent.parent.zoom.FromViewport([event.x, event.y])
         self.move(self.moveInBounds([int(zoomedCoords[0]), int(zoomedCoords[1])]))
+        self.expand(event)
+        
 
     def releaseHandle(self, event):
         # Merge verts when droped on same position
@@ -80,7 +83,21 @@ class Vertex:
             self.mergeWithVertex(vert)
         self.parent.mesh.bvertices[x][y] = self
         self.parent.mouseEvent = False
-
+        
+    def expand(self, event):
+        visualCoords = self.getVisualCoords()
+        self.parent.canvas.coords(self.id, visualCoords[0] - LARGE_RADIUS,
+                                          visualCoords[1] - LARGE_RADIUS,
+                                          visualCoords[0] + LARGE_RADIUS,
+                                          visualCoords[1] + LARGE_RADIUS,) 
+        
+    def shrink(self, event):
+        visualCoords = self.getVisualCoords()
+        self.parent.canvas.coords(self.id, visualCoords[0] - RADIUS,
+                                          visualCoords[1] - RADIUS,
+                                          visualCoords[0] + RADIUS,
+                                          visualCoords[1] + RADIUS,) 
+        
     """ GENERAL """
     def draw(self, user=False):
         visualCoords = self.getVisualCoords()
@@ -95,6 +112,8 @@ class Vertex:
         self.parent.canvas.tag_bind(self.id, sequence="<Button>", func=self.clickHandle)
         self.parent.canvas.tag_bind(self.id, sequence="<B1-Motion>", func=self.moveHandle)
         self.parent.canvas.tag_bind(self.id, sequence="<ButtonRelease-1>", func=self.releaseHandle)
+        self.parent.canvas.tag_bind(self.id, sequence="<Enter>", func=self.expand)
+        self.parent.canvas.tag_bind(self.id, sequence="<Leave>", func=self.shrink)
 
         if user:
             self.parent.canvas.tag_raise(self.id, TAG_VERTEX)
