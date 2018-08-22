@@ -54,15 +54,8 @@ class Triangulate(object):
             random_points[i] = [randint(0, width - 1), randint(0, height - 1)]
         self.points = np.vstack([self.points, random_points])
 
-    def generateCanny(self, sigma=2):
-        # TODO: MASK
-        test = np.ones((512, 512), dtype=bool)
-        for i in range(200, 512):
-            for x in range(0, 256):
-                test[i][x] = 1
-        # print test
-
-        cannyPoints = feature.canny(self.image, sigma=sigma, mask=test)
+    def generateCanny(self, sigma=0, mask=None):
+        cannyPoints = feature.canny(self.image, sigma=sigma, mask=mask)
         cannyPointsIndices = np.nonzero(cannyPoints)
         cannyPointsCombined = np.vstack((cannyPointsIndices[1],
                                          cannyPointsIndices[0])).T
@@ -74,7 +67,7 @@ class Triangulate(object):
         cropped_indices = indices[:size]
         self.points = self.points[cropped_indices]
 
-    def triangulate(self, size=1000, random=50, corners=6,):
+    def triangulate(self, size=1000, random=50, corners=6):
         self.subsetCanny(size)
         self.generateCorners(corners)
         self.generateRandom(random)

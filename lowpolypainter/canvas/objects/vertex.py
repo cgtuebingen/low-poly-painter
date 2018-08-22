@@ -44,7 +44,7 @@ class Vertex:
         # Select
         self.select()
         self.parent.select(self)
-        
+
         # trace start of movement
         self.firstMove = True
 
@@ -83,6 +83,7 @@ class Vertex:
 
     """ GENERAL """
     def draw(self, user=False):
+        return
         visualCoords = self.getVisualCoords()
         self.id = self.parent.canvas.create_oval(visualCoords[0] - RADIUS,
                                           visualCoords[1] - RADIUS,

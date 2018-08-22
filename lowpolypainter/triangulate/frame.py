@@ -1,4 +1,5 @@
 # Python Modules
+import numpy as np
 from Tkinter import *
 from PIL import ImageTk, Image
 
@@ -102,4 +103,31 @@ class MaskFrame(Frame):
         self.height = self.background.height()
         self.canvas = Canvas(self, width=self.width, height=self.height)
         self.canvas.create_image(0, 0, image=self.background, anchor=NW)
+        self.canvas.bind("<B1-Motion>", func=self.click)
         self.canvas.grid(row=1, column=1, sticky=NSEW)
+
+        # Mask
+        self.mask = np.zeros([self.width, self.height], dtype=bool)
+
+        # Radius
+        self.r = 2
+
+    def click(self, event):
+        point = [event.x, event.y]
+        if self.inBounds(point):
+            self.addPointToMask(point)
+            self.canvas.create_oval(point[0] - self.r, point[1] - self.r,
+                                    point[0] + self.r, point[1] + self.r,
+                                    outline = "", fill = 'green', tag = 'v')
+
+    def addPointToMask(self, point):
+        # TODO: Currently rectenagle but is circle
+        for y in range(point[1] - self.r, point[1] + self.r + 1):
+            for x in range(point[0] - self.r, point[0] + self.r + 1):
+                if self.inBounds([x,y]):
+                    self.mask[y][x] = 1
+
+
+    def inBounds(self, point):
+        x, y = point[0], point[1]
+        return (x >= 0) and (y >= 0) and (x < self.width) and (y < self.height)

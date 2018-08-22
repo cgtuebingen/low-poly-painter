@@ -164,7 +164,7 @@ class Mesh:
             edges.append([vert1, vert2])
 
         return [vertices, edges]
-    
+
     # saves current mesh.
     # differs from "save" because edges will not get saved with indices of their vertices
     def save1(self):
@@ -182,7 +182,7 @@ class Mesh:
         edges = meshArray[1]
         for edge in edges:
             self.addEdge(self.vertices[edge[0]], self.vertices[edge[1]])
-            
+
     def load1(self, meshArray):
         if (meshArray == None):
             return
@@ -192,7 +192,7 @@ class Mesh:
         edges = meshArray[1]
         for edge in edges:
             self.addEdge(self.getVertexByCoords(edge[0]), self.getVertexByCoords(edge[1]))
-            
+
     def getVertexByCoords(self, coordinates):
         for vertex in self.vertices:
             if vertex.coords == coordinates:

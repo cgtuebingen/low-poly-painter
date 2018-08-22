@@ -74,6 +74,7 @@ class Edge:
         return self.parent.color.grayColorFromImage(self.verts[0], self.verts[1])
 
     def draw(self, user=True):
+        return
         vertVisualCoords = [self.verts[0].getVisualCoords(), self.verts[1].getVisualCoords()]
         self.color = self.getColor()
         self.id = self.parent.canvas.create_line(vertVisualCoords[0][0],

@@ -118,7 +118,7 @@ class CanvasFrame(Frame):
         self.mesh.clear()
 
     """ Triangulate """
-    def triangulate(self, size=0, random=0):
+    def triangulate(self, size=0, random=0, mask=None):
 
         points = []
         for point in self.mesh.vertices:
@@ -129,7 +129,8 @@ class CanvasFrame(Frame):
         triangulate = Triangulate(self.inputimage, points)
         start0 = time.clock()
         if size != 0:
-            triangulate.generateCanny()
+            print 'hey1'
+            triangulate.generateCanny(mask=mask)
         end0 = time.clock()
         triangle = triangulate.triangulate(size, random)
 
