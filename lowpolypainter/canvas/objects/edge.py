@@ -103,7 +103,7 @@ class Edge:
 
     def move(self):
         self.updatePosition()
-         # self.checkValidEdge()
+        self.checkValidEdge()
         for face in self.faces:
             face.move()
 
