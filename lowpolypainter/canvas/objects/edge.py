@@ -274,7 +274,7 @@ class Edge:
 
     def setValid(self, isValid):
         if isValid:
-            self.parent.canvas.itemconfigure(self.id, fill=COLOR_DEFAULT)
+            self.parent.canvas.itemconfigure(self.id, fill=self.color)
         else:
             # Invalid Edges should be on top
             self.parent.canvas.tag_raise(self.id, TAG_EDGE)

@@ -101,6 +101,7 @@ class Vertex:
     def deselect(self):
         self.parent.canvas.itemconfigure(self.id, fill=COLOR_DEFAULT)
 
+
     def move(self, vert):
         self.coords = vert
         self.updatePosition()

@@ -107,7 +107,7 @@ class Mesh:
         # Init methodes are not used as they should be used
         # (!) Point should be array of coordinate
 
-        # Vertecies
+        # Vertices
         vert1 = self.bvertices[point1[0]][point1[1]]
         if vert1 == 0:
             vert1 = Vertex(point1, self.parent, False)
