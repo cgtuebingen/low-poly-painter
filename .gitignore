@@ -7,6 +7,9 @@
 
 # Created by https://www.gitignore.io/api/linux,macos,python,windows
 
+### TEMP ###
+**/temp
+
 ### Linux ###
 *~
 

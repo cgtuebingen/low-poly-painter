@@ -7,7 +7,7 @@ TAG_EDGE = "e"
 TAG_FACE = "f"
 
 # SIZE
-WIDTH = 2
+WIDTH = 1
 
 # COLOR
 COLOR_DEFAULT = "#161616"
@@ -85,7 +85,7 @@ class Edge:
                                                  width=WIDTH)
 
         self.parent.canvas.tag_bind(self.id, "<Button>", func=self.click)
-        if (user):
+        if user:
             self.parent.canvas.tag_lower(self.id, TAG_VERTEX)
 
     def updatePosition(self):

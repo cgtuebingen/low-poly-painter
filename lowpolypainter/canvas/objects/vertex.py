@@ -4,7 +4,7 @@ TAG_EDGE = "e"
 TAG_FACE = "f"
 
 # SIZE
-RADIUS = 4
+RADIUS = 2
 
 # COLOR
 COLOR_BORDER = "#FFFFFF"
@@ -82,7 +82,7 @@ class Vertex:
         self.parent.mouseEvent = False
 
     """ GENERAL """
-    def draw(self):
+    def draw(self, user=False):
         visualCoords = self.getVisualCoords()
         self.id = self.parent.canvas.create_oval(visualCoords[0] - RADIUS,
                                           visualCoords[1] - RADIUS,
@@ -95,6 +95,9 @@ class Vertex:
         self.parent.canvas.tag_bind(self.id, sequence="<Button>", func=self.clickHandle)
         self.parent.canvas.tag_bind(self.id, sequence="<B1-Motion>", func=self.moveHandle)
         self.parent.canvas.tag_bind(self.id, sequence="<ButtonRelease-1>", func=self.releaseHandle)
+
+        if user:
+            self.parent.canvas.tag_raise(self.id, TAG_VERTEX)
 
     def updatePosition(self):
         visualCoords = self.getVisualCoords()

@@ -39,27 +39,34 @@ class Face:
 
     """ GENERAL """
     def draw(self, user=True):
-        vertVisualCoords = [    self.parent.parent.zoom.ToViewport(self.coords[0]),
-                                self.parent.parent.zoom.ToViewport(self.coords[1]),
-                                self.parent.parent.zoom.ToViewport(self.coords[2])]
-        self.id = self.parent.canvas.create_polygon(vertVisualCoords[0][0], vertVisualCoords[0][1],
-                                             vertVisualCoords[1][0], vertVisualCoords[1][1],
-                                             vertVisualCoords[2][0], vertVisualCoords[2][1],
-                                             fill=self.color,
-                                             tag=TAG_FACE,
-                                             state=self.parent.faceState)
+        vertVisualCoords = [self.parent.parent.zoom.ToViewport(self.coords[0]),
+                            self.parent.parent.zoom.ToViewport(self.coords[1]),
+                            self.parent.parent.zoom.ToViewport(self.coords[2])]
+        self.id = self.parent.canvas.create_polygon(vertVisualCoords[0][0],
+                                                    vertVisualCoords[0][1],
+                                                    vertVisualCoords[1][0],
+                                                    vertVisualCoords[1][1],
+                                                    vertVisualCoords[2][0],
+                                                    vertVisualCoords[2][1],
+                                                    fill=self.color,
+                                                    tag=TAG_FACE,
+                                                    state=self.parent.faceState)
         self.parent.canvas.tag_bind(self.id, "<Button>", func=self.click)
-        if (user):
+        
+        if user:
             self.parent.canvas.tag_lower(self.id, TAG_EDGE)
 
     def updatePosition(self):
         self.coords = self.getCoordinates(self.getVertices())
-        vertVisualCoords = [    self.parent.parent.zoom.ToViewport(self.coords[0]),
-                                self.parent.parent.zoom.ToViewport(self.coords[1]),
-                                self.parent.parent.zoom.ToViewport(self.coords[2])]
-        self.parent.canvas.coords(self.id,  vertVisualCoords[0][0], vertVisualCoords[0][1],
-                                            vertVisualCoords[1][0], vertVisualCoords[1][1],
-                                            vertVisualCoords[2][0], vertVisualCoords[2][1])
+        vertVisualCoords = [self.parent.parent.zoom.ToViewport(self.coords[0]),
+                            self.parent.parent.zoom.ToViewport(self.coords[1]),
+                            self.parent.parent.zoom.ToViewport(self.coords[2])]
+        self.parent.canvas.coords(self.id, vertVisualCoords[0][0],
+                                           vertVisualCoords[0][1],
+                                           vertVisualCoords[1][0],
+                                           vertVisualCoords[1][1],
+                                           vertVisualCoords[2][0],
+                                           vertVisualCoords[2][1])
 
     def getColorFromImage(self):
         return self.parent.color.fromImage(self.coords)
@@ -68,6 +75,7 @@ class Face:
         self.updatePosition()
         if not self.colorLock:
             self.color = self.getColorFromImage()
+
         self.parent.canvas.itemconfig(self.id, fill=self.color)
 
 
@@ -83,13 +91,12 @@ class Face:
         vert1 = self.edges[0].verts[0].coords
         vert2 = self.edges[0].verts[1].coords
         vert3 = self.edges[1].verts[0].coords
-        if vert3 is vert1:
+        if vert3 is vert1 or vert3 is vert2:
             vert3 = self.edges[1].verts[1].coords
         return [vert1, vert2, vert3]
 
     def getCoordinates(self, verts):
         verts.sort(key = lambda vert: vert[1], reverse = False)
-
         if verts[0][1] == verts[1][1]:
             if verts[0][0] < verts[1][0]:
                 verts[0], verts[1] = verts[1], verts[0]
