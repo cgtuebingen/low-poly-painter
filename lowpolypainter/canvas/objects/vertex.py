@@ -83,7 +83,6 @@ class Vertex:
 
     """ GENERAL """
     def draw(self, user=False):
-        return
         visualCoords = self.getVisualCoords()
         self.id = self.parent.canvas.create_oval(visualCoords[0] - RADIUS,
                                           visualCoords[1] - RADIUS,
