@@ -1,5 +1,7 @@
 # Python Modules
 import numpy as np
+import time
+import copy
 
 # Local Modules
 from objects.vertex import Vertex
@@ -108,7 +110,7 @@ class Mesh:
         # Init methodes are not used as they should be used
         # (!) Point should be array of coordinate
 
-        # Vertecies
+        # Vertices
         vert1 = self.bvertices[point1[0]][point1[1]]
         if vert1 == 0:
             vert1 = Vertex(point1, self.parent, False)
@@ -162,6 +164,13 @@ class Mesh:
             edges.append([vert1, vert2])
 
         return [vertices, edges]
+    
+    # saves current mesh.
+    # differs from "save" because edges will not get saved with indices of their vertices
+    def save1(self):
+        vertices = map(lambda x: x.coords, self.vertices)
+        edges = map(lambda x: [x.verts[0].coords, x.verts[1].coords], self.edges)
+        return [vertices, edges]
 
     def load(self, meshArray):
         if (meshArray == None):
@@ -173,6 +182,21 @@ class Mesh:
         edges = meshArray[1]
         for edge in edges:
             self.addEdge(self.vertices[edge[0]], self.vertices[edge[1]])
+            
+    def load1(self, meshArray):
+        if (meshArray == None):
+            return
+        vertices = meshArray[0]
+        for vertex in vertices:
+            self.addVertex(vertex)
+        edges = meshArray[1]
+        for edge in edges:
+            self.addEdge(self.getVertexByCoords(edge[0]), self.getVertexByCoords(edge[1]))
+            
+    def getVertexByCoords(self, coordinates):
+        for vertex in self.vertices:
+            if vertex.coords == coordinates:
+                return vertex
 
 
     # Unused but keeping it as an alternative for now.

@@ -7,6 +7,9 @@ TAG_FACE = "f"
 COLOR_DEFAULT = "#000000"
 COLOR_SELECTED = "#ff0000"
 
+# Masks
+ALT_MASK = 0x131072
+
 class Face:
     def __init__(self, edge1, edge2, edge3, frame, user=True):
         # Information
@@ -110,9 +113,10 @@ class Face:
     # New faceselection Method
     # TODO Make Faceselection Visible
     def click(self, event):
-        self.parent.mouseEvent = True
-        self.parent.selectedFace[0] = True
-        self.parent.selectedFace[1] = self.id
+        if not (event.state & ALT_MASK):
+            self.parent.mouseEventHandled = True
+            self.parent.selectedFace[0] = True
+            self.parent.selectedFace[1] = self.id
 
 
     # No Use right now but maybe some day.

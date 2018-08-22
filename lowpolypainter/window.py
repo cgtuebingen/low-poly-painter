@@ -6,13 +6,14 @@ from PIL import ImageTk, Image
 import tkMessageBox
 
 # Local Modules
-from store import save, load
+from store import save, load, savePath, loadPath
 from export import exportDialog
 from canvas.frame import CanvasFrame
 from triangulate.frame import MaskFrame
 from triangulate.frame import TriangulateFrame
 from zoomTransformer import ZoomTransformer
 from Colorwheel import Colorwheel
+from lowpolypainter.undoManager import UndoManager
 
 
 class Window(object):
@@ -54,6 +55,9 @@ class Window(object):
         self.frame.bind_all("<Button-4>", self.mouse_wheel_button)
         self.frame.bind_all("<Button-5>", self.mouse_wheel_button)
 
+        self.frame.bind_all("<Control-z>", self.undo)
+        self.frame.bind_all("<Control-y>", self.redo)
+
         # Canvas Frame
         self.canvasFrameToogle = False
         self.canvasFrame = CanvasFrame(self, inputimage)
@@ -72,6 +76,8 @@ class Window(object):
         self.colorWheelSafePoint2 = "black"
         self.colorWheelSafePoint3 = "black"
 
+        self.undoManager = UndoManager()
+
     """ ZOOM """
     def mouse_wheel_button(self, event):
         if event.num == 4:
@@ -85,6 +91,7 @@ class Window(object):
     def mouse_wheel(self, delta, x, y):
         self.zoom.ZoomAt(2**(delta * 0.001), [x, y])
         self.canvasFrame.mesh.updatePositions()
+
 
     """ ACTIONS """
     def toogleCanvasFrame(self, event=None):
@@ -113,10 +120,18 @@ class Window(object):
         exportDialog(self.canvasFrame.mesh, self.canvasFrame.width, self.canvasFrame.height)
 
     def saveMeshData(self, event=None):
-        save(self.canvasFrame.mesh.save(), self.inputimage)
+        save(self.canvasFrame.mesh.save1(), path)
 
-    def loadMeshData(self, event=None):
-        self.canvasFrame.mesh.load(load(self.inputimage))
+    def loadMeshDataPath(self, path, event=None):
+        self.canvasFrame.mesh.load1(loadPath(path))
+
+    # undoes the last change
+    def undo(self, event=None):
+        self.undoManager.undo(self)
+
+    # redoes the last undo
+    def redo(self, event=None):
+        self.undoManager.redo(self)
 
     def triangulate(self, size=0, random=0):
         self.canvasFrame.triangulate(size, random)
@@ -167,8 +182,9 @@ class ButtonFrame(Frame):
     """
     def __init__(self, parent, *args, **kwargs):
         Frame.__init__(self, parent)
-        self.config(bg='#D8D8D8', height=46)
-        self.grid_columnconfigure(4, weight=1)
+        self.config(bg='#DADADA', height=46)
+        self.grid_columnconfigure(6, weight=1)
+        # self.grid_rowconfigure(0, weight=0)
 
         icon_0 = PhotoImage(file="./lowpolypainter/resources/icons/Insert.gif")
         icon_1 = PhotoImage(file="./lowpolypainter/resources/icons/Clear.gif")
@@ -176,6 +192,8 @@ class ButtonFrame(Frame):
         icon_3 = PhotoImage(file="./lowpolypainter/resources/icons/Color.gif")
         icon_4 = PhotoImage(file="./lowpolypainter/resources/icons/Save.gif")
         icon_5 = PhotoImage(file="./lowpolypainter/resources/icons/Export.gif")
+        icon_6 = PhotoImage(file="./lowpolypainter/resources/icons/Undo.gif")
+        icon_7 = PhotoImage(file="./lowpolypainter/resources/icons/Redo.gif")
 
         options = {"height": 46, "width": 46, "bg":'#D8D8D8', "borderwidth":0}
 
@@ -203,20 +221,32 @@ class ButtonFrame(Frame):
         self.colorWheelButton.grid(row=0, column=3, sticky=N+E+S+W)
         self.colorWheelButton.bind("<Button-1>", parent.parent.colorwheel)
 
+        # Undo Button
+        self.undoButton = Label(self, image=icon_6, **options)
+        self.undoButton.image = icon_6
+        self.undoButton.grid(row=0, column=4, sticky=N+E+S+W)
+        self.undoButton.bind("<Button-1>", parent.parent.undo)
+
+        # Redo Button
+        self.redoButton = Label(self, image=icon_7, **options)
+        self.redoButton.image = icon_7
+        self.redoButton.grid(row=0, column=5, sticky=N+E+S+W)
+        self.redoButton.bind("<Button-1>", parent.parent.redo)
+
         # Space
-        self.space = Label(self, height=2, bg='#D8D8D8', borderwidth=0)
-        self.space.grid(row=0, column=4, sticky=N+E+S+W)
+        self.space = Label(self, height=2, bg='#DADADA', borderwidth=0)
+        self.space.grid(row=0, column=6, sticky=N+E+S+W)
 
         # Save Button
         self.saveButton = Label(self, image=icon_4, **options)
         self.saveButton.image = icon_4
-        self.saveButton.grid(row=0, column=5, sticky=N+E+S+W)
+        self.saveButton.grid(row=0, column=7, sticky=N+E+S+W)
         self.saveButton.bind("<Button-1>", parent.parent.saveMeshData)
 
         # Export Button
         self.exportButton = Label(self, image=icon_5, **options)
         self.exportButton.image = icon_5
-        self.exportButton.grid(row=0, column=6, sticky=N+E+S+W)
+        self.exportButton.grid(row=0, column=8, sticky=N+E+S+W)
         self.exportButton.bind("<Button-1>", parent.parent.export)
 
 class DetailFrame(Frame):
