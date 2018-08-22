@@ -14,6 +14,7 @@ COLOR_SELECTED = "#ff0000"
 # MASK
 MASK_SHIFT = 0x0001
 
+
 class Vertex:
     """
     Vertex
@@ -43,6 +44,9 @@ class Vertex:
         # Select
         self.select()
         self.parent.select(self)
+        
+        # trace start of movement
+        self.firstMove = True
 
     """ EVENTS """
     def clickHandle(self, event):
@@ -54,17 +58,22 @@ class Vertex:
         x, y = int(self.coords[0]), int(self.coords[1])
         self.parent.mesh.bvertices[x][y] = 0
         if (event.state & MASK_SHIFT) and (self.parent.selected is not None):
+            self.parent.parent.undoManager.do(self.parent.parent)
             self.parent.mesh.addEdge(self, self.parent.selected)
             return
         self.select()
         self.parent.select(self)
 
     def moveHandle(self, event):
+        if self.firstMove:
+            self.parent.parent.undoManager.do(self.parent.parent)
+            self.firstMove = False
         zoomedCoords = self.parent.parent.zoom.FromViewport([event.x, event.y])
         self.move(self.moveInBounds([int(zoomedCoords[0]), int(zoomedCoords[1])]))
 
     def releaseHandle(self, event):
         # Merge verts when droped on same position
+        self.firstMove = True
         x, y = int(self.coords[0]), int(self.coords[1])
         vert = self.parent.mesh.bvertices[x][y]
         if vert != 0:
