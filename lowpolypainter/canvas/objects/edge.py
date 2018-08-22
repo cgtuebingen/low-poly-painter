@@ -52,15 +52,18 @@ class Edge:
         Shift click on Edge: Place vertex on edge
         Default click on vertex: Sets edge as selected
         '''
-        self.parent.mouseEvent = True
+        self.parent.mouseEventHandled = True
 
         if (event.state & MASK_SHIFT):
+<<<<<<< HEAD
             self.parent.parent.undoManager.do(self.parent.parent)
+=======
+            selected = self.parent.selected
+>>>>>>> dc8520c02797c0d2ce88d5fd0283fc4b3ef75315
             vert = self.parent.mesh.addVertex([event.x, event.y])
 
-            # TODO: IF SELECTED IS VERTEX
-            if isinstance(self.parent.selected, Vertex):
-                self.parent.mesh.addEdge(vert, self.parent.selected)
+            if isinstance(selected, Vertex):
+                self.parent.mesh.addEdge(vert, selected)
             self.parent.mesh.addEdge(vert, self.verts[0])
             self.parent.mesh.addEdge(vert, self.verts[1])
             self.delete()
@@ -75,12 +78,13 @@ class Edge:
 
     def draw(self, user=True):
         vertVisualCoords = [self.verts[0].getVisualCoords(), self.verts[1].getVisualCoords()]
+        self.color = self.getColor()
         self.id = self.parent.canvas.create_line(vertVisualCoords[0][0],
                                                  vertVisualCoords[0][1],
                                                  vertVisualCoords[1][0],
                                                  vertVisualCoords[1][1],
                                                  tag=TAG_EDGE,
-                                                 fill=self.getColor(),
+                                                 fill=self.color,
                                                  width=WIDTH)
 
         self.parent.canvas.tag_bind(self.id, "<Button>", func=self.click)
@@ -99,11 +103,11 @@ class Edge:
         self.parent.canvas.tag_raise(self.id, TAG_EDGE)
 
     def deselect(self):
-        self.parent.canvas.itemconfigure(self.id, fill=self.getColor())
+        self.parent.canvas.itemconfigure(self.id, fill=self.color)
 
     def move(self):
         self.updatePosition()
-         # self.checkValidEdge()
+        self.checkValidEdge()
         for face in self.faces:
             face.move()
 
@@ -274,19 +278,19 @@ class Edge:
 
     def setValid(self, isValid):
         if isValid:
-            self.parent.canvas.itemconfigure(self.id, fill=COLOR_DEFAULT)
+            self.parent.canvas.itemconfigure(self.id, fill=self.color)
         else:
             # Invalid Edges should be on top
             self.parent.canvas.tag_raise(self.id, TAG_EDGE)
             self.parent.canvas.itemconfigure(self.id, fill=COLOR_INVALID)
 
-    def addIntersectionWithEdge(self, Edge):
-        self.intersectingEdges.add(Edge)
+    def addIntersectionWithEdge(self, edge):
+        self.intersectingEdges.add(edge)
         if len(self.intersectingEdges) == 1:
             self.setValid(False)
 
-    def removeIntersectionWithEdge(self, Edge):
-        self.intersectingEdges.remove(Edge)
+    def removeIntersectionWithEdge(self, edge):
+        self.intersectingEdges.remove(edge)
         if len(self.intersectingEdges) == 0:
             self.setValid(True)
 

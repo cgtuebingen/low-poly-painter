@@ -54,7 +54,7 @@ class Vertex:
         Shift click on vertex: Creates edge to vertex
         Default click on vertex: Sets vertex as selected
         '''
-        self.parent.mouseEvent = True
+        self.parent.mouseEventHandled = True
         x, y = int(self.coords[0]), int(self.coords[1])
         self.parent.mesh.bvertices[x][y] = 0
         if (event.state & MASK_SHIFT) and (self.parent.selected is not None):
@@ -109,6 +109,7 @@ class Vertex:
 
     def deselect(self):
         self.parent.canvas.itemconfigure(self.id, fill=COLOR_DEFAULT)
+
 
     def move(self, vert):
         self.coords = vert
