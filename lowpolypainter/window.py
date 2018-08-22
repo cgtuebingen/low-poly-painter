@@ -120,7 +120,13 @@ class Window(object):
         exportDialog(self.canvasFrame.mesh, self.canvasFrame.width, self.canvasFrame.height)
 
     def saveMeshData(self, event=None):
-        save(self.canvasFrame.mesh.save1(), path)
+        save(self.canvasFrame.mesh.save(), self.inputimage)
+
+    def loadMeshData(self, event=None):
+        self.canvasFrame.mesh.load(load(self.inputimage))
+
+    def saveMeshDataPath(self, path, event=None):
+        savePath(self.canvasFrame.mesh.save1(), path)
 
     def loadMeshDataPath(self, path, event=None):
         self.canvasFrame.mesh.load1(loadPath(path))
