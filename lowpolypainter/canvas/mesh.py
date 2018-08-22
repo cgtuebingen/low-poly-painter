@@ -195,7 +195,7 @@ class Mesh:
 
     def getVertexByCoords(self, coordinates):
         for vertex in self.vertices:
-            if vertex.coords == coordinates:
+            if vertex.coords[0] == coordinates[0] and vertex.coords[1] == coordinates[1]:
                 return vertex
 
 

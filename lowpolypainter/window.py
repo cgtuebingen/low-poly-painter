@@ -110,6 +110,7 @@ class Window(object):
 
 
     def clear(self, event=None):
+        self.undoManager.do(self)
         # Colorwheel Speicherplaetze
         self.colorWheelSafePoint1 = "black"
         self.colorWheelSafePoint2 = "black"
@@ -140,6 +141,7 @@ class Window(object):
         self.undoManager.redo(self)
 
     def triangulate(self, size=0, random=0):
+        self.undoManager.do(self)
         if self.canvasFrameToogle:
             self.toogleCanvasFrame()
             self.maskFrame.canvas.delete("v")
