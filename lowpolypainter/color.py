@@ -48,7 +48,7 @@ class Color:
         for i in range(length):
             x = vertices[i][0]
             y = vertices[i][1]
-            count = 3 * (y * self.height + x)
+            count = 3 * (y * self.width + x)
             r += self.flattenImageArray[count]
             g += self.flattenImageArray[count + 1]
             b += self.flattenImageArray[count + 2]
