@@ -6,8 +6,8 @@ from PIL import ImageTk, Image
 
 # Local Modules
 from mesh import Mesh
-from lowpolypainter.canny import Canny
 from lowpolypainter.color import Color
+from lowpolypainter.triangulate.triangulate import Triangulate
 
 # Masks
 CTRL_MASK = 0x0004
@@ -32,17 +32,17 @@ class CanvasFrame(Frame):
         self.image = Image.open(filepath)
         self.background = ImageTk.PhotoImage(self.image)
 
-        # Center Canvas 
-        self.grid_rowconfigure(0, weight=1)
-        self.grid_rowconfigure(2, weight=1)
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_columnconfigure(2, weight=1)
+        # # Center Canvas
+        # self.grid_rowconfigure(0, weight=1)
+        # self.grid_rowconfigure(2, weight=1)
+        # self.grid_columnconfigure(0, weight=1)
+        # self.grid_columnconfigure(2, weight=1)
 
         # Create Canvas
         self.width = self.background.width()
         self.height = self.background.height()
         self.canvas = Canvas(self, width=self.width, height=self.height)
-        self.canvas.create_image(1, 1, image=self.background, anchor=NW)
+        self.canvas.create_image(0, 0, image=self.background, anchor=NW)
         self.canvas.grid(row=1, column=1, sticky=NSEW)
 
         # Color Object
@@ -115,20 +115,28 @@ class CanvasFrame(Frame):
         self.selectedFace = [False, None]
         self.mesh.clear()
 
-    """ CANNY """
-    def canny(self):
+    """ Triangulate """
+    def triangulate(self, size=0, random=0):
+
+        points = []
+        for point in self.mesh.vertices:
+            points.append(point.coords)
+        points = np.asarray(points)
+        self.clear()
+
+        triangulate = Triangulate(self.inputimage, points)
         start0 = time.clock()
-        canny = Canny(self.inputimage)
-        canny.generateCorners()
-        canny.generateCanny(99, 100)
-        triangle = canny.generateDelaunay()
+        if size != 0:
+            triangulate.generateCanny()
         end0 = time.clock()
+        triangle = triangulate.triangulate(size, random)
+
 
         start1 = time.clock()
         for tris in triangle:
-            self.mesh.faceToVertexGeneration(canny.points[tris[0]],
-                                             canny.points[tris[1]],
-                                             canny.points[tris[2]])
+            self.mesh.faceToVertexGeneration(triangulate.points[tris[0]],
+                                             triangulate.points[tris[1]],
+                                             triangulate.points[tris[2]])
         end1 = time.clock()
 
         start2 = time.clock()
@@ -143,7 +151,7 @@ class CanvasFrame(Frame):
 
         start4 = time.clock()
         for vert in self.mesh.vertices:
-            vert.draw()
+            vert.draw(False)
         end4 = time.clock()
 
         print 'Delaunay', end0 - start0

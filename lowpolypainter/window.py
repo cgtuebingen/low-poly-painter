@@ -9,6 +9,8 @@ import tkMessageBox
 from store import save, load
 from export import exportDialog
 from canvas.frame import CanvasFrame
+from triangulate.frame import MaskFrame
+from triangulate.frame import TriangulateFrame
 from zoomTransformer import ZoomTransformer
 from Colorwheel import Colorwheel
 
@@ -35,7 +37,6 @@ class Window(object):
         self.root.title('Low Poly Painter')
         self.root.grid_rowconfigure(0, weight=1)
         self.root.grid_columnconfigure(0, weight=1)
-        # print 'DPI value: %f' % self.root.winfo_fpixels('1i')
 
         # Frame
         self.frame = Frame(self.root, bg='white')
@@ -54,17 +55,52 @@ class Window(object):
         self.frame.bind_all("<Button-5>", self.mouse_wheel_button)
 
         # Canvas Frame
+        self.canvasFrameToogle = False
         self.canvasFrame = CanvasFrame(self, inputimage)
         self.canvasFrame.grid(row=1, column=0, sticky=NSEW)
+
+        # Mask Frame
+        self.maskFrame = MaskFrame(self, inputimage)
 
         # Detail Frame
         self.detailFrame = DetailFrame(self)
         self.detailFrame.grid(row=1, column=1, sticky=NSEW)
 
+
         # Color Safepoints
         self.colorWheelSafePoint1 = "black"
         self.colorWheelSafePoint2 = "black"
         self.colorWheelSafePoint3 = "black"
+
+    """ ZOOM """
+    def mouse_wheel_button(self, event):
+        if event.num == 4:
+            self.mouse_wheel(120, 0, 0)
+        elif event.num == 5:
+            self.mouse_wheel(-120, 0, 0)
+
+    def mouse_wheel_wheel(self, event):
+        self.mouse_wheel(event.delta, event.x, event.y)
+
+    def mouse_wheel(self, delta, x, y):
+        self.zoom.ZoomAt(2**(delta * 0.001), [x, y])
+        self.canvasFrame.mesh.updatePositions()
+
+    """ ACTIONS """
+    def toogleCanvasFrame(self, event=None):
+        if self.canvasFrameToogle:
+            self.canvasFrameToogle = False
+            self.maskFrame.grid_remove()
+            self.canvasFrame.grid(row=1, column=0, sticky=NSEW)
+            # print self.canvasFrame.canvas.winfo_width(), self.canvasFrame.canvas.winfo_height()
+            # print self.maskFrame.canvas.winfo_width(), self.maskFrame.canvas.winfo_height()
+        else:
+            self.canvasFrameToogle = True
+            self.canvasFrame.grid_remove()
+            self.maskFrame.grid(row=1, column=0, sticky=NSEW)
+            # print self.canvasFrame.canvas.winfo_width(), self.canvasFrame.canvas.winfo_height()
+            # print self.maskFrame.canvas.winfo_width(), self.maskFrame.canvas.winfo_height()
+
 
     def clear(self, event=None):
         # Colorwheel Speicherplaetze
@@ -82,22 +118,10 @@ class Window(object):
     def loadMeshData(self, event=None):
         self.canvasFrame.mesh.load(load(self.inputimage))
 
-    def triangulate(self, event=None):
-        self.canvasFrame.canny()
+    def triangulate(self, size=0, random=0):
+        self.canvasFrame.triangulate(size, random)
 
-    def mouse_wheel_button(self, event):
-        if event.num == 4:
-            self.mouse_wheel(120, 0, 0)
-        elif event.num == 5:
-            self.mouse_wheel(-120, 0, 0)
-
-    def mouse_wheel_wheel(self, event):
-        self.mouse_wheel(event.delta, event.x, event.y)
-
-    def mouse_wheel(self, delta, x, y):
-        self.zoom.ZoomAt(2**(delta * 0.001), [x, y])
-        self.canvasFrame.mesh.updatePositions()
-
+    # TODO: Move to detail view menu
     def colorwheel(self, event=None):
         if not self.canvasFrame.selectedFace[0]:
             tkMessageBox.showinfo("Error", "No face selected!")
@@ -109,6 +133,12 @@ class Window(object):
         cw.destroy()
         self.canvasFrame.selectedFace[0]=False
 
+    """ DETAIL VIEW """
+    def show_triangulate(self, event=None):
+        self.detailFrame.selectedFrame.grid_forget()
+        self.detailFrame.triangulateFrame.grid(row=0, column=1, sticky=N+E+S+W)
+        self.detailFrame.selectedFrame = self.detailFrame.triangulateFrame
+
 class ToolbarFrame(Frame):
     """
     Toolbar Frame Class
@@ -119,7 +149,7 @@ class ToolbarFrame(Frame):
     def __init__(self, parent, *args, **kwargs):
         Frame.__init__(self, parent.frame)
         self.parent = parent
-        self.config(bg='#DADADA', width=47)
+        self.config(bg='#D8D8D8', width=47)
         self.grid_columnconfigure(0, weight=1)
 
         self.buttonFrame = ButtonFrame(self)
@@ -137,9 +167,8 @@ class ButtonFrame(Frame):
     """
     def __init__(self, parent, *args, **kwargs):
         Frame.__init__(self, parent)
-        self.config(bg='#DADADA', height=46)
+        self.config(bg='#D8D8D8', height=46)
         self.grid_columnconfigure(4, weight=1)
-        # self.grid_rowconfigure(0, weight=0)
 
         icon_0 = PhotoImage(file="./lowpolypainter/resources/icons/Insert.gif")
         icon_1 = PhotoImage(file="./lowpolypainter/resources/icons/Clear.gif")
@@ -148,7 +177,7 @@ class ButtonFrame(Frame):
         icon_4 = PhotoImage(file="./lowpolypainter/resources/icons/Save.gif")
         icon_5 = PhotoImage(file="./lowpolypainter/resources/icons/Export.gif")
 
-        options = {"height": 46, "width": 46, "bg":'#DADADA', "borderwidth":0}
+        options = {"height": 46, "width": 46, "bg":'#D8D8D8', "borderwidth":0}
 
         # Insert Button
         self.insertButton = Label(self, image=icon_0, **options)
@@ -166,7 +195,7 @@ class ButtonFrame(Frame):
         self.cannyButton = Label(self, image=icon_2, **options)
         self.cannyButton.image = icon_2
         self.cannyButton.grid(row=0, column=2, sticky=N+E+S+W)
-        self.cannyButton.bind("<Button-1>", parent.parent.triangulate)
+        self.cannyButton.bind("<Button-1>", parent.parent.show_triangulate)
 
         # Colorwheel Button
         self.colorWheelButton = Label(self, image=icon_3, **options)
@@ -175,7 +204,7 @@ class ButtonFrame(Frame):
         self.colorWheelButton.bind("<Button-1>", parent.parent.colorwheel)
 
         # Space
-        self.space = Label(self, height=2, bg='#DADADA', borderwidth=0)
+        self.space = Label(self, height=2, bg='#D8D8D8', borderwidth=0)
         self.space.grid(row=0, column=4, sticky=N+E+S+W)
 
         # Save Button
@@ -200,11 +229,16 @@ class DetailFrame(Frame):
     def __init__(self, parent, *args, **kwargs):
         Frame.__init__(self, parent.frame)
         self.config(bg='#ECECEC', width=200)
+        self.parent = parent
 
         self.grid_rowconfigure(0, weight=1)
 
-        self.informationFrame = Frame(self, bg='#ECECEC', width=199)
+        self.informationFrame = Frame(self, bg='#ECECEC', width=212)
         self.informationFrame.grid(row=0, column=1, sticky=N+E+S+W)
+        self.selectedFrame = self.informationFrame
+
+        self.triangulateFrame = TriangulateFrame(self)
+        # self.triangulateFrame.grid(row=0, column=1, sticky=N+E+S+W)
 
         self.leftBorder = Frame(self, bg='#AAAAAA', width=1)
         self.leftBorder.grid(row=0, column=0, sticky=N+E+S+W)

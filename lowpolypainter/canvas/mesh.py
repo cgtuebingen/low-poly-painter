@@ -93,6 +93,7 @@ class Mesh:
         self.vertices = []
         self.edges = []
         self.faces = []
+        self.bvertices = np.zeros([self.parent.width, self.parent.height]).tolist()
 
         # Delete from canvas
         self.parent.canvas.delete(TAG_VERTEX)
