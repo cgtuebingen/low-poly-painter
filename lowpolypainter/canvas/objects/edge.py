@@ -74,12 +74,13 @@ class Edge:
 
     def draw(self, user=True):
         vertVisualCoords = [self.verts[0].getVisualCoords(), self.verts[1].getVisualCoords()]
+        self.color = self.getColor()
         self.id = self.parent.canvas.create_line(vertVisualCoords[0][0],
                                                  vertVisualCoords[0][1],
                                                  vertVisualCoords[1][0],
                                                  vertVisualCoords[1][1],
                                                  tag=TAG_EDGE,
-                                                 fill=self.getColor(),
+                                                 fill=self.color,
                                                  width=WIDTH)
 
         self.parent.canvas.tag_bind(self.id, "<Button>", func=self.click)
@@ -98,11 +99,11 @@ class Edge:
         self.parent.canvas.tag_raise(self.id, TAG_EDGE)
 
     def deselect(self):
-        self.parent.canvas.itemconfigure(self.id, fill=self.getColor())
+        self.parent.canvas.itemconfigure(self.id, fill=self.color)
 
     def move(self):
         self.updatePosition()
-         # self.checkValidEdge()
+        self.checkValidEdge()
         for face in self.faces:
             face.move()
 
