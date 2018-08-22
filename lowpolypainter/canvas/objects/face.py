@@ -107,7 +107,7 @@ class Face:
     # TODO Make Faceselection Visible
     def click(self, event):
         if not (event.state & ALT_MASK):
-            self.parent.mouseEvent = True
+            self.parent.mouseEventHandled = True
             self.parent.selectedFace[0] = True
             self.parent.selectedFace[1] = self.id
 

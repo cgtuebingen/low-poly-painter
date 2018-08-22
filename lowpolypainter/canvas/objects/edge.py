@@ -52,7 +52,7 @@ class Edge:
         Shift click on Edge: Place vertex on edge
         Default click on vertex: Sets edge as selected
         '''
-        self.parent.mouseEvent = True
+        self.parent.mouseEventHandled = True
 
         if (event.state & MASK_SHIFT):
             selected = self.parent.selected
