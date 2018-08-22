@@ -57,7 +57,7 @@ class CanvasFrame(Frame):
         self.selected = None
 
          # Mouse Event
-        self.mouseEvent = False
+        self.mouseEventHandled = False
 
         self.faceState = NORMAL
 
@@ -76,7 +76,8 @@ class CanvasFrame(Frame):
         Adds point to canvas, will draw line to last point while ctrl isn't pressed
         """
         eventPoint = [event.x, event.y]
-        if self.inBounds(eventPoint) and not self.mouseEvent:
+        if self.inBounds(eventPoint) and not self.mouseEventHandled:
+            self.parent.undoManager.do(self.parent)
             previousSelected = self.selected
             zoomedCoords = self.parent.zoom.FromViewport([event.x, event.y])
             self.mesh.addVertex([int(zoomedCoords[0]), int(zoomedCoords[1])])
@@ -103,6 +104,7 @@ class CanvasFrame(Frame):
             self.selected = object
 
     def deleteSelected(self, event):
+        self.parent.undoManager.do(self.parent)
         if self.selected is not None:
             self.selected.delete()
             self.selected = None
