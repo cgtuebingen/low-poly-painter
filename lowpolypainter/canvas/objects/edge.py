@@ -55,11 +55,8 @@ class Edge:
         self.parent.mouseEventHandled = True
 
         if (event.state & MASK_SHIFT):
-<<<<<<< HEAD
             self.parent.parent.undoManager.do(self.parent.parent)
-=======
             selected = self.parent.selected
->>>>>>> dc8520c02797c0d2ce88d5fd0283fc4b3ef75315
             vert = self.parent.mesh.addVertex([event.x, event.y])
 
             if isinstance(selected, Vertex):
