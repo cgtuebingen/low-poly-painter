@@ -55,11 +55,11 @@ class Edge:
         self.parent.mouseEvent = True
 
         if (event.state & MASK_SHIFT):
+            selected = self.parent.selected
             vert = self.parent.mesh.addVertex([event.x, event.y])
 
-            # TODO: IF SELECTED IS VERTEX
-            if isinstance(self.parent.selected, Vertex):
-                self.parent.mesh.addEdge(vert, self.parent.selected)
+            if isinstance(selected, Vertex):
+                self.parent.mesh.addEdge(vert, selected)
             self.parent.mesh.addEdge(vert, self.verts[0])
             self.parent.mesh.addEdge(vert, self.verts[1])
             self.delete()
@@ -280,13 +280,13 @@ class Edge:
             self.parent.canvas.tag_raise(self.id, TAG_EDGE)
             self.parent.canvas.itemconfigure(self.id, fill=COLOR_INVALID)
 
-    def addIntersectionWithEdge(self, Edge):
-        self.intersectingEdges.add(Edge)
+    def addIntersectionWithEdge(self, edge):
+        self.intersectingEdges.add(edge)
         if len(self.intersectingEdges) == 1:
             self.setValid(False)
 
-    def removeIntersectionWithEdge(self, Edge):
-        self.intersectingEdges.remove(Edge)
+    def removeIntersectionWithEdge(self, edge):
+        self.intersectingEdges.remove(edge)
         if len(self.intersectingEdges) == 0:
             self.setValid(True)
 
