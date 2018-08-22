@@ -22,6 +22,8 @@ def exportDialog(mesh, width, height):
 
 
 def exportFromCanvasObjectsMesh(filename, mesh, width, height):
+    if filename.endswith('.svg'):
+        filename = filename[:-4]
     img = svgwrite.Drawing(filename + '.svg', size=(str(width), str(height)))
     for face in mesh.faces:
         # vertices for triangle
