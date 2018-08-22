@@ -120,8 +120,8 @@ class Vertex:
         x, y = vert[0], vert[1]
         x = x if x > 0 else 0
         y = y if y > 0 else 0
-        x = x if x <= self.parent.width else self.parent.width - 1
-        y = y if y <= self.parent.height else self.parent.height - 1
+        x = x if x < self.parent.width else self.parent.width - 1
+        y = y if y < self.parent.height else self.parent.height - 1
         return [x, y]
 
     def moveEdges(self):
