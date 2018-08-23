@@ -155,7 +155,7 @@ class MaskFrame(Frame):
         for y in range(point[1] - self.radius, point[1] + self.radius + 1):
             for x in range(point[0] - self.radius, point[0] + self.radius + 1):
                 if self.inBounds([x,y]):
-                    self.mask[y][x] = 1
+                    self.mask[x][y] = 1
 
 
     def inBounds(self, point):
