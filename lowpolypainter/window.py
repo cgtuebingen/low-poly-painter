@@ -152,7 +152,7 @@ class Window(object):
 
 
     def generateBorder(self):
-        self.canvasFrame.border()
+        self.canvasFrame.generateBorder(6)
 
     def triangulate(self, size=0, random=0):
         self.undoManager.do(self)

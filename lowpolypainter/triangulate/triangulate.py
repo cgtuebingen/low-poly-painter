@@ -20,31 +20,6 @@ class Triangulate(object):
         self.image = cv2.imread(filepath + inputimage, 0)
         self.points = np.array([], dtype=int).reshape(0,2)
 
-    def generateCorners(self, step):
-        height, width = self.image.shape[:2]
-
-        # Height
-        height_indices = np.arange(0, height, math.floor(height/step), dtype=int)
-        height_indices[-1] = height - 1
-        height_points_west = np.zeros((len(height_indices), 2), dtype=int)
-        height_points_east = np.zeros((len(height_indices), 2), dtype=int)
-        for i in range(len(height_points_west)):
-            height_points_west[i][1] = height_indices[i]
-            height_points_east[i] = [width - 1, height_indices[i]]
-        self.points = np.vstack([self.points, height_points_west])
-        self.points = np.vstack([self.points, height_points_east])
-
-        # Width
-        width_indices = np.arange(0, width, math.floor(width/step), dtype=int)
-        width_indices[-1] = width - 1
-        width_points_north = np.zeros((len(width_indices), 2), dtype=int)
-        width_points_south = np.zeros((len(width_indices), 2), dtype=int)
-        for i in range(len(width_points_north)):
-            width_points_north[i][0] = width_indices[i]
-            width_points_south[i] = [width_indices[i], height - 1]
-        self.points = np.vstack([self.points, width_points_north])
-        self.points = np.vstack([self.points, width_points_south])
-
     def generateRandom(self, size):
         if size == 0:
             return

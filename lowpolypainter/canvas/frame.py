@@ -1,5 +1,6 @@
 # Python Modules
 import time
+import math
 import numpy as np
 from Tkinter import *
 from PIL import ImageTk, Image
@@ -84,6 +85,35 @@ class CanvasFrame(Frame):
             if (previousSelected is not None) and not (event.state & CTRL_MASK):
                 self.mesh.addEdge(previousSelected, self.selected)
         self.mouseEventHandled = False
+
+    def generateBorder(self, step):
+        width = self.width
+        height = self.height
+
+        # Height
+        height_indices = np.arange(0, height, math.floor(height/step), dtype=int)
+        height_indices[-1] = height - 1
+        height_points_west = np.zeros((len(height_indices), 2), dtype=int)
+        height_points_east = np.zeros((len(height_indices), 2), dtype=int)
+        for i in range(len(height_points_west)):
+            height_points_west[i][1] = height_indices[i]
+            height_points_east[i] = [width - 1, height_indices[i]]
+        points = height_points_west
+        points = np.vstack([points, height_points_east])
+
+        # Width
+        width_indices = np.arange(0, width, math.floor(width/step), dtype=int)
+        width_indices[-1] = width - 1
+        width_points_north = np.zeros((len(width_indices), 2), dtype=int)
+        width_points_south = np.zeros((len(width_indices), 2), dtype=int)
+        for i in range(len(width_points_north)):
+            width_points_north[i][0] = width_indices[i]
+            width_points_south[i] = [width_indices[i], height - 1]
+        points = np.vstack([points, width_points_north])
+        points = np.vstack([points, width_points_south])
+
+        for point in points:
+            self.mesh.addVertex([int(point[0]), int(point[1])])
 
     """ FACE """
     def toggleFaces(self, event):

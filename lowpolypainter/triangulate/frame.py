@@ -20,52 +20,69 @@ class TriangulateFrame(Frame):
         self.grid_columnconfigure(3, weight=1)
         self.grid_rowconfigure(3, weight=1)
 
-        self.left_keeper = Frame(self, bg='#ECECEC', width=10)
-        self.left_keeper.grid(row=0, column=0, sticky=N+E+S+W)
+        color = '#ECECEC'
+        color_opts = {'bg': color}
+        entry_opts = {'width':0,
+                         'justify':'right',
+                         'highlightbackground':color}
+        button_opts = {'highlightthickness':0,
+                          'highlightbackground':'#ECECEC'}
 
-        self.right_keeper = Frame(self, bg='#ECECEC', width=10)
-        self.right_keeper.grid(row=0, column=3, sticky=N+E+S+W)
+        self.left_keeper = Frame(self, width=10, **color_opts)
+        self.left_keeper.grid(row=0, column=0, sticky=NSEW)
 
-        self.width_keeper_1 = Frame(self, bg='#ECECEC', width=110)
-        self.width_keeper_1.grid(row=0, column=1, sticky=N+E+S+W)
+        self.right_keeper = Frame(self, width=10, **color_opts)
+        self.right_keeper.grid(row=0, column=3, sticky=NSEW)
 
-        self.width_keeper_2 = Frame(self,bg='#ECECEC',  width=82)
-        self.width_keeper_2.grid(row=0, column=2, sticky=N+E+S+W)
+        self.width_keeper_1 = Frame(self, width=110, **color_opts)
+        self.width_keeper_1.grid(row=0, column=1, sticky=NSEW)
 
-        self.cannyLabel = Label(self, bg='#ECECEC', text='Canny Points')
+        self.width_keeper_2 = Frame(self,  width=82, **color_opts)
+        self.width_keeper_2.grid(row=0, column=2, sticky=NSEW)
+
+        self.cannyLabel = Label(self, text='Canny Points', **color_opts)
         self.cannyLabel.grid(row=1, column=1, sticky=N+W+S)
 
-        self.cannyEntry = Entry(self, width=0, highlightbackground='#ECECEC',justify='right')
-        self.cannyEntry.grid(row=1, column=2, sticky=N+E+S+W)
+        self.cannyEntry = Entry(self, **entry_opts)
+        self.cannyEntry.grid(row=1, column=2, sticky=NSEW)
         self.cannyEntry.insert(0,'0')
 
-        self.randomLabel = Label(self, bg='#ECECEC', text='Random Points')
+        self.randomLabel = Label(self, text='Random Points', **color_opts)
         self.randomLabel.grid(row=2, column=1, sticky=N+W+S)
 
-        self.randomEntry = Entry(self, width=0,highlightbackground='#ECECEC', justify='right')
-        self.randomEntry.grid(row=2, column=2, sticky=N+E+S+W)
+        self.randomEntry = Entry(self, **entry_opts)
+        self.randomEntry.grid(row=2, column=2, sticky=NSEW)
         self.randomEntry.insert(0,'0')
 
-        self.height_keeper = Frame(self, bg='#ECECEC')
-        self.height_keeper.grid(row=3, column=1, sticky=N+E+S+W)
+        self.height_keeper = Frame(self, **color_opts)
+        self.height_keeper.grid(row=3, column=1, sticky=NSEW)
 
-        self.maskButton = Button(self, highlightthickness=0, highlightbackground='#ECECEC', text='Mask', command=self.mask)
+        mask_opts = {'text':'Mask', 'command':self.mask}
+        mask_opts.update(button_opts)
+
+        self.maskButton = Button(self, **mask_opts)
         self.maskButton.grid(row=4, column=1, columnspan=2, sticky=N+E+S+W)
 
-        self.spacer = Frame(self, bg='#ECECEC', height=10)
-        self.spacer.grid(row=5, column=1, sticky=N+E+S+W)
+        self.spacer = Frame(self, height=10, **color_opts)
+        self.spacer.grid(row=5, column=1, sticky=NSEW)
 
-        self.borderButton = Button(self, highlightthickness=0, highlightbackground='#ECECEC', text='Border', command=self.border)
+        border_opts = {'text':'Border', 'command':self.border}
+        border_opts.update(button_opts)
+
+        self.borderButton = Button(self, **border_opts)
         self.borderButton.grid(row=6, column=1, columnspan=2, sticky=N+E+S+W)
 
-        self.spacer2 = Frame(self, bg='#ECECEC', height=10)
-        self.spacer2.grid(row=7, column=1, sticky=N+E+S+W)
+        self.spacer2 = Frame(self, height=10, **color_opts)
+        self.spacer2.grid(row=7, column=1, sticky=NSEW)
 
-        self.triangulateButton = Button(self, highlightthickness=0, highlightbackground='#ECECEC', text='Triangulate', command=self.triangulate)
-        self.triangulateButton.grid(row=8, column=1, columnspan=2, sticky=N+E+S+W)
+        triangulate_opts = {'text':'Triangulate', 'command':self.triangulate}
+        triangulate_opts.update(button_opts)
 
-        self.bottom_keeper = Frame(self, bg='#ECECEC', height=10)
-        self.bottom_keeper.grid(row=9, column=1, sticky=N+E+S+W)
+        self.triangulateButton = Button(self, **triangulate_opts)
+        self.triangulateButton.grid(row=8, column=1, columnspan=2, sticky=NSEW)
+
+        self.bottom_keeper = Frame(self, height=10, **color_opts)
+        self.bottom_keeper.grid(row=9, column=1, sticky=NSEW)
 
     def mask(self):
         self.parent.parent.toogleCanvasFrame()
@@ -82,6 +99,7 @@ class TriangulateFrame(Frame):
             self.cannyEntry.delete(0,END)
             self.randomEntry.delete(0,END)
 
+
 class MaskFrame(Frame):
     """
     Mask Frame Class
@@ -89,6 +107,7 @@ class MaskFrame(Frame):
     Description:
     Mask image for specific triangulation
     """
+
     def __init__(self, parent, inputimage, *args, **kwargs):
         Frame.__init__(self, parent.frame)
 
@@ -115,24 +134,26 @@ class MaskFrame(Frame):
         self.canvas.bind("<B1-Motion>", func=self.click)
         self.canvas.grid(row=1, column=1, sticky=NSEW)
 
+        # Radius
+        self.radius = 2
+
         # Mask
         self.mask = np.zeros([self.width, self.height], dtype=bool)
-
-        # Radius
-        self.r = 2
 
     def click(self, event):
         point = [event.x, event.y]
         if self.inBounds(point):
             self.addPointToMask(point)
-            self.canvas.create_oval(point[0] - self.r, point[1] - self.r,
-                                    point[0] + self.r, point[1] + self.r,
+            self.canvas.create_oval(point[0] - self.radius,
+                                    point[1] - self.radius,
+                                    point[0] + self.radius,
+                                    point[1] + self.radius,
                                     outline = "", fill = 'green', tag = 'v')
 
     def addPointToMask(self, point):
         # TODO: Currently rectenagle but is circle
-        for y in range(point[1] - self.r, point[1] + self.r + 1):
-            for x in range(point[0] - self.r, point[0] + self.r + 1):
+        for y in range(point[1] - self.radius, point[1] + self.radius + 1):
+            for x in range(point[0] - self.radius, point[0] + self.radius + 1):
                 if self.inBounds([x,y]):
                     self.mask[y][x] = 1
 
