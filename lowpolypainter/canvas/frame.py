@@ -32,11 +32,11 @@ class CanvasFrame(Frame):
         self.image = Image.open(filepath)
         self.background = ImageTk.PhotoImage(self.image)
 
-        # # Center Canvas
-        # self.grid_rowconfigure(0, weight=1)
-        # self.grid_rowconfigure(2, weight=1)
-        # self.grid_columnconfigure(0, weight=1)
-        # self.grid_columnconfigure(2, weight=1)
+        # Center Canvas
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_rowconfigure(2, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(2, weight=1)
 
         # Create Canvas
         self.width = self.background.width()
@@ -118,47 +118,47 @@ class CanvasFrame(Frame):
         self.mesh.clear()
 
     """ Triangulate """
-    def triangulate(self, size=0, random=0, mask=None):
+    def border(self):
+        print 'nothing yet'
 
+
+    def triangulate(self, size=0, random=0, mask=None):
+        if mask is None or len(mask[mask != 0]) == 0:
+            mask = np.ones([self.width, self.height], dtype=bool)
+
+        # Get points in mask
         points = []
-        for point in self.mesh.vertices:
-            points.append(point.coords)
+        verts = np.asarray(self.mesh.bvertices)[np.transpose(mask)]
+        verts = verts[verts != 0.0]
+
+        # Need min 4 points
+        if len(verts) + size <= 3:
+            return
+
+        for vert in verts:
+            vert.deconnect()
+            points.append(vert.coords)
         points = np.asarray(points)
-        self.clear()
 
         triangulate = Triangulate(self.inputimage, points)
-        start0 = time.clock()
+
         if size != 0:
-            print 'hey1'
             triangulate.generateCanny(mask=mask)
-        end0 = time.clock()
+
         triangle = triangulate.triangulate(size, random)
 
-
-        start1 = time.clock()
+        # Generate Mesh Objects
         for tris in triangle:
             self.mesh.faceToVertexGeneration(triangulate.points[tris[0]],
                                              triangulate.points[tris[1]],
                                              triangulate.points[tris[2]])
-        end1 = time.clock()
 
-        start2 = time.clock()
+        # Draw
         for face in self.mesh.faces:
             face.draw(False)
-        end2 = time.clock()
 
-        start3 = time.clock()
         for edge in self.mesh.edges:
             edge.draw(False)
-        end3 = time.clock()
 
-        start4 = time.clock()
         for vert in self.mesh.vertices:
             vert.draw(False)
-        end4 = time.clock()
-
-        print 'Delaunay', end0 - start0
-        print 'Mesh Generation', end1 - start1
-        print 'Draw Face', end2 - start2
-        print 'Draw Edge', end3 - start3
-        print 'Draw Vert', end4 - start4

@@ -55,14 +55,23 @@ class TriangulateFrame(Frame):
         self.spacer = Frame(self, bg='#ECECEC', height=10)
         self.spacer.grid(row=5, column=1, sticky=N+E+S+W)
 
+        self.borderButton = Button(self, highlightthickness=0, highlightbackground='#ECECEC', text='Border', command=self.border)
+        self.borderButton.grid(row=6, column=1, columnspan=2, sticky=N+E+S+W)
+
+        self.spacer2 = Frame(self, bg='#ECECEC', height=10)
+        self.spacer2.grid(row=7, column=1, sticky=N+E+S+W)
+
         self.triangulateButton = Button(self, highlightthickness=0, highlightbackground='#ECECEC', text='Triangulate', command=self.triangulate)
-        self.triangulateButton.grid(row=6, column=1, columnspan=2, sticky=N+E+S+W)
+        self.triangulateButton.grid(row=8, column=1, columnspan=2, sticky=N+E+S+W)
 
         self.bottom_keeper = Frame(self, bg='#ECECEC', height=10)
-        self.bottom_keeper.grid(row=7, column=1, sticky=N+E+S+W)
+        self.bottom_keeper.grid(row=9, column=1, sticky=N+E+S+W)
 
     def mask(self):
         self.parent.parent.toogleCanvasFrame()
+
+    def border(self):
+        self.parent.parent.generateBorder()
 
     def triangulate(self):
         try:
@@ -93,10 +102,10 @@ class MaskFrame(Frame):
         self.background = ImageTk.PhotoImage(self.image)
 
         # Center Canvas
-        # self.grid_rowconfigure(0, weight=1)
-        # self.grid_rowconfigure(2, weight=1)
-        # self.grid_columnconfigure(0, weight=1)
-        # self.grid_columnconfigure(2, weight=1)
+        self.grid_rowconfigure(0, weight=1)
+        self.grid_rowconfigure(2, weight=1)
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(2, weight=1)
 
         # Create Canvas
         self.width = self.background.width()

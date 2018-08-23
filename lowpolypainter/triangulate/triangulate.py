@@ -67,9 +67,8 @@ class Triangulate(object):
         cropped_indices = indices[:size]
         self.points = self.points[cropped_indices]
 
-    def triangulate(self, size=1000, random=50, corners=6):
+    def triangulate(self, size=1000, random=50):
         self.subsetCanny(size)
-        self.generateCorners(corners)
         self.generateRandom(random)
         if len(self.oldPoints) != 0:
             self.points = np.vstack([self.points, self.oldPoints])

@@ -35,6 +35,9 @@ class Vertex:
         # Dependencies
         self.parent = frame
 
+        # trace start of movement
+        self.firstMove = True
+
         # User clicked canvas
         if not user:
             return
@@ -45,9 +48,6 @@ class Vertex:
         # Select
         self.select()
         self.parent.select(self)
-
-        # trace start of movement
-        self.firstMove = True
 
     """ EVENTS """
     def clickHandle(self, event):
@@ -72,7 +72,7 @@ class Vertex:
         zoomedCoords = self.parent.parent.zoom.FromViewport([event.x, event.y])
         self.move(self.moveInBounds([int(zoomedCoords[0]), int(zoomedCoords[1])]))
         self.expand(event)
-        
+
 
     def releaseHandle(self, event):
         # Merge verts when droped on same position
@@ -83,21 +83,21 @@ class Vertex:
             self.mergeWithVertex(vert)
         self.parent.mesh.bvertices[x][y] = self
         self.parent.mouseEvent = False
-        
+
     def expand(self, event):
         visualCoords = self.getVisualCoords()
         self.parent.canvas.coords(self.id, visualCoords[0] - LARGE_RADIUS,
                                           visualCoords[1] - LARGE_RADIUS,
                                           visualCoords[0] + LARGE_RADIUS,
-                                          visualCoords[1] + LARGE_RADIUS,) 
-        
+                                          visualCoords[1] + LARGE_RADIUS,)
+
     def shrink(self, event):
         visualCoords = self.getVisualCoords()
         self.parent.canvas.coords(self.id, visualCoords[0] - RADIUS,
                                           visualCoords[1] - RADIUS,
                                           visualCoords[0] + RADIUS,
-                                          visualCoords[1] + RADIUS,) 
-        
+                                          visualCoords[1] + RADIUS,)
+
     """ GENERAL """
     def draw(self, user=False):
         visualCoords = self.getVisualCoords()
@@ -162,7 +162,14 @@ class Vertex:
         for edge in queue:
             edge.delete()
 
+        self.parent.mesh.bvertices[int(self.coords[0])][int(self.coords[1])] = 0
         self.parent.mesh.vertices.remove(self)
+        self.parent.canvas.delete(self.id)
+
+    def deconnect(self):
+        queue = self.edges[:]
+        for edge in queue:
+            edge.delete()
         self.parent.canvas.delete(self.id)
 
     def getVisualCoords(self):

@@ -27,17 +27,27 @@ class Window(object):
     def __init__(self, inputimage):
         self.root = Tk()
 
+        # Zoom
         self.zoom = ZoomTransformer()
 
+        # Image Path
         self.inputimage = inputimage
 
         # Settings
-        self.root.minsize(800, 400)
+        off_x = 0
+        off_y = -100
+        min_width = 800
+        min_height = 400
         self.root.config(bg='white')
         self.root.resizable(True, False)
         self.root.title('Low Poly Painter')
+        self.root.minsize(min_width, min_height)
         self.root.grid_rowconfigure(0, weight=1)
         self.root.grid_columnconfigure(0, weight=1)
+        dist_right = int(self.root.winfo_screenwidth()/2 - min_width/2 + off_x)
+        dist_down = int(self.root.winfo_screenheight()/2 - min_height/2 + off_y)
+        self.root.geometry("+{}+{}".format(dist_right, dist_down))
+
 
         # Frame
         self.frame = Frame(self.root, bg='white')
@@ -139,6 +149,10 @@ class Window(object):
     # redoes the last undo
     def redo(self, event=None):
         self.undoManager.redo(self)
+
+
+    def generateBorder(self):
+        self.canvasFrame.border()
 
     def triangulate(self, size=0, random=0):
         self.undoManager.do(self)

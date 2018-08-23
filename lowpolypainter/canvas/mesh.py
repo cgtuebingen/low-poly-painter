@@ -103,12 +103,11 @@ class Mesh:
         self.parent.canvas.delete(TAG_FACE)
         self.parent.selected = None
 
-
     def faceToVertexGeneration(self, point1, point2, point3):
         # Fast way to generate given face by points
         # Starts at face and generates edges and vertices
         # Init methodes are not used as they should be used
-        # (!) Point should be array of coordinate
+        # (!) Point should be array of coordinates
 
         # Vertices
         vert1 = self.bvertices[point1[0]][point1[1]]
