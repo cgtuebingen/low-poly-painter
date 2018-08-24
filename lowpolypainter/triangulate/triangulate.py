@@ -30,6 +30,7 @@ class Triangulate(object):
         self.points = np.vstack([self.points, random_points])
 
     def generateCanny(self, sigma=0, mask=None):
+        mask = np.transpose(mask)
         cannyPoints = feature.canny(self.image, sigma=sigma, mask=mask)
         cannyPointsIndices = np.nonzero(cannyPoints)
         cannyPointsCombined = np.vstack((cannyPointsIndices[1],
@@ -47,4 +48,4 @@ class Triangulate(object):
         self.generateRandom(random)
         if len(self.oldPoints) != 0:
             self.points = np.vstack([self.points, self.oldPoints])
-        return Delaunay(self.points).simplices
+        return Delaunay(self.points).simplices if len(self.points) != 0 else []

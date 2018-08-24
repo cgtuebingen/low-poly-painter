@@ -148,21 +148,18 @@ class CanvasFrame(Frame):
         self.mesh.clear()
 
     """ Triangulate """
-    def border(self):
-        print 'nothing yet'
-
-
     def triangulate(self, size=0, random=0, mask=None):
         if mask is None or len(mask[mask != 0]) == 0:
             mask = np.ones([self.width, self.height], dtype=bool)
 
         # Get points in mask
         points = []
-        verts = np.asarray(self.mesh.bvertices)[np.transpose(mask)]
+        verts = np.asarray(self.mesh.bvertices)[mask]
         verts = verts[verts != 0.0]
 
+
         # Need min 4 points
-        if len(verts) + size <= 3:
+        if len(verts) + size + random <= 3:
             return
 
         for vert in verts:
