@@ -150,9 +150,12 @@ class Window(object):
     def redo(self, event=None):
         self.undoManager.redo(self)
 
+    def generateBorder(self, borderpoints=6):
+        self.canvasFrame.generateBorder(borderpoints)
 
-    def generateBorder(self):
-        self.canvasFrame.generateBorder(6)
+    def generateBorderAndTriangulate(self, event=None):
+        self.generateBorder()
+        self.triangulate()
 
     def triangulate(self, size=0, random=0):
         self.undoManager.do(self)
@@ -211,7 +214,7 @@ class ButtonFrame(Frame):
     def __init__(self, parent, *args, **kwargs):
         Frame.__init__(self, parent)
         self.config(bg='#DADADA', height=46)
-        self.grid_columnconfigure(6, weight=1)
+        self.grid_columnconfigure(7, weight=1)
         # self.grid_rowconfigure(0, weight=0)
 
         icon_0 = PhotoImage(file="./lowpolypainter/resources/icons/Insert.gif")
@@ -222,6 +225,7 @@ class ButtonFrame(Frame):
         icon_5 = PhotoImage(file="./lowpolypainter/resources/icons/Export.gif")
         icon_6 = PhotoImage(file="./lowpolypainter/resources/icons/Undo.gif")
         icon_7 = PhotoImage(file="./lowpolypainter/resources/icons/Redo.gif")
+        icon_8 = PhotoImage(file="./lowpolypainter/resources/icons/Borders.png")
 
         options = {"height": 46, "width": 46, "bg":'#D8D8D8', "borderwidth":0}
 
@@ -261,20 +265,26 @@ class ButtonFrame(Frame):
         self.redoButton.grid(row=0, column=5, sticky=N+E+S+W)
         self.redoButton.bind("<Button-1>", parent.parent.redo)
 
+        # Borders Button
+        self.redoButton = Label(self, image=icon_8, **options)
+        self.redoButton.image = icon_8
+        self.redoButton.grid(row=0, column=6, sticky=N+E+S+W)
+        self.redoButton.bind("<Button-1>", parent.parent.generateBorderAndTriangulate)
+
         # Space
         self.space = Label(self, height=2, bg='#DADADA', borderwidth=0)
-        self.space.grid(row=0, column=6, sticky=N+E+S+W)
+        self.space.grid(row=0, column=7, sticky=N+E+S+W)
 
         # Save Button
         self.saveButton = Label(self, image=icon_4, **options)
         self.saveButton.image = icon_4
-        self.saveButton.grid(row=0, column=7, sticky=N+E+S+W)
+        self.saveButton.grid(row=0, column=8, sticky=N+E+S+W)
         self.saveButton.bind("<Button-1>", parent.parent.saveMeshData)
 
         # Export Button
         self.exportButton = Label(self, image=icon_5, **options)
         self.exportButton.image = icon_5
-        self.exportButton.grid(row=0, column=8, sticky=N+E+S+W)
+        self.exportButton.grid(row=0, column=9, sticky=N+E+S+W)
         self.exportButton.bind("<Button-1>", parent.parent.export)
 
 class DetailFrame(Frame):
