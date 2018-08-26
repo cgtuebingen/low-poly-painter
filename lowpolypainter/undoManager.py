@@ -46,6 +46,11 @@ class UndoManager:
             self.undoStack.push(window)
             window.canvasFrame.mesh.clear()
             window.loadMeshDataPath('lowpolypainter/resources/temp/temp' + str(oldVersionNumber) + '.py')
+            
+    def clear(self):
+        self.undoStack.clear()
+        self.redoStack.clear()
+        
     
     
 

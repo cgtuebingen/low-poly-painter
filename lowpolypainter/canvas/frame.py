@@ -189,3 +189,28 @@ class CanvasFrame(Frame):
 
         for vert in self.mesh.vertices:
             vert.draw(False)
+            
+    def insert(self, path, name):
+        self.inputimage = name
+        self.image = Image.open(path)
+        self.background = ImageTk.PhotoImage(self.image)
+        self.width = self.background.width()
+        self.height = self.background.height()
+        self.canvas.configure(width=self.width, height=self.height)
+        self.canvas.create_image(0, 0, image=self.background, anchor=NW)
+        
+        self.color = Color(np.array(self.image), 0.5, 0.5)
+
+        self.selectedFace = [False, None]
+
+        # Mesh
+        self.mesh = Mesh(self)
+
+        # Selection
+        self.selected = None
+
+         # Mouse Event
+        self.mouseEventHandled = False
+
+        self.faceState = NORMAL
+        

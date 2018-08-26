@@ -4,6 +4,7 @@ import numpy as np
 from Tkinter import *
 from PIL import ImageTk, Image
 import tkMessageBox
+import tkFileDialog
 
 # Local Modules
 from store import save, load, savePath, loadPath
@@ -119,6 +120,11 @@ class Window(object):
             # print self.maskFrame.canvas.winfo_width(), self.maskFrame.canvas.winfo_height()
 
 
+    def insert(self, event=None):
+        file_path = tkFileDialog.askopenfilename(filetypes=[("all files","*"), ("portable pixmap","*.ppm"), ("JPEG","*.jpg")])
+        if file_path != "":
+            self.loadImage(file_path)
+
     def clear(self, event=None):
         self.undoManager.do(self)
         # Colorwheel Speicherplaetze
@@ -184,6 +190,19 @@ class Window(object):
         self.detailFrame.selectedFrame.grid_forget()
         self.detailFrame.triangulateFrame.grid(row=0, column=1, sticky=N+E+S+W)
         self.detailFrame.selectedFrame = self.detailFrame.triangulateFrame
+        
+    def loadImage(self, path):
+        name = path[path.rindex('/')+1:]
+        # changes in window
+        self.inputimage = name
+        self.undoManager.clear()
+        # changes in canvas
+        self.canvasFrame.insert(path, name)
+        # changes in maskFrame
+        self.maskFrame.insert(path, name)
+        # changes in frame
+        self.frame.update()
+        
 
 class ToolbarFrame(Frame):
     """
@@ -225,7 +244,7 @@ class ButtonFrame(Frame):
         icon_5 = PhotoImage(file="./lowpolypainter/resources/icons/Export.gif")
         icon_6 = PhotoImage(file="./lowpolypainter/resources/icons/Undo.gif")
         icon_7 = PhotoImage(file="./lowpolypainter/resources/icons/Redo.gif")
-        icon_8 = PhotoImage(file="./lowpolypainter/resources/icons/Borders.png")
+        icon_8 = PhotoImage(file="./lowpolypainter/resources/icons/Borders.gif")
 
         options = {"height": 46, "width": 46, "bg":'#D8D8D8', "borderwidth":0}
 
@@ -233,7 +252,7 @@ class ButtonFrame(Frame):
         self.insertButton = Label(self, image=icon_0, **options)
         self.insertButton.image = icon_0
         self.insertButton.grid(row=0, column=0, sticky=N+E+S+W)
-        # self.insertButton.bind("<Button-1>", parent.parent.clear)
+        self.insertButton.bind("<Button-1>", parent.parent.insert)
 
         # Clear Button
         self.clearButton = Label(self, image=icon_1, **options)
