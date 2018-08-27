@@ -1,3 +1,5 @@
+import numpy as np
+
 # TAG
 TAG_VERTEX = "v"
 TAG_EDGE = "e"
@@ -32,7 +34,7 @@ class Face:
             return
 
         # Update
-        self.coords = self.getCoordinates(self.getVertices())
+        self.coords = self.getCoordinates(self.getVerticesCoords())
         self.color = self.getColorFromImage()
         self.draw()
 
@@ -52,12 +54,12 @@ class Face:
                                                     tag=TAG_FACE,
                                                     state=self.parent.faceState)
         self.parent.canvas.tag_bind(self.id, "<Button>", func=self.click)
-        
+
         if user:
             self.parent.canvas.tag_lower(self.id, TAG_EDGE)
 
     def updatePosition(self):
-        self.coords = self.getCoordinates(self.getVertices())
+        self.coords = self.getCoordinates(self.getVerticesCoords())
         vertVisualCoords = [self.parent.parent.zoom.ToViewport(self.coords[0]),
                             self.parent.parent.zoom.ToViewport(self.coords[1]),
                             self.parent.parent.zoom.ToViewport(self.coords[2])]
@@ -87,7 +89,7 @@ class Face:
         self.parent.mesh.faces.remove(self)
         self.parent.canvas.delete(self.id)
 
-    def getVertices(self):
+    def getVerticesCoords(self):
         vert1 = self.edges[0].verts[0].coords
         vert2 = self.edges[0].verts[1].coords
         vert3 = self.edges[1].verts[0].coords
@@ -95,6 +97,14 @@ class Face:
             vert3 = self.edges[1].verts[1].coords
         return [vert1, vert2, vert3]
 
+    def getVertices(self):
+        vert1 = self.edges[0].verts[0]
+        vert2 = self.edges[0].verts[1]
+        vert3 = self.edges[1].verts[0]
+        if vert3 is vert1 or vert3 is vert2:
+            vert3 = self.edges[1].verts[1]
+        return [vert1, vert2, vert3]
+    # what is happening here?
     def getCoordinates(self, verts):
         verts.sort(key = lambda vert: vert[1], reverse = False)
         if verts[0][1] == verts[1][1]:
@@ -123,7 +133,7 @@ class Face:
     # Calculate if a given Point is inside the current face
     # Using a given a rectangle as raw approximation and barycentric coordinates for fine tuning.
     def pointInside(self, point):
-        coords = self.getCoordinates(self.getVertices())
+        coords = self.getCoordinates(self.getVerticesCoords())
         if (coords[0][0]>point[0] and coords[1][0]>point[0] and coords[2][0]>point[0]):
             return False
         if (coords[0][0]<point[0] and coords[1][0]<point[0] and coords[2][0]<point[0]):
@@ -144,3 +154,24 @@ class Face:
                 return True
             else:
                 return False
+
+    def calcVerticesDegrees(self):
+        verts = self.getVertices()
+        # points
+        A = np.array((verts[0].coords[0], verts[0].coords[1]))
+        B = np.array((verts[1].coords[0], verts[1].coords[1]))
+        C = np.array((verts[2].coords[0], verts[2].coords[1]))
+
+        # lines
+        a = np.linalg.norm(B-C)
+        b = np.linalg.norm(A-C)
+        c = np.linalg.norm(A-B)
+
+        # degrees
+        alpha = np.degrees(np.arccos( (a**2 - b**2 - c**2) / (-2*b*c) ))
+        beta = np.degrees(np.arccos( (b**2 - a**2 - c**2) / (-2*a*c) ))
+        gamma = np.degrees(np.arccos( (c**2 - a**2 - b**2) / (-2*a*b) ))
+
+        verts[0].degree += alpha
+        verts[1].degree += beta
+        verts[2].degree += gamma

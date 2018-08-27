@@ -24,7 +24,7 @@ def exportFromCanvasObjectsMesh(filename, mesh, width, height):
     img = svgwrite.Drawing(filename + '.svg', size=(str(width), str(height)))
     for face in mesh.faces:
         # vertices for triangle
-        points = face.getCoordinates(face.getVertices())
+        points = face.getCoordinates(face.getVerticesCoords())
         # color of the face, converted to decimal rgb values
         color = svgwrite.rgb(r=int(face.color[1:3], 16),
                              g=int(face.color[3:5], 16),

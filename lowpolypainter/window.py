@@ -174,6 +174,20 @@ class Window(object):
         else:
             self.canvasFrame.triangulate(size, random)
 
+    # check if a vertex is an outer vertex
+    def updateOuterVertices(self):
+        # reset vertex degrees to 0
+        for vertex in self.canvasFrame.mesh.vertices:
+            vertex.degree = 0
+
+        # calculate degree of enclosing angles by surrounding faces
+        for face in self.canvasFrame.mesh.faces:
+            face.calcVerticesDegrees()
+
+        # if enclosing angle degree is not 360 a vertex is an outer vertex
+        for vertex in self.canvasFrame.mesh.vertices:
+            vertex.updateIsOuter()
+
     # TODO: Move to detail view menu
     def colorwheel(self, event=None):
         if not self.canvasFrame.selectedFace[0]:

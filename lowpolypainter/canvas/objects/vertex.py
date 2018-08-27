@@ -49,6 +49,10 @@ class Vertex:
         self.select()
         self.parent.select(self)
 
+        # for border algorithm
+        self.isOuter = False
+        self.degree = 0
+
     """ EVENTS """
     def clickHandle(self, event):
         '''
@@ -174,6 +178,10 @@ class Vertex:
 
     def getVisualCoords(self):
         return self.parent.parent.zoom.ToViewport(self.coords)
+
+    def updateIsOuter(self, range=0.001):
+        if self.degree < 360 - range:
+            self.isOuter = True
 
     """ EDGE """
     def getEdge(self, vert):
