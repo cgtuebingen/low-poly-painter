@@ -194,6 +194,7 @@ class Window(object):
     def loadImage(self, path):
         name = path[path.rindex('/')+1:]
         # changes in window
+        self.clear()
         self.inputimage = name
         self.undoManager.clear()
         # changes in canvas
