@@ -68,6 +68,7 @@ class Window(object):
 
         self.frame.bind_all("<Control-z>", self.undo)
         self.frame.bind_all("<Control-y>", self.redo)
+        self.frame.bind_all("<Control-s>", self.saveMeshData)
 
         # Canvas Frame
         self.canvasFrameToogle = False
