@@ -165,7 +165,10 @@ class MaskFrame(Frame):
     def insert(self, path, name):
         # Load Image
         self.inputimage = name
-        self.image = Image.open(path)
+        if isinstance(path, basestring):
+            self.image = Image.open(path)
+        else:
+            self.image = path
         self.background = ImageTk.PhotoImage(self.image)
 
         # Center Canvas

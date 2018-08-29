@@ -5,9 +5,10 @@ from Tkinter import *
 from PIL import ImageTk, Image
 import tkMessageBox
 import tkFileDialog
+import os, errno
 
 # Local Modules
-from store import save, load, savePath, loadPath
+from store import save, load, savePath, loadPath, saveState
 from export import exportDialog
 from canvas.frame import CanvasFrame
 from triangulate.frame import MaskFrame
@@ -68,7 +69,7 @@ class Window(object):
 
         self.frame.bind_all("<Control-z>", self.undo)
         self.frame.bind_all("<Control-y>", self.redo)
-        self.frame.bind_all("<Control-s>", self.saveMeshData)
+        self.frame.bind_all("<Control-s>", self.saveState)
 
         # Canvas Frame
         self.canvasFrameToogle = False
@@ -89,6 +90,15 @@ class Window(object):
         self.colorWheelSafePoint3 = "black"
 
         self.undoManager = UndoManager()
+        
+        self.saveName = None
+        # default save directory
+        defaultDirectory = "lowpolypainter/resources/stored_mesh_data/"
+        try:
+            os.makedirs(defaultDirectory)
+        except OSError as e:
+            if e.errno != errno.EEXIST:
+                raise
 
     """ ZOOM """
     def mouse_wheel_button(self, event):
@@ -122,9 +132,18 @@ class Window(object):
 
 
     def insert(self, event=None):
-        file_path = tkFileDialog.askopenfilename(filetypes=[("all files","*"), ("portable pixmap","*.ppm"), ("JPEG","*.jpg")])
+        defaultDirectory = "lowpolypainter/resources/stored_mesh_data/"
+        file_path = tkFileDialog.askopenfilename(initialdir = defaultDirectory, filetypes=[("all files","*"), ("python","*.py"), ("portable pixmap","*.ppm"), ("JPEG","*.jpg")])
         if file_path != "":
-            self.loadImage(file_path)
+            if file_path.endswith('.py'):
+                name = file_path[file_path.rindex('/')+1:]
+                content = loadPath(file_path)
+                image = Image.fromstring(content[0]['mode'], content[0]['size'], content[0]['pixels'])
+                self.loadImage(image, name)
+                self.canvasFrame.mesh.quickload(content[1])
+                self.saveName = file_path
+            else:
+                self.loadImagePath(file_path)
 
     def clear(self, event=None):
         self.undoManager.do(self)
@@ -137,6 +156,7 @@ class Window(object):
     def export(self, event=None):
         exportDialog(self.canvasFrame.mesh, self.canvasFrame.width, self.canvasFrame.height)
 
+    # currently unused
     def saveMeshData(self, event=None):
         save(self.canvasFrame.mesh.save(), self.inputimage)
 
@@ -144,10 +164,26 @@ class Window(object):
         self.canvasFrame.mesh.load(load(self.inputimage))
 
     def saveMeshDataPath(self, path, event=None):
-        savePath(self.canvasFrame.mesh.save1(), path)
+        savePath(self.canvasFrame.mesh.quicksave(), path)
 
     def loadMeshDataPath(self, path, event=None):
-        self.canvasFrame.mesh.load1(loadPath(path))
+        self.canvasFrame.mesh.quickload(loadPath(path))
+        
+    def saveState(self, event=None):
+        if self.saveName == None:
+            self.saveStateAs()
+        else:
+            saveState(self.canvasFrame.mesh, self.canvasFrame.image, self.saveName)
+    
+    def saveStateAs(self, event=None):
+        defaultDirectory = "lowpolypainter/resources/stored_mesh_data/"
+        file_path = tkFileDialog.asksaveasfilename(initialdir = defaultDirectory, filetypes=[("python", "*.py")])
+        if file_path != "":
+            if not file_path.endswith('.py'):
+                file_path += '.py'
+            self.saveName = file_path
+            self.saveState()
+        
 
     # undoes the last change
     def undo(self, event=None):
@@ -206,7 +242,7 @@ class Window(object):
         self.detailFrame.triangulateFrame.grid(row=0, column=1, sticky=N+E+S+W)
         self.detailFrame.selectedFrame = self.detailFrame.triangulateFrame
         
-    def loadImage(self, path):
+    def loadImagePath(self, path):
         name = path[path.rindex('/')+1:]
         # changes in window
         self.clear()
@@ -218,6 +254,19 @@ class Window(object):
         self.maskFrame.insert(path, name)
         # changes in frame
         self.frame.update()
+        
+    def loadImage(self, image, name):
+        # changes in window
+        self.clear()
+        self.inputimage = name
+        self.undoManager.clear()
+        # changes in canvas
+        self.canvasFrame.insert(image, name)
+        # changes in maskFrame
+        self.maskFrame.insert(image, name)
+        # changes in frame
+        self.frame.update()
+        
         
 
 class ToolbarFrame(Frame):
@@ -261,6 +310,7 @@ class ButtonFrame(Frame):
         icon_6 = PhotoImage(file="./lowpolypainter/resources/icons/Undo.gif")
         icon_7 = PhotoImage(file="./lowpolypainter/resources/icons/Redo.gif")
         icon_8 = PhotoImage(file="./lowpolypainter/resources/icons/Borders.gif")
+        icon_9 = PhotoImage(file="./lowpolypainter/resources/icons/SaveAs.gif")
 
         options = {"height": 46, "width": 46, "bg":'#D8D8D8', "borderwidth":0}
 
@@ -310,16 +360,22 @@ class ButtonFrame(Frame):
         self.space = Label(self, height=2, bg='#DADADA', borderwidth=0)
         self.space.grid(row=0, column=7, sticky=N+E+S+W)
 
+        # SaveAs Button
+        self.SaveAsButton = Label(self, image=icon_9, **options)
+        self.SaveAsButton.image = icon_9
+        self.SaveAsButton.grid(row=0, column=8, sticky=N+E+S+W)
+        self.SaveAsButton.bind("<Button-1>", parent.parent.saveStateAs)
+
         # Save Button
         self.saveButton = Label(self, image=icon_4, **options)
         self.saveButton.image = icon_4
-        self.saveButton.grid(row=0, column=8, sticky=N+E+S+W)
-        self.saveButton.bind("<Button-1>", parent.parent.saveMeshData)
+        self.saveButton.grid(row=0, column=9, sticky=N+E+S+W)
+        self.saveButton.bind("<Button-1>", parent.parent.saveState)
 
         # Export Button
         self.exportButton = Label(self, image=icon_5, **options)
         self.exportButton.image = icon_5
-        self.exportButton.grid(row=0, column=9, sticky=N+E+S+W)
+        self.exportButton.grid(row=0, column=10, sticky=N+E+S+W)
         self.exportButton.bind("<Button-1>", parent.parent.export)
 
 class DetailFrame(Frame):

@@ -166,7 +166,7 @@ class Mesh:
 
     # saves current mesh.
     # differs from "save" because edges will not get saved with indices of their vertices
-    def save1(self):
+    def quicksave(self):
         vertices = map(lambda x: x.coords, self.vertices)
         edges = map(lambda x: [x.verts[0].coords, x.verts[1].coords], self.edges)
         return [vertices, edges]
@@ -182,7 +182,7 @@ class Mesh:
         for edge in edges:
             self.addEdge(self.vertices[edge[0]], self.vertices[edge[1]])
 
-    def load1(self, meshArray):
+    def quickload(self, meshArray):
         if (meshArray == None):
             return
         vertices = meshArray[0]

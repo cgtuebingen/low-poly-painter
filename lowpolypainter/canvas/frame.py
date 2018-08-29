@@ -161,13 +161,13 @@ class CanvasFrame(Frame):
         # Need min 4 points
         if len(verts) + size + random <= 3:
             return
-
+        
         for vert in verts:
             vert.deconnect()
             points.append(vert.coords)
         points = np.asarray(points)
 
-        triangulate = Triangulate(self.inputimage, points)
+        triangulate = Triangulate(self.image, points)
 
         if size != 0:
             triangulate.generateCanny(mask=mask)
@@ -190,9 +190,14 @@ class CanvasFrame(Frame):
         for vert in self.mesh.vertices:
             vert.draw(False)
             
+            
+    # inserts an image into canvas Frame by path
     def insert(self, path, name):
         self.inputimage = name
-        self.image = Image.open(path)
+        if isinstance(path, basestring):
+            self.image = Image.open(path)
+        else:
+            self.image = path
         self.background = ImageTk.PhotoImage(self.image)
         self.width = self.background.width()
         self.height = self.background.height()

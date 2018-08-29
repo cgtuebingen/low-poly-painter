@@ -2,8 +2,10 @@
 import cv2
 import math
 import numpy as np
+from PIL import ImageTk, Image
 from random import randint
 from skimage import feature
+from skimage.color import rgb2gray
 from scipy.spatial import Delaunay
 
 """
@@ -16,8 +18,13 @@ class Triangulate(object):
 
     def __init__(self, inputimage, points):
         self.oldPoints = points
-        filepath = 'lowpolypainter/resources/images/'
-        self.image = cv2.imread(filepath + inputimage, 0)
+        if isinstance(inputimage, basestring):
+            filepath = 'lowpolypainter/resources/images/'
+            self.image = cv2.imread(filepath + inputimage, 0)
+        else:
+            img_arr = np.array(inputimage, dtype=np.uint8)
+            img_gray = rgb2gray(img_arr)
+            self.image = img_gray
         self.points = np.array([], dtype=int).reshape(0,2)
 
     def generateRandom(self, size):
