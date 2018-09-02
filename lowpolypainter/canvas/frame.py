@@ -43,7 +43,7 @@ class CanvasFrame(Frame):
         self.width = self.background.width()
         self.height = self.background.height()
         self.canvas = Canvas(self, width=self.width, height=self.height)
-        self.canvas.create_image(0, 0, image=self.background, anchor=NW)
+        self.backgroundId = self.canvas.create_image(0, 0, image=self.background, anchor=NW)
         self.canvas.grid(row=1, column=1, sticky=NSEW)
 
         # Color Object

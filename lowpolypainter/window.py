@@ -111,8 +111,22 @@ class Window(object):
         self.mouse_wheel(event.delta, event.x, event.y)
 
     def mouse_wheel(self, delta, x, y):
-        self.zoom.ZoomAt(2**(delta * 0.001), [x, y])
-        self.canvasFrame.mesh.updatePositions()
+        delta = 2**(delta * 0.001)
+        self.zoom.ZoomAt(delta, [x, y])
+        #self.canvasFrame.mesh.updatePositions()
+        self.canvasFrame.canvas.scale("all", x, y, delta, delta)
+        
+        currentScale = self.zoom.CurrentScale()
+        backgroundPosition = self.zoom.ToViewport([0,0])
+
+        width, height = self.canvasFrame.image.size
+        new_size = int(currentScale * width), int(currentScale * height)
+        self.canvasFrame.background = ImageTk.PhotoImage(self.canvasFrame.image.resize(new_size))
+        self.canvasFrame.canvas.delete(self.canvasFrame.backgroundId)
+        self.canvasFrame.backgroundId = self.canvasFrame.canvas.create_image(
+            backgroundPosition[0], backgroundPosition[1],
+            image=self.canvasFrame.background, anchor=NW)
+        self.canvasFrame.canvas.lower(self.canvasFrame.backgroundId)
 
 
     """ ACTIONS """

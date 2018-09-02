@@ -15,3 +15,6 @@ class ZoomTransformer(object):
     def ZoomAt(self, scale, position):
         oms = 1-scale
         self.matrix = numpy.matmul([[scale,0,position[0] * oms],[0,scale,position[1] * oms],[0,0,1]], self.matrix)
+
+    def CurrentScale(self):
+        return self.matrix[0][0]
