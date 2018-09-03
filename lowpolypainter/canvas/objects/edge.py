@@ -205,9 +205,6 @@ class Edge:
         isOnEdge1 = (s >= 0) and (s <= 1)
         isOnEdge2 = (t >= 0) and (t <= 1)
 
-        # if isOnEdge1 and isOnEdge2:
-        #    self.parent.addPoint(x1 + s * a, y1 + s * c)
-
         return isOnEdge1 and isOnEdge2
 
     def getPossibleIntersectingEdges(self, interpolationSteps = 10):
@@ -217,6 +214,9 @@ class Edge:
         :return:
         """
         x1, y1, x2, y2 = self.getCoords()
+
+        x1, y1 = self.parent.parent.zoom.ToViewport((x1, y1))
+        x2, y2 = self.parent.parent.zoom.ToViewport((x2, y2))
 
         xStep = (x2 - x1) / float(interpolationSteps)
         yStep = (y2 - y1) / float(interpolationSteps)
@@ -254,6 +254,8 @@ class Edge:
         isValid = True
         for id in possibleIDs:
             x3, y3, x4, y4 = self.parent.canvas.coords(id)
+            x3, y3 = self.parent.parent.zoom.FromViewport((x3, y3))
+            x4, y4 = self.parent.parent.zoom.FromViewport((x4, y4))
             if self.isIntersectingEdge(x3, y3, x4, y4):
                 oldEdge = self.parent.mesh.getEdgeByID(id)
                 currentintersectingEdges.append(oldEdge)

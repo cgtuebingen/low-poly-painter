@@ -9,6 +9,7 @@ from PIL import ImageTk, Image
 from mesh import Mesh
 from lowpolypainter.color import Color
 from lowpolypainter.triangulate.triangulate import Triangulate
+from lowpolypainter.canvas.objects.vertex import Vertex
 
 # Masks
 CTRL_MASK = 0x0004
@@ -63,7 +64,7 @@ class CanvasFrame(Frame):
         self.faceState = NORMAL
 
         # Events
-        self.canvas.bind("<Button>", self.click)
+        self.canvas.bind("<Button-1>", self.click)
         self.canvas.bind_all("<space>", func=self.toggleFaces)
         self.canvas.bind_all("<BackSpace>", self.deleteSelected)
         self.canvas.bind_all("<Key-Delete>", self.deleteSelected)
@@ -82,7 +83,7 @@ class CanvasFrame(Frame):
             previousSelected = self.selected
             zoomedCoords = self.parent.zoom.FromViewport([event.x, event.y])
             self.mesh.addVertex([int(zoomedCoords[0]), int(zoomedCoords[1])])
-            if (previousSelected is not None) and not (event.state & CTRL_MASK):
+            if (previousSelected is not None) and (isinstance(previousSelected, Vertex)) and not (event.state & CTRL_MASK):
                 self.mesh.addEdge(previousSelected, self.selected)
         self.mouseEventHandled = False
 
