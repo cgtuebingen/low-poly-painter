@@ -8,6 +8,7 @@ TAG_FACE = "f"
 
 # SIZE
 WIDTH = 1
+LARGE_WIDTH = 4
 
 # COLOR
 COLOR_DEFAULT = "#161616"
@@ -73,6 +74,12 @@ class Edge:
         # calculate gray edge color from rgb values of points in between edge points
         return self.parent.color.grayColorFromImage(self.verts[0], self.verts[1])
 
+    def expand(self, event=None):
+        self.parent.canvas.itemconfig(self.id, width=LARGE_WIDTH)
+
+    def shrink(self, event=None):
+        self.parent.canvas.itemconfig(self.id, width=WIDTH)
+
     def draw(self, user=True):
         vertVisualCoords = [self.verts[0].getVisualCoords(), self.verts[1].getVisualCoords()]
         self.color = self.getColor()
@@ -85,6 +92,8 @@ class Edge:
                                                  width=WIDTH)
 
         self.parent.canvas.tag_bind(self.id, "<Button>", func=self.click)
+        self.parent.canvas.tag_bind(self.id, sequence="<Enter>", func=self.expand)
+        self.parent.canvas.tag_bind(self.id, sequence="<Leave>", func=self.shrink)
         if user:
             self.parent.canvas.tag_lower(self.id, TAG_VERTEX)
 

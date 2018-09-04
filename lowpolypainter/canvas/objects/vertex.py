@@ -88,19 +88,19 @@ class Vertex:
         self.parent.mesh.bvertices[x][y] = self
         self.parent.mouseEvent = False
 
-    def expand(self, event):
+    def expand(self, event=None):
         visualCoords = self.getVisualCoords()
         self.parent.canvas.coords(self.id, visualCoords[0] - LARGE_RADIUS,
                                           visualCoords[1] - LARGE_RADIUS,
                                           visualCoords[0] + LARGE_RADIUS,
-                                          visualCoords[1] + LARGE_RADIUS,)
+                                          visualCoords[1] + LARGE_RADIUS)
 
-    def shrink(self, event):
+    def shrink(self, event=None):
         visualCoords = self.getVisualCoords()
         self.parent.canvas.coords(self.id, visualCoords[0] - RADIUS,
                                           visualCoords[1] - RADIUS,
                                           visualCoords[0] + RADIUS,
-                                          visualCoords[1] + RADIUS,)
+                                          visualCoords[1] + RADIUS)
 
     """ GENERAL """
     def draw(self, user=False):
