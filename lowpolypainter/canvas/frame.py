@@ -61,13 +61,16 @@ class CanvasFrame(Frame):
          # Mouse Event
         self.mouseEventHandled = False
 
+        # Toggle Events
         self.faceState = NORMAL
+        self.toggleState = NORMAL
 
         # Events
         self.canvas.bind("<Button-1>", self.click)
         self.canvas.bind_all("<space>", func=self.toggleFaces)
         self.canvas.bind_all("<BackSpace>", self.deleteSelected)
         self.canvas.bind_all("<Key-Delete>", self.deleteSelected)
+        self.canvas.bind_all("<Up>", func=self.toggleVertsAndEdges)
 
     """ EVENT """
     def click(self, event):
@@ -123,6 +126,15 @@ class CanvasFrame(Frame):
             state = HIDDEN
         self.canvas.itemconfigure("f", state=state)
         self.faceState = state
+
+    """ VERTICES AND EDGES """
+    def toggleVertsAndEdges(self, event):
+        state = NORMAL
+        if self.toggleState is NORMAL:
+            state = HIDDEN
+        self.canvas.itemconfigure("v", state=state)
+        self.canvas.itemconfigure("e", state=state)
+        self.toggleState = state
 
     """ GENERAL """
     def inBounds(self, point):
