@@ -72,7 +72,7 @@ class Window(object):
         self.frame.bind_all("<Control-s>", self.saveState)
 
         # Canvas Frame
-        self.canvasFrameToogle = False
+        self.canvasFrameToggle = False
         self.canvasFrame = CanvasFrame(self, inputimage)
         self.canvasFrame.grid(row=1, column=0, sticky=NSEW)
 
@@ -130,20 +130,15 @@ class Window(object):
 
 
     """ ACTIONS """
-    def toogleCanvasFrame(self, event=None):
-        if self.canvasFrameToogle:
-            self.canvasFrameToogle = False
+    def toggleCanvasFrame(self, event=None):
+        if self.canvasFrameToggle:
+            self.canvasFrameToggle = False
             self.maskFrame.grid_remove()
             self.canvasFrame.grid(row=1, column=0, sticky=NSEW)
-            # print self.canvasFrame.canvas.winfo_width(), self.canvasFrame.canvas.winfo_height()
-            # print self.maskFrame.canvas.winfo_width(), self.maskFrame.canvas.winfo_height()
         else:
-            self.canvasFrameToogle = True
+            self.canvasFrameToggle = True
             self.canvasFrame.grid_remove()
             self.maskFrame.grid(row=1, column=0, sticky=NSEW)
-            # print self.canvasFrame.canvas.winfo_width(), self.canvasFrame.canvas.winfo_height()
-            # print self.maskFrame.canvas.winfo_width(), self.maskFrame.canvas.winfo_height()
-
 
     def insert(self, event=None):
         defaultDirectory = "lowpolypainter/resources/stored_mesh_data/"
@@ -216,8 +211,8 @@ class Window(object):
 
     def triangulate(self, size=0, random=0):
         self.undoManager.do(self)
-        if self.canvasFrameToogle:
-            self.toogleCanvasFrame()
+        if self.canvasFrameToggle:
+            self.toggleCanvasFrame()
             self.maskFrame.canvas.delete("v")
             self.canvasFrame.triangulate(size, random, self.maskFrame.mask)
             self.maskFrame.mask = np.zeros([self.maskFrame.width, self.maskFrame.height], dtype=bool)

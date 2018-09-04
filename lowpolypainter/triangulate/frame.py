@@ -85,7 +85,7 @@ class TriangulateFrame(Frame):
         self.bottom_keeper.grid(row=9, column=1, sticky=NSEW)
 
     def mask(self):
-        self.parent.parent.toogleCanvasFrame()
+        self.parent.parent.toggleCanvasFrame()
 
     def border(self):
         self.parent.parent.generateBorder()
