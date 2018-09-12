@@ -88,7 +88,7 @@ class TriangulateFrame(Frame):
         self.parent.parent.toggleCanvasFrame()
 
     def border(self):
-        self.parent.parent.generateBorder()
+        self.parent.parent.border()
 
     def triangulate(self):
         try:
@@ -161,7 +161,7 @@ class MaskFrame(Frame):
     def inBounds(self, point):
         x, y = point[0], point[1]
         return (x >= 0) and (y >= 0) and (x < self.width) and (y < self.height)
-    
+
     def insert(self, path, name):
         # Load Image
         self.inputimage = name
@@ -183,4 +183,3 @@ class MaskFrame(Frame):
         self.canvas.configure(width=self.width, height=self.height)
         self.canvas.create_image(0, 0, image=self.background, anchor=NW)
         self.mask = np.zeros([self.width, self.height], dtype=bool)
-        

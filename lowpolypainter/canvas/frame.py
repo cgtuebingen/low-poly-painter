@@ -8,8 +8,9 @@ from PIL import ImageTk, Image
 # Local Modules
 from mesh import Mesh
 from lowpolypainter.color import Color
-from lowpolypainter.triangulate.triangulate import Triangulate
+from lowpolypainter.triangulate.border import Border
 from lowpolypainter.canvas.objects.vertex import Vertex
+from lowpolypainter.triangulate.triangulate import Triangulate
 
 # Masks
 CTRL_MASK = 0x0004
@@ -90,35 +91,6 @@ class CanvasFrame(Frame):
                 self.mesh.addEdge(previousSelected, self.selected)
         self.mouseEventHandled = False
 
-    def generateBorder(self, step):
-        width = self.width
-        height = self.height
-
-        # Height
-        height_indices = np.arange(0, height, math.floor(height/step), dtype=int)
-        height_indices[-1] = height - 1
-        height_points_west = np.zeros((len(height_indices), 2), dtype=int)
-        height_points_east = np.zeros((len(height_indices), 2), dtype=int)
-        for i in range(len(height_points_west)):
-            height_points_west[i][1] = height_indices[i]
-            height_points_east[i] = [width - 1, height_indices[i]]
-        points = height_points_west
-        points = np.vstack([points, height_points_east])
-
-        # Width
-        width_indices = np.arange(0, width, math.floor(width/step), dtype=int)
-        width_indices[-1] = width - 1
-        width_points_north = np.zeros((len(width_indices), 2), dtype=int)
-        width_points_south = np.zeros((len(width_indices), 2), dtype=int)
-        for i in range(len(width_points_north)):
-            width_points_north[i][0] = width_indices[i]
-            width_points_south[i] = [width_indices[i], height - 1]
-        points = np.vstack([points, width_points_north])
-        points = np.vstack([points, width_points_south])
-
-        for point in points:
-            self.mesh.addVertex([int(point[0]), int(point[1])])
-
     """ FACE """
     def toggleFaces(self, event):
         state = NORMAL
@@ -160,6 +132,148 @@ class CanvasFrame(Frame):
         self.selectedFace = [False, None]
         self.mesh.clear()
 
+    """ Border """
+    def border(self, triangulate=False, step=6):
+        # generate border points
+        border = Border(self.width, self.height)
+
+        if triangulate:
+            if len(self.mesh.vertices) <= 4:
+                return
+
+            coords = []
+            for vert in self.mesh.vertices:
+                coords.append(vert.coords)
+
+            # generate convex hull
+            border.generateConvexHull(coords)
+
+            # mark hull points
+            for point in border.hull:
+                id = self.mesh.bvertices[point[0]][point[1]].id
+                self.canvas.itemconfigure(id, fill='yellow')
+
+            # add corner points and edges
+            corn_verts = []
+            for i in range(len(border.corner)):
+                hpoint = border.hull[border.corner[i]]
+                hvert = self.mesh.bvertices[hpoint[0]][hpoint[1]]
+                bvert = self.mesh.addVertex(border.points[i])
+                self.mesh.addEdge(bvert, hvert)
+                corn_verts.append(bvert)
+
+            sort_verts_index = np.argsort(border.corner)
+
+            sort_index = sort_verts_index[3]
+            prev_vert = corn_verts[sort_index]
+            for i in range(border.corner[scorner[3]]+1, len(border.hull)):
+                hpoint = border.hull[i]
+                # hvert = self.mesh.bvertices[hpoint[0]][hpoint[1]]
+                # bvert = self.mesh.addVertex([border.hull[i][0], border.points[scorner[3]][1]])
+                # self.mesh.addEdge(bvert, hvert)
+                # self.mesh.addEdge(pbvert, hvert)
+                # self.mesh.addEdge(pbvert, bvert)
+                # pbvert = bvert
+
+            for i in range(0, border.corner[0]):
+                point = border.hull[i]
+                id = self.mesh.bvertices[point[0]][point[1]].id
+                self.canvas.itemconfigure(id, fill='red')
+
+            prev_vert = vcorner[sort_vert[0]]
+            for i in range(border.corner[scorner[0]]+1, border.corner[scorner[1]]):
+                hpoint = border.hull[i]
+                hvert = self.mesh.bvertices[hpoint[0]][hpoint[1]]
+                bvert = self.mesh.addVertex([border.hull[i][0], border.points[scorner[0]][1]])
+                self.mesh.addEdge(bvert, hvert)
+                self.mesh.addEdge(pbvert, hvert)
+                self.mesh.addEdge(pbvert, bvert)
+                pbvert = bvert
+
+            for i in range(border.corner[1]+1, border.corner[2]):
+                point = border.hull[i]
+                id = self.mesh.bvertices[point[0]][point[1]].id
+                self.canvas.itemconfigure(id, fill='orange')
+
+            for i in range(border.corner[2]+1, border.corner[3]):
+                point = border.hull[i]
+                id = self.mesh.bvertices[point[0]][point[1]].id
+                self.canvas.itemconfigure(id, fill='magenta')
+
+
+
+
+
+
+
+
+
+
+
+
+            return
+            # draw border from border to hull
+            bprev = None
+            for bpoint in border.points:
+                hvert = None
+                minDistance = float('Inf')
+                bvert = self.mesh.addVertex(bpoint)
+
+                for hpoint in border.hull:
+                    dist = math.sqrt((hpoint[0] - bpoint[0])**2 + (hpoint[1] - bpoint[1])**2)
+                    if dist < minDistance:
+                        minDistance = dist
+                        hvert = self.mesh.bvertices[hpoint[0]][hpoint[1]]
+
+                if hvert != None:
+                    self.mesh.addEdge(bvert, hvert)
+                    if bprev != None:
+                        self.mesh.addEdge(bprev, bvert)
+                        self.mesh.addEdge(bprev, hvert)
+                    bprev = bvert
+
+
+            return
+
+
+
+            # triangulate hull and border
+            if len(points) >= 4:
+
+                triangulate = Triangulate(self.image, points)
+                triangle = triangulate.triangulate(0, 0)
+
+                # sort out connection between hull points
+                for tris in triangle:
+                    l = len(border.hull) - 1
+
+                    if not (tris[0] < l and tris[1] < l and tris[2] < l):
+                        point1 = points[tris[0]]
+                        vert1 = self.mesh.bvertices[point1[0]][point1[1]]
+                        self.canvas.itemconfigure(vert1.id, fill='yellow')
+                        point2 = points[tris[1]]
+                        vert2 = self.mesh.bvertices[point2[0]][point2[1]]
+                        self.canvas.itemconfigure(vert2.id, fill='yellow')
+                        point3 = points[tris[2]]
+                        vert3 = self.mesh.bvertices[point3[0]][point3[1]]
+                        self.canvas.itemconfigure(vert3.id, fill='yellow')
+                        edge1 = self.mesh.addEdge(vert1, vert2)
+                        if len(edge1.intersectingEdges) != 0:
+                            edge1.delete()
+                        edge2 = self.mesh.addEdge(vert2, vert3)
+                        if len(edge2.intersectingEdges) != 0:
+                            edge2.delete()
+                        edge3 = self.mesh.addEdge(vert1, vert3)
+                        if len(edge3.intersectingEdges) != 0:
+                            edge3.delete()
+        else:
+            # draw border points
+            for point in border.points:
+                self.mesh.addVertex([int(point[0]), int(point[1])])
+
+
+
+
     """ Triangulate """
     def triangulate(self, size=0, random=0, mask=None):
         if mask is None or len(mask[mask != 0]) == 0:
@@ -170,11 +284,10 @@ class CanvasFrame(Frame):
         verts = np.asarray(self.mesh.bvertices)[mask]
         verts = verts[verts != 0.0]
 
-
         # Need min 4 points
         if len(verts) + size + random <= 3:
             return
-        
+
         for vert in verts:
             vert.deconnect()
             points.append(vert.coords)
@@ -202,8 +315,8 @@ class CanvasFrame(Frame):
 
         for vert in self.mesh.vertices:
             vert.draw(False)
-            
-            
+
+
     # inserts an image into canvas Frame by path
     def insert(self, path, name):
         self.inputimage = name
@@ -216,7 +329,7 @@ class CanvasFrame(Frame):
         self.height = self.background.height()
         self.canvas.configure(width=self.width, height=self.height)
         self.canvas.create_image(0, 0, image=self.background, anchor=NW)
-        
+
         self.color = Color(np.array(self.image), 0.5, 0.5)
 
         self.selectedFace = [False, None]
@@ -231,4 +344,3 @@ class CanvasFrame(Frame):
         self.mouseEventHandled = False
 
         self.faceState = NORMAL
-        

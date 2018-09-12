@@ -18,6 +18,7 @@ from Colorwheel import Colorwheel
 from lowpolypainter.undoManager import UndoManager
 
 
+
 class Window(object):
     """
     Window Class
@@ -90,7 +91,7 @@ class Window(object):
         self.colorWheelSafePoint3 = "black"
 
         self.undoManager = UndoManager()
-        
+
         self.saveName = None
         # default save directory
         defaultDirectory = "lowpolypainter/resources/stored_mesh_data/"
@@ -115,7 +116,7 @@ class Window(object):
         self.zoom.ZoomAt(delta, [x, y])
         #self.canvasFrame.mesh.updatePositions()
         self.canvasFrame.canvas.scale("all", x, y, delta, delta)
-        
+
         currentScale = self.zoom.CurrentScale()
         backgroundPosition = self.zoom.ToViewport([0,0])
 
@@ -177,13 +178,13 @@ class Window(object):
 
     def loadMeshDataPath(self, path, event=None):
         self.canvasFrame.mesh.quickload(loadPath(path))
-        
+
     def saveState(self, event=None):
         if self.saveName == None:
             self.saveStateAs()
         else:
             saveState(self.canvasFrame.mesh, self.canvasFrame.image, self.saveName)
-    
+
     def saveStateAs(self, event=None):
         defaultDirectory = "lowpolypainter/resources/stored_mesh_data/"
         file_path = tkFileDialog.asksaveasfilename(initialdir = defaultDirectory, filetypes=[("python", "*.py")])
@@ -192,7 +193,7 @@ class Window(object):
                 file_path += '.py'
             self.saveName = file_path
             self.saveState()
-        
+
 
     # undoes the last change
     def undo(self, event=None):
@@ -202,12 +203,12 @@ class Window(object):
     def redo(self, event=None):
         self.undoManager.redo(self)
 
-    def generateBorder(self, borderpoints=6):
-        self.canvasFrame.generateBorder(borderpoints)
+    def border(self, step=6):
+        self.canvasFrame.border(step=step)
 
-    def generateBorderAndTriangulate(self, event=None):
-        self.generateBorder()
-        self.triangulate()
+    def borderTriangulate(self, event=None):
+        self.canvasFrame.border(triangulate=True, step=6)
+
 
     def triangulate(self, size=0, random=0):
         self.undoManager.do(self)
@@ -218,20 +219,6 @@ class Window(object):
             self.maskFrame.mask = np.zeros([self.maskFrame.width, self.maskFrame.height], dtype=bool)
         else:
             self.canvasFrame.triangulate(size, random)
-
-    # check if a vertex is an outer vertex
-    def updateOuterVertices(self):
-        # reset vertex degrees to 0
-        for vertex in self.canvasFrame.mesh.vertices:
-            vertex.degree = 0
-
-        # calculate degree of enclosing angles by surrounding faces
-        for face in self.canvasFrame.mesh.faces:
-            face.calcVerticesDegrees()
-
-        # if enclosing angle degree is not 360 a vertex is an outer vertex
-        for vertex in self.canvasFrame.mesh.vertices:
-            vertex.updateIsOuter()
 
     # TODO: Move to detail view menu
     def colorwheel(self, event=None):
@@ -250,7 +237,7 @@ class Window(object):
         self.detailFrame.selectedFrame.grid_forget()
         self.detailFrame.triangulateFrame.grid(row=0, column=1, sticky=N+E+S+W)
         self.detailFrame.selectedFrame = self.detailFrame.triangulateFrame
-        
+
     def loadImagePath(self, path):
         name = path[path.rindex('/')+1:]
         # changes in window
@@ -263,7 +250,7 @@ class Window(object):
         self.maskFrame.insert(path, name)
         # changes in frame
         self.frame.update()
-        
+
     def loadImage(self, image, name):
         # changes in window
         self.clear()
@@ -275,8 +262,8 @@ class Window(object):
         self.maskFrame.insert(image, name)
         # changes in frame
         self.frame.update()
-        
-        
+
+
 
 class ToolbarFrame(Frame):
     """
@@ -363,7 +350,7 @@ class ButtonFrame(Frame):
         self.redoButton = Label(self, image=icon_8, **options)
         self.redoButton.image = icon_8
         self.redoButton.grid(row=0, column=6, sticky=N+E+S+W)
-        self.redoButton.bind("<Button-1>", parent.parent.generateBorderAndTriangulate)
+        self.redoButton.bind("<Button-1>", parent.parent.borderTriangulate)
 
         # Space
         self.space = Label(self, height=2, bg='#DADADA', borderwidth=0)

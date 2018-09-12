@@ -49,9 +49,6 @@ class Vertex:
         self.select()
         self.parent.select(self)
 
-        # for border algorithm
-        self.isOuter = False
-        self.degree = 0
 
     """ EVENTS """
     def clickHandle(self, event):
