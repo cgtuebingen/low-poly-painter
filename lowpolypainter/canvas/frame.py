@@ -67,10 +67,10 @@ class CanvasFrame(Frame):
 
         # Events
         self.canvas.bind("<Button-1>", self.click)
-        self.canvas.bind_all("<space>", func=self.toggleFaces)
+        self.canvas.bind_all("<space>", func=self.toggleFacesCheckbutton)
         self.canvas.bind_all("<BackSpace>", self.deleteSelected)
         self.canvas.bind_all("<Key-Delete>", self.deleteSelected)
-        self.canvas.bind_all("<Up>", func=self.toggleVertsAndEdges)
+        self.canvas.bind_all("<Up>", func=self.toggleVertsAndEdgesCheckbutton)
 
     """ EVENT """
     def click(self, event):
@@ -81,12 +81,12 @@ class CanvasFrame(Frame):
         Adds point to canvas, will draw line to last point while ctrl isn't pressed
         """
         eventPoint = [event.x, event.y]
-        if self.inBounds(eventPoint) and not self.mouseEventHandled:
+        if self.inBounds(eventPoint) and (not self.mouseEventHandled) and ((self.parent.controlMode=="Points") or (self.parent.controlMode=="Points and Lines")):
             self.parent.undoManager.do(self.parent)
             previousSelected = self.selected
             zoomedCoords = self.parent.zoom.FromViewport([event.x, event.y])
             self.mesh.addVertex([int(zoomedCoords[0]), int(zoomedCoords[1])])
-            if (previousSelected is not None) and (isinstance(previousSelected, Vertex)) and not (event.state & CTRL_MASK):
+            if (previousSelected is not None) and (isinstance(previousSelected, Vertex)) and (self.parent.controlMode == "Points and Lines") and not (event.state & CTRL_MASK):
                 self.mesh.addEdge(previousSelected, self.selected)
         self.mouseEventHandled = False
 
@@ -118,9 +118,19 @@ class CanvasFrame(Frame):
 
         for point in points:
             self.mesh.addVertex([int(point[0]), int(point[1])])
+    
+    """ checks Button for Vertices and Edges """
+    def toggleVertsAndEdgesCheckbutton(self, event=None):
+        self.parent.zoomAndToggleFrame.toggleFrame.vertexCheckbox.toggle()
+        self.toggleVertsAndEdges(event)
+        
+    """checks Button for Faces """
+    def toggleFacesCheckbutton(self, event=None):
+        self.parent.zoomAndToggleFrame.toggleFrame.facesCheckbox.toggle()
+        self.toggleFaces(event)
 
     """ FACE """
-    def toggleFaces(self, event):
+    def toggleFaces(self, event=None):
         state = NORMAL
         if self.faceState is NORMAL:
             state = HIDDEN
@@ -128,7 +138,7 @@ class CanvasFrame(Frame):
         self.faceState = state
 
     """ VERTICES AND EDGES """
-    def toggleVertsAndEdges(self, event):
+    def toggleVertsAndEdges(self, event=None):
         state = NORMAL
         if self.toggleState is NORMAL:
             state = HIDDEN
