@@ -13,76 +13,111 @@ class TriangulateFrame(Frame):
     """
     def __init__(self, parent, *args, **kwargs):
         Frame.__init__(self, parent)
-        self.config(bg='#ECECEC', width=199)
+        self.config(bg='#DADADA', width=199)
         self.parent = parent
 
         self.grid_columnconfigure(0, weight=1)
         self.grid_columnconfigure(3, weight=1)
-        self.grid_rowconfigure(3, weight=1)
+        self.grid_rowconfigure(0, weight=3, uniform="triangulateFrame")
+        self.grid_rowconfigure(1, weight=1, uniform="triangulateFrame")
+        self.grid_rowconfigure(2, weight=1, uniform="triangulateFrame")
+        self.grid_rowconfigure(3, weight=1, uniform="triangulateFrame")
+        self.grid_rowconfigure(4, weight=2, uniform="triangulateFrame")
+        self.grid_rowconfigure(5, weight=3, uniform="triangulateFrame")
 
-        color = '#ECECEC'
-        color_opts = {'bg': color}
+        color1 = '#ECECEC'
+        color2 = '#DADADA'
+        color_opts1 = {'bg': color1}
+        color_opts2 = {'bg': color2}
         entry_opts = {'width':0,
                          'justify':'right',
-                         'highlightbackground':color}
+                         'highlightbackground':color2}
         button_opts = {'highlightthickness':0,
-                          'highlightbackground':'#ECECEC'}
+                          'highlightbackground':color2}
 
-        self.left_keeper = Frame(self, width=10, **color_opts)
+        self.left_keeper = Frame(self, width=10, **color_opts1)
         self.left_keeper.grid(row=0, column=0, sticky=NSEW)
 
-        self.right_keeper = Frame(self, width=10, **color_opts)
+        self.right_keeper = Frame(self, width=10, **color_opts1)
         self.right_keeper.grid(row=0, column=3, sticky=NSEW)
 
-        self.width_keeper_1 = Frame(self, width=110, **color_opts)
+        self.width_keeper_1 = Frame(self, width=110, **color_opts1)
         self.width_keeper_1.grid(row=0, column=1, sticky=NSEW)
 
-        self.width_keeper_2 = Frame(self,  width=82, **color_opts)
+        self.width_keeper_2 = Frame(self,  width=82, **color_opts1)
         self.width_keeper_2.grid(row=0, column=2, sticky=NSEW)
 
-        self.cannyLabel = Label(self, text='Canny Points', **color_opts)
+        self.cannyLabel = Label(self, text='Canny Points', **color_opts2)
         self.cannyLabel.grid(row=1, column=1, sticky=N+W+S)
 
         self.cannyEntry = Entry(self, **entry_opts)
         self.cannyEntry.grid(row=1, column=2, sticky=NSEW)
         self.cannyEntry.insert(0,'0')
 
-        self.randomLabel = Label(self, text='Random Points', **color_opts)
+        self.randomLabel = Label(self, text='Random Points', **color_opts2)
         self.randomLabel.grid(row=2, column=1, sticky=N+W+S)
 
         self.randomEntry = Entry(self, **entry_opts)
         self.randomEntry.grid(row=2, column=2, sticky=NSEW)
         self.randomEntry.insert(0,'0')
 
-        self.height_keeper = Frame(self, **color_opts)
+        self.height_keeper = Frame(self, **color_opts2)
         self.height_keeper.grid(row=3, column=1, sticky=NSEW)
+        
+        self.buttonFrame = Frame(self, **color_opts2)
+        self.buttonFrame.grid(row=4, column=0, columnspan=3)
+        self.buttonFrame.grid_columnconfigure(0, weight=2, uniform="buttonframe")
+        self.buttonFrame.grid_columnconfigure(1, weight=1, uniform="buttonframe")
+        self.buttonFrame.grid_columnconfigure(2, weight=2, uniform="buttonframe")
+        self.buttonFrame.grid_columnconfigure(3, weight=1, uniform="buttonframe")
+        self.buttonFrame.grid_columnconfigure(4, weight=2, uniform="buttonframe")
+        self.buttonFrame.grid_columnconfigure(5, weight=1, uniform="buttonframe")
+        self.buttonFrame.grid_columnconfigure(6, weight=2, uniform="buttonframe")
 
-        mask_opts = {'text':'Mask', 'command':self.mask}
+        image = Image.open("lowpolypainter/resources/images/mask.png")
+        self.maskImage = ImageTk.PhotoImage(image)
+        mask_opts = {'image':self.maskImage, 'command':self.mask}
         mask_opts.update(button_opts)
 
-        self.maskButton = Button(self, **mask_opts)
-        self.maskButton.grid(row=4, column=1, columnspan=2, sticky=N+E+S+W)
+        self.maskButton = Button(self.buttonFrame, **mask_opts)
+        self.maskButton.grid(row=0, column=0, sticky=N+E+S+W)
 
-        self.spacer = Frame(self, height=10, **color_opts)
-        self.spacer.grid(row=5, column=1, sticky=NSEW)
-
-        border_opts = {'text':'Border', 'command':self.border}
+        self.spacer = Frame(self.buttonFrame, width=1, **color_opts2)
+        self.spacer.grid(row=0, column=1, sticky=NSEW)
+        
+        
+        image = Image.open("lowpolypainter/resources/images/BorderPoints.png")
+        self.borderImage = ImageTk.PhotoImage(image)
+        border_opts = {'image':self.borderImage, 'command':self.border}
         border_opts.update(button_opts)
 
-        self.borderButton = Button(self, **border_opts)
-        self.borderButton.grid(row=6, column=1, columnspan=2, sticky=N+E+S+W)
+        self.borderButton = Button(self.buttonFrame, **border_opts)
+        self.borderButton.grid(row=0, column=2, sticky=N+E+S+W)
 
-        self.spacer2 = Frame(self, height=10, **color_opts)
-        self.spacer2.grid(row=7, column=1, sticky=NSEW)
-
-        triangulate_opts = {'text':'Triangulate', 'command':self.triangulate}
+        self.spacer2 = Frame(self.buttonFrame, width=1, **color_opts2)
+        self.spacer2.grid(row=0, column=3, sticky=NSEW)
+        
+        image = Image.open("lowpolypainter/resources/images/triangulate.png")
+        self.triangleImage = ImageTk.PhotoImage(image)
+        triangulate_opts = {'image': self.triangleImage, 'command':self.triangulate}
         triangulate_opts.update(button_opts)
 
-        self.triangulateButton = Button(self, **triangulate_opts)
-        self.triangulateButton.grid(row=8, column=1, columnspan=2, sticky=NSEW)
+        self.triangulateButton = Button(self.buttonFrame, **triangulate_opts)
+        self.triangulateButton.grid(row=0, column=4, sticky=NSEW)
+        
+        self.spacer3 = Frame(self.buttonFrame, width=1, **color_opts2)
+        self.spacer3.grid(row=0, column=5, sticky=NSEW)
+        
+        image = Image.open("lowpolypainter/resources/icons/Borders.gif")
+        self.BordersImage = ImageTk.PhotoImage(image)
+        borders_opts = {'image': self.BordersImage, 'command': self.parent.parent.generateBorderAndTriangulate}
+        borders_opts.update(button_opts)
 
-        self.bottom_keeper = Frame(self, height=10, **color_opts)
-        self.bottom_keeper.grid(row=9, column=1, sticky=NSEW)
+        self.BordersButton = Button(self.buttonFrame, **borders_opts)
+        self.BordersButton.grid(row=0, column=6, sticky=NSEW)
+
+        self.bottom_keeper = Frame(self, width=1, **color_opts1)
+        self.bottom_keeper.grid(row=5, column=0, columnspan=5, sticky=NSEW)
 
     def mask(self):
         self.parent.parent.toggleCanvasFrame()
