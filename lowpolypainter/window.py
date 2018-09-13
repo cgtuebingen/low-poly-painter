@@ -420,6 +420,7 @@ Please note that there is no visualisation if you select any face.
 To connect two points with a line, or to split a line in two, hold the SHIFT button.
 If a line creates one or more triangles, then they will be automatically added.
 Delete selected objects with DEL.
+Toggle the visibility of the vertices with UP.
+Toggle the visibility of the edges with DOWN.
 Toggle the visibility of the faces with SPACE.
-Toggle the visibility of the edges and vertices with UP.
 """

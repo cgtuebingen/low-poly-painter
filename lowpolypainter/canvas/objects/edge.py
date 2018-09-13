@@ -89,7 +89,8 @@ class Edge:
                                                  vertVisualCoords[1][1],
                                                  tag=TAG_EDGE,
                                                  fill=self.color,
-                                                 width=WIDTH)
+                                                 width=WIDTH,
+                                                 state=self.parent.edgesState)
 
         self.parent.canvas.tag_bind(self.id, "<Button>", func=self.click)
         self.parent.canvas.tag_bind(self.id, sequence="<Enter>", func=self.expand)

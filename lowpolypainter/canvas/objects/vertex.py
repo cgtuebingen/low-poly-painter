@@ -112,7 +112,7 @@ class Vertex:
                                           outline = COLOR_BORDER,
                                           fill = COLOR_DEFAULT,
                                           tag = TAG_VERTEX,
-                                          state= self.parent.toggleState)
+                                          state= self.parent.vertsState)
 
         self.parent.canvas.tag_bind(self.id, sequence="<Button>", func=self.clickHandle)
         self.parent.canvas.tag_bind(self.id, sequence="<B1-Motion>", func=self.moveHandle)
