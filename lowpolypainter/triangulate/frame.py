@@ -13,7 +13,7 @@ class TriangulateFrame(Frame):
     """
     def __init__(self, parent, *args, **kwargs):
         Frame.__init__(self, parent)
-        self.config(bg='#DADADA', width=199)
+        self.config(bg='#ffffff', width=199)
         self.parent = parent
 
         self.grid_columnconfigure(0, weight=1)
@@ -25,8 +25,8 @@ class TriangulateFrame(Frame):
         self.grid_rowconfigure(4, weight=2, uniform="triangulateFrame")
         self.grid_rowconfigure(5, weight=3, uniform="triangulateFrame")
 
-        color1 = '#ECECEC'
-        color2 = '#DADADA'
+        color1 = '#ffffff'
+        color2 = '#ffffff'
         color_opts1 = {'bg': color1}
         color_opts2 = {'bg': color2}
         entry_opts = {'width':0,
@@ -63,7 +63,7 @@ class TriangulateFrame(Frame):
 
         self.height_keeper = Frame(self, **color_opts2)
         self.height_keeper.grid(row=3, column=1, sticky=NSEW)
-        
+
         self.buttonFrame = Frame(self, **color_opts2)
         self.buttonFrame.grid(row=4, column=0, columnspan=3)
         self.buttonFrame.grid_columnconfigure(0, weight=2, uniform="buttonframe")
@@ -84,8 +84,7 @@ class TriangulateFrame(Frame):
 
         self.spacer = Frame(self.buttonFrame, width=1, **color_opts2)
         self.spacer.grid(row=0, column=1, sticky=NSEW)
-        
-        
+
         image = Image.open("lowpolypainter/resources/images/BorderPoints.png")
         self.borderImage = ImageTk.PhotoImage(image)
         border_opts = {'image':self.borderImage, 'command':self.border}
@@ -96,7 +95,7 @@ class TriangulateFrame(Frame):
 
         self.spacer2 = Frame(self.buttonFrame, width=1, **color_opts2)
         self.spacer2.grid(row=0, column=3, sticky=NSEW)
-        
+
         image = Image.open("lowpolypainter/resources/images/triangulate.png")
         self.triangleImage = ImageTk.PhotoImage(image)
         triangulate_opts = {'image': self.triangleImage, 'command':self.triangulate}
@@ -104,10 +103,10 @@ class TriangulateFrame(Frame):
 
         self.triangulateButton = Button(self.buttonFrame, **triangulate_opts)
         self.triangulateButton.grid(row=0, column=4, sticky=NSEW)
-        
+
         self.spacer3 = Frame(self.buttonFrame, width=1, **color_opts2)
         self.spacer3.grid(row=0, column=5, sticky=NSEW)
-        
+
         image = Image.open("lowpolypainter/resources/icons/Borders.gif")
         self.BordersImage = ImageTk.PhotoImage(image)
         borders_opts = {'image': self.BordersImage, 'command': self.parent.parent.generateBorderAndTriangulate}
@@ -196,7 +195,7 @@ class MaskFrame(Frame):
     def inBounds(self, point):
         x, y = point[0], point[1]
         return (x >= 0) and (y >= 0) and (x < self.width) and (y < self.height)
-    
+
     def insert(self, path, name):
         # Load Image
         self.inputimage = name
@@ -218,4 +217,3 @@ class MaskFrame(Frame):
         self.canvas.configure(width=self.width, height=self.height)
         self.canvas.create_image(0, 0, image=self.background, anchor=NW)
         self.mask = np.zeros([self.width, self.height], dtype=bool)
-        

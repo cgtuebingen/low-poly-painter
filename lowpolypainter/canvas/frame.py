@@ -62,15 +62,18 @@ class CanvasFrame(Frame):
         self.mouseEventHandled = False
 
         # Toggle Events
+        self.vertsState = NORMAL
+        self.edgesState = NORMAL
         self.faceState = NORMAL
-        self.toggleState = NORMAL
 
         # Events
         self.canvas.bind("<Button-1>", self.click)
         self.canvas.bind_all("<space>", func=self.toggleFacesCheckbutton)
         self.canvas.bind_all("<BackSpace>", self.deleteSelected)
         self.canvas.bind_all("<Key-Delete>", self.deleteSelected)
-        self.canvas.bind_all("<Up>", func=self.toggleVertsAndEdgesCheckbutton)
+        self.canvas.bind_all("<Up>", func=self.toggleVertsCheckbutton)
+        self.canvas.bind_all("<Down>", func=self.toggleEdgesCheckbutton)
+
 
     """ EVENT """
     def click(self, event):
@@ -118,16 +121,38 @@ class CanvasFrame(Frame):
 
         for point in points:
             self.mesh.addVertex([int(point[0]), int(point[1])])
-    
+
     """ checks Button for Vertices and Edges """
-    def toggleVertsAndEdgesCheckbutton(self, event=None):
+    def toggleVertsCheckbutton(self, event=None):
         self.parent.zoomAndToggleFrame.toggleFrame.vertexCheckbox.toggle()
-        self.toggleVertsAndEdges(event)
-        
+        self.toggleVerts(event)
+
+    """ checks Button for Vertices and Edges """
+    def toggleEdgesCheckbutton(self, event=None):
+        self.parent.zoomAndToggleFrame.toggleFrame.edgesCheckbox.toggle()
+        self.toggleEdges(event)
+
     """checks Button for Faces """
     def toggleFacesCheckbutton(self, event=None):
         self.parent.zoomAndToggleFrame.toggleFrame.facesCheckbox.toggle()
         self.toggleFaces(event)
+
+
+    """ VERTICES """
+    def toggleVerts(self, event=None):
+        state = NORMAL
+        if self.vertsState is NORMAL:
+            state = HIDDEN
+        self.canvas.itemconfigure("v", state=state)
+        self.vertsState = state
+
+    """ EDGES """
+    def toggleEdges(self, event=None):
+        state = NORMAL
+        if self.edgesState is NORMAL:
+            state = HIDDEN
+        self.canvas.itemconfigure("e", state=state)
+        self.edgesState = state
 
     """ FACE """
     def toggleFaces(self, event=None):
@@ -136,15 +161,6 @@ class CanvasFrame(Frame):
             state = HIDDEN
         self.canvas.itemconfigure("f", state=state)
         self.faceState = state
-
-    """ VERTICES AND EDGES """
-    def toggleVertsAndEdges(self, event=None):
-        state = NORMAL
-        if self.toggleState is NORMAL:
-            state = HIDDEN
-        self.canvas.itemconfigure("v", state=state)
-        self.canvas.itemconfigure("e", state=state)
-        self.toggleState = state
 
     """ GENERAL """
     def inBounds(self, point):
@@ -184,7 +200,7 @@ class CanvasFrame(Frame):
         # Need min 4 points
         if len(verts) + size + random <= 3:
             return
-        
+
         for vert in verts:
             vert.deconnect()
             points.append(vert.coords)
@@ -212,8 +228,8 @@ class CanvasFrame(Frame):
 
         for vert in self.mesh.vertices:
             vert.draw(False)
-            
-            
+
+
     # inserts an image into canvas Frame by path
     def insert(self, path, name):
         self.inputimage = name
@@ -226,7 +242,7 @@ class CanvasFrame(Frame):
         self.height = self.background.height()
         self.canvas.configure(width=self.width, height=self.height)
         self.canvas.create_image(0, 0, image=self.background, anchor=NW)
-        
+
         self.color = Color(np.array(self.image), 0.5, 0.5)
 
         self.selectedFace = [False, None]
@@ -241,4 +257,3 @@ class CanvasFrame(Frame):
         self.mouseEventHandled = False
 
         self.faceState = NORMAL
-        

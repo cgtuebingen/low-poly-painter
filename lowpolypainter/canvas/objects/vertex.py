@@ -78,7 +78,7 @@ class Vertex:
 
 
     def releaseHandle(self, event):
-        # Merge verts when droped on same position
+        # Merge verts when dropped on same position
         self.firstMove = True
         x, y = int(self.coords[0]), int(self.coords[1])
         vert = self.parent.mesh.bvertices[x][y]
@@ -111,7 +111,7 @@ class Vertex:
                                           outline = COLOR_BORDER,
                                           fill = COLOR_DEFAULT,
                                           tag = TAG_VERTEX,
-                                          state= self.parent.toggleState)
+                                          state= self.parent.vertsState)
 
         self.parent.canvas.tag_bind(self.id, sequence="<Button>", func=self.clickHandle)
         self.parent.canvas.tag_bind(self.id, sequence="<B1-Motion>", func=self.moveHandle)

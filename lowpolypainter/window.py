@@ -40,7 +40,7 @@ class Window(object):
         off_y = -100
         min_width = 800
         min_height = 400
-        self.root.config(bg='#ECECEC')
+        self.root.config(bg='#ffffff')
         self.root.resizable(True, False)
         self.root.title('Low Poly Painter')
         self.root.minsize(min_width, min_height)
@@ -52,17 +52,17 @@ class Window(object):
 
 
         # Frame
-        self.frame = Frame(self.root, bg='#ECECEC')
+        self.frame = Frame(self.root, bg='#ffffff')
         self.frame.grid(sticky=N+S+E+W)
         self.frame.grid_rowconfigure(0, weight=0)
         self.frame.grid_rowconfigure(1, weight=1)
         self.frame.grid_columnconfigure(0, weight=1)
         self.frame.grid_columnconfigure(1, weight=0)
-        
+
         # Canvas Frame
         self.canvasFrameToggle = False
         self.canvasFrame = CanvasFrame(self, inputimage)
-        self.canvasFrame.grid(row=1, column=1, sticky=NSEW)
+        self.canvasFrame.grid(row=1, column=1, sticky=NSEW, padx=10)
 
         # Toolbar Frame
         self.toolbarFrame = ToolbarFrame(self)
@@ -75,36 +75,34 @@ class Window(object):
         self.frame.bind_all("<Control-z>", self.undo)
         self.frame.bind_all("<Control-y>", self.redo)
         self.frame.bind_all("<Control-s>", self.saveState)
-        
-        #Title Frame
-        self.titleFrame = Label(self.frame, text="Low Poly Painter", height=5)
-        self.titleFrame.grid(row=0, column=1, sticky=NSEW)
-        self.titleFrame.config(bg="#ECECEC")
 
+        #Title Frame
+        self.titleFrame = Label(self.frame, text="Low Poly Painter", height=1, justify='center')
+        self.titleFrame.grid(row=0, column=1, sticky=S+N+E+W, pady=10)
+        self.titleFrame.config(bg="#ffffff")
 
         # Mask Frame
         self.maskFrame = MaskFrame(self, inputimage)
 
         # Detail Frame
         self.detailFrame = DetailFrame(self)
-        self.detailFrame.grid(row=1, column=2, sticky=NSEW)
-        
+        self.detailFrame.grid(row=1, column=2, sticky=NSEW, padx=10)
+
         # Zoom and Toggle Frame
         self.zoomAndToggleFrame = ZoomAndToggleFrame(self)
         self.zoomAndToggleFrame.grid(row=2, column=1, sticky=N+E+S+W)
-
 
         # Color Safepoints
         self.colorWheelSafePoint1 = "black"
         self.colorWheelSafePoint2 = "black"
         self.colorWheelSafePoint3 = "black"
-        
-        #Contol Modus
+
+        #Control Modus
         self.controlMode = None
         self.changeModeToP()
 
         self.undoManager = UndoManager()
-        
+
         self.saveName = None
         # default save directory
         defaultDirectory = "lowpolypainter/resources/stored_mesh_data/"
@@ -113,24 +111,27 @@ class Window(object):
         except OSError as e:
             if e.errno != errno.EEXIST:
                 raise
-                
+
     """ Control Mode"""
+    # point mode
     def changeModeToP(self, event=None):
-        self.toolbarFrame.buttonFrame.pointsButton.config(bg="#AAAAAA")                                
-        self.toolbarFrame.buttonFrame.pointsAndLinesButton.config(bg="#D8D8D8")                                
-        self.toolbarFrame.buttonFrame.splitLineButton.config(bg="#D8D8D8")
+        self.toolbarFrame.buttonFrame.pointsButton.config(bg="#ffffff")
+        self.toolbarFrame.buttonFrame.pointsAndLinesButton.config(bg="#ffffff")
+        self.toolbarFrame.buttonFrame.splitLineButton.config(bg="#ffffff")
         self.controlMode = "Points"
-    
+
+    # point and line mode
     def changeModeToPAL(self, event=None):
-        self.toolbarFrame.buttonFrame.pointsButton.config(bg="#D8D8D8")                                
-        self.toolbarFrame.buttonFrame.pointsAndLinesButton.config(bg="#AAAAAA")                                
-        self.toolbarFrame.buttonFrame.splitLineButton.config(bg="#D8D8D8")
+        self.toolbarFrame.buttonFrame.pointsButton.config(bg="#ffffff")
+        self.toolbarFrame.buttonFrame.pointsAndLinesButton.config(bg="#ffffff")
+        self.toolbarFrame.buttonFrame.splitLineButton.config(bg="#ffffff")
         self.controlMode = "Points and Lines"
-    
+
+    # split line mode
     def changeModeToSL(self, event=None):
-        self.toolbarFrame.buttonFrame.pointsButton.config(bg="#D8D8D8")                                
-        self.toolbarFrame.buttonFrame.pointsAndLinesButton.config(bg="#D8D8D8")                                
-        self.toolbarFrame.buttonFrame.splitLineButton.config(bg="#AAAAAA")
+        self.toolbarFrame.buttonFrame.pointsButton.config(bg="#ffffff")
+        self.toolbarFrame.buttonFrame.pointsAndLinesButton.config(bg="#ffffff")
+        self.toolbarFrame.buttonFrame.splitLineButton.config(bg="#ffffff")
         self.controlMode = "Split Line"
 
     """ ZOOM """
@@ -148,7 +149,7 @@ class Window(object):
         self.zoom.ZoomAt(delta, [x, y])
         #self.canvasFrame.mesh.updatePositions()
         self.canvasFrame.canvas.scale("all", x, y, delta, delta)
-        
+
         currentScale = self.zoom.CurrentScale()
         backgroundPosition = self.zoom.ToViewport([0,0])
 
@@ -210,13 +211,13 @@ class Window(object):
 
     def loadMeshDataPath(self, path, event=None):
         self.canvasFrame.mesh.quickload(loadPath(path))
-        
+
     def saveState(self, event=None):
         if self.saveName == None:
             self.saveStateAs()
         else:
             saveState(self.canvasFrame.mesh, self.canvasFrame.image, self.saveName)
-    
+
     def saveStateAs(self, event=None):
         defaultDirectory = "lowpolypainter/resources/stored_mesh_data/"
         file_path = tkFileDialog.asksaveasfilename(initialdir = defaultDirectory, filetypes=[("python", "*.py")])
@@ -225,7 +226,7 @@ class Window(object):
                 file_path += '.py'
             self.saveName = file_path
             self.saveState()
-        
+
 
     # undoes the last change
     def undo(self, event=None):
@@ -278,7 +279,7 @@ class Window(object):
         cw.destroy()
         self.canvasFrame.selectedFace[0]=False
 
-        
+
     def loadImagePath(self, path):
         name = path[path.rindex('/')+1:]
         # changes in window
@@ -291,7 +292,7 @@ class Window(object):
         self.maskFrame.insert(path, name)
         # changes in frame
         self.frame.update()
-        
+
     def loadImage(self, image, name):
         # changes in window
         self.clear()
@@ -303,8 +304,7 @@ class Window(object):
         self.maskFrame.insert(image, name)
         # changes in frame
         self.frame.update()
-        
-        
+
 
 class ToolbarFrame(Frame):
     """
@@ -316,14 +316,14 @@ class ToolbarFrame(Frame):
     def __init__(self, parent, *args, **kwargs):
         Frame.__init__(self, parent.frame)
         self.parent = parent
-        self.config(bg='#D8D8D8', width=47)
+        self.config(bg='#ffffff', width=47)
         self.grid_columnconfigure(0, weight=1)
 
         self.buttonFrame = ButtonFrame(self)
         self.buttonFrame.grid(row=0, sticky=N+E+S+W)
 
-        self.bottomBorder = Frame(self, bg='#AAAAAA', height=1)
-        self.bottomBorder.grid(row=1, sticky=N+E+S+W)
+        # self.bottomBorder = Frame(self, bg='#ffffff', height=1)
+        # self.bottomBorder.grid(row=1, sticky=N+E+S+W)
 
 class ButtonFrame(Frame):
     """
@@ -334,10 +334,8 @@ class ButtonFrame(Frame):
     """
     def __init__(self, parent, *args, **kwargs):
         Frame.__init__(self, parent)
-        self.config(bg='#DADADA', height=46)
         self.grid_columnconfigure(7, weight=1)
-        # self.grid_rowconfigure(0, weight=0)
-        
+
         image = Image.open("lowpolypainter/resources/images/open.png")
         icon_0 = ImageTk.PhotoImage(image)
         image = Image.open("lowpolypainter/resources/images/delete.png")
@@ -361,23 +359,23 @@ class ButtonFrame(Frame):
         image = Image.open("lowpolypainter/resources/images/splitLine.png")
         icon_13 = ImageTk.PhotoImage(image)
 
-        options = {"height": 46, "width": 46, "bg":'#D8D8D8', "borderwidth":0}
+        options = {"height": 60, "width": 40, "bg":'#ffffff', "borderwidth":0}
 
         # Insert Button
-        self.insertButton = Label(self, image=icon_0, **options)
+        self.insertButton = Label(self, image=icon_0, activebackground="#ffffff", activeforeground="#000000", background="#ffffff", borderwidth="0", foreground="#000000", height=30, width=90, highlightbackground='#ffffff', highlightcolor='#ffffff', justify='center')
         self.insertButton.image = icon_0
         self.insertButton.grid(row=0, column=0, sticky=N+E+S+W)
         self.insertButton.bind("<Button-1>", parent.parent.insert)
-        
+
         # Save Button
-        self.saveButton = Menubutton(self, image=icon_4, **options)
+        self.saveButton = Menubutton(self, image=icon_4, activebackground="#ffffff", activeforeground="#000000", background="#ffffff", borderwidth="0", foreground="#000000", relief='flat', highlightbackground='#ffffff', highlightcolor='#ffffff', justify='center', font='font12')
         self.saveButton.image = icon_4
         self.saveButton.grid(row=1, column=0, columnspan=2, sticky=N+E+S+W)
         self.saveButton.menu =  Menu (self.saveButton, tearoff = 0)
         self.saveButton.menu.add_checkbutton (label="Save", command=parent.parent.saveState)
         self.saveButton.menu.add_checkbutton (label="Save as...", command=parent.parent.saveStateAs)
         self.saveButton.config(menu=self.saveButton.menu)
-        
+
         # Export Button
         self.exportButton = Label(self, image=icon_5, **options)
         self.exportButton.image = icon_5
@@ -385,8 +383,8 @@ class ButtonFrame(Frame):
         self.exportButton.bind("<Button-1>", parent.parent.export)
 
         # Space
-        self.space = Frame(self, height=1, bg='#000000', borderwidth=0)
-        self.space.grid(row=3, column=0, sticky=N+E+S+W)
+        self.space = Frame(self, height=1, width=1, bg='#DADADA', borderwidth=0)
+        self.space.grid(row=3, column=0, sticky=N+E+S+W, padx=8)
 
         # Clear Button
         self.clearButton = Label(self, image=icon_1, **options)
@@ -411,40 +409,35 @@ class ButtonFrame(Frame):
         self.redoButton.image = icon_7
         self.redoButton.grid(row=7, column=0, sticky=N+E+S+W)
         self.redoButton.bind("<Button-1>", parent.parent.redo)
-        
-        
+
         # Space2
-        self.space2 = Frame(self, height=1, bg='#000000', borderwidth=0)
-        self.space2.grid(row=8, column=0, sticky=N+E+S+W)
-        
-        
+        self.space2 = Frame(self, height=1, bg='#DADADA', borderwidth=0)
+        self.space2.grid(row=8, column=0, sticky=N+E+S+W, padx=8)
+
         # Colorwheel Button
         self.colorWheelButton = Label(self, image=icon_3, **options)
         self.colorWheelButton.image = icon_3
         self.colorWheelButton.grid(row=9, column=0, sticky=N+E+S+W)
         self.colorWheelButton.bind("<Button-1>", parent.parent.colorwheel)
 
-        
         # Change to Points Mode
         self.pointsButton = Label(self, image=icon_11, **options)
         self.pointsButton.image = icon_11
         self.pointsButton.grid(row=10, column=0, sticky=N+E+S+W)
         self.pointsButton.bind("<Button-1>", parent.parent.changeModeToP)
-        
+
         # Change to Points and Lines Mode
         self.pointsAndLinesButton = Label(self, image=icon_12, **options)
         self.pointsAndLinesButton.image = icon_12
         self.pointsAndLinesButton.grid(row=11, column=0, sticky=N+E+S+W)
         self.pointsAndLinesButton.bind("<Button-1>", parent.parent.changeModeToPAL)
-        
+
         # Change to Split Line Mode
         self.splitLineButton = Label(self, image=icon_13, **options)
         self.splitLineButton.image = icon_13
         self.splitLineButton.grid(row=12, column=0, sticky=N+E+S+W)
         self.splitLineButton.bind("<Button-1>", parent.parent.changeModeToSL)
-        
-        
-        
+
 
 class DetailFrame(Frame):
     """
@@ -456,124 +449,132 @@ class DetailFrame(Frame):
     def __init__(self, parent, *args, **kwargs):
         Frame.__init__(self, parent.frame)
         self.parent = parent
-        self.config(bg='#ECECEC', width=5)
+        self.config(bg='#ffffff', width=5)
 
         self.grid_rowconfigure(1, weight=1, uniform="detailframe")
         self.grid_rowconfigure(3, weight=1, uniform="detailframe")
 
-        self.informationFrame = Frame(self, bg='#ECECEC', width=1)
+        self.informationFrame = Frame(self, bg='#ffffff', width=1)
         self.informationFrame.grid(row=1, column=1, sticky=N+E+S+W)
-        
+
         #TODO: insert color wheel
-        self.colorWheel = Label(self, width=5, height=10, text="insert Color Wheel here")
-        self.colorWheel.config(bg='#ECECEC') 
+        self.colorWheel = Label(self, width=5, height=10, text="Color Wheel")
+        self.colorWheel.config(bg='#ffffff')
+
+        self.middleLine = Frame(self, bg='#DADADA', height=1, width=50)
 
         self.triangulateFrame = TriangulateFrame(self)
-        #self.triangulateFrame.grid(row=0, column=1, sticky=N+E+S+W)
-        
+
         self.colorWheel.grid(row=1, column=1, sticky=N+E+S+W)
+        self.middleLine.grid(row=2, column=0, columnspan=3, sticky=N+E+S+W, padx=10)
         self.triangulateFrame.grid(row=3, column=1, sticky=N+E+S+W)
 
-        self.leftBorder = Frame(self, bg='#AAAAAA', width=1)
-        self.leftBorder.grid(row=0, column=0, rowspan=5, sticky=N+E+S+W)
-        
-        self.upperBorder = Frame(self, bg="#AAAAAA", height=1)
-        self.upperBorder.grid(row=0, column=0, columnspan=3, sticky=N+E+S+W)
-        
-        self.middleLine = Frame(self, bg="#AAAAAA", height=1)
-        self.middleLine.grid(row=2, column=0, columnspan=3, sticky=N+E+S+W)
-        
-        self.lowerBorder = Frame(self, bg="#AAAAAA", height=1)
-        self.lowerBorder.grid(row=4, column=0, columnspan=3, sticky=N+E+S+W)
-        
+        # self.leftBorder = Frame(self, bg='#AAAAAA', width=1)
+        # self.leftBorder.grid(row=0, column=0, rowspan=5, sticky=N+E+S+W)
+
+        # self.upperBorder = Frame(self, bg="#AAAAAA", height=1)
+        # self.upperBorder.grid(row=0, column=0, columnspan=3, sticky=N+E+S+W)
+        # self.lowerBorder = Frame(self, bg="#AAAAAA", height=1)
+        # self.lowerBorder.grid(row=4, column=0, columnspan=3, sticky=N+E+S+W)
+
 
 class ZoomAndToggleFrame(Frame):
     """
     Zoom And Toggle Frame Class
-    
+
     Description:
     Contains Zoom Frame and Toggle Frame
     """
-    
+
     def __init__(self, parent, *args, **kwargs):
         Frame.__init__(self, parent.frame)
-        self.config(bg='#ECECEC', height=1)
+        self.config(bg='#ffffff', height=1)
         self.parent=parent
         self.zoomFrame=ZoomFrame(self)
         self.toggleFrame=ToggleFrame(self)
-        self.spaceFrame=Label(self, bg='#ECECEC', width=5)
+        self.spaceFrame=Label(self, bg='#ffffff', width=5)
         self.grid_columnconfigure(0, weight=2, uniform="ZoomAndToggle")
         self.grid_columnconfigure(1, weight=1, uniform="ZoomAndToggle")
         self.grid_columnconfigure(2, weight=2, uniform="ZoomAndToggle")
-        self.toggleFrame.grid(row=0, column=0, sticky=N+E+S+W)
+        self.toggleFrame.grid(row=0, column=0, sticky=N+W)
         self.spaceFrame.grid(row=0, column=1, sticky=N+E+S+W)
-        self.zoomFrame.grid(row=0, column=2, sticky=E)
+        self.zoomFrame.grid(row=0, column=2, sticky=NE)
 
 
 class ZoomFrame(Frame):
     """
     Zoom Frame Class
-    
+
     Description:
     Contains two Zoom Buttons
     """
-    
+
     def __init__(self, parent, *args, **kwargs):
         Frame.__init__(self, parent)
-        self.config(bg='#ECECEC')
+        self.config(bg='#ffffff')
         self.grid_columnconfigure(0, weight=2, uniform="zoomFrame")
         self.grid_columnconfigure(1, weight=1, uniform="zoomFrame")
         self.grid_columnconfigure(2, weight=1, uniform="zoomFrame")
         self.grid_columnconfigure(3, weight=1, uniform="zoomFrame")
-        
-        # Label
-        self.text = Label(self, text="Zoom:", height=1, width=5)
-        self.text.grid(row=0, column=0, sticky=E)
-        self.text.config(bg='#ECECEC')
-                    
+
         # zoom-in Button
-        self.zoomInButton = Button(self, text="+", command=lambda: parent.parent.mouse_wheel(120, 0, 0))
-        self.zoomInButton.grid(row=0, column=1, sticky=W) 
-        
+        self.zoomInButton = Button(self, text=" + ", command=lambda: parent.parent.mouse_wheel(120, 0, 0), borderwidth=0, relief='flat', highlightbackground='#ffffff', highlightcolor='#ffffff', bd=0, highlightthickness=0, justify='center', padx=1, pady=0)
+        self.zoomInButton.grid(row=0, column=1, sticky=NSEW, padx=3)
+
         # zoom-out Button
-        self.zoomOutButton = Button(self, text="-", command=lambda: parent.parent.mouse_wheel(-120, 0, 0))
-        self.zoomOutButton.grid(row=0, column=2, sticky=W)
-        
+        self.zoomOutButton = Button(self, text=" - ", command=lambda: parent.parent.mouse_wheel(-120, 0, 0), borderwidth=0, relief='flat', highlightbackground='#ffffff', background='#ffffff', bg='#ffffff')
+        self.zoomOutButton.grid(row=0, column=2, sticky=NSEW, padx=3)
+
         # space
-        self.spaceFrame = Frame(self, bg="#ECECEC")
-        self.spaceFrame.grid(row=0, column=3, sticky=W)
+        # self.spaceFrame = Frame(self, bg="#ffffff")
+        # self.spaceFrame.grid(row=0, column=3, sticky=NSEW)
 
 class ToggleFrame(Frame):
     """
     Toogle Frame Class
-    
+
     Descripton:
     Contains the Toggle Checkboxes
     """
     def __init__(self, parent, *args, **kwargs):
         Frame.__init__(self, parent)
-        self.config(bg="#ECECEC")
-                    
+        self.config(bg="#ffffff")
+
         # Label
-        self.frame = Label(self, height=1, text="Show...")
-        self.frame.grid(row=0, column=0, sticky=NSEW)
-        self.frame.config(bg="#ECECEC")
-                          
+        # self.frame = Label(self, height=1, text="Show...")
+        # self.frame.grid(row=0, column=0, sticky=NSEW)
+        # self.frame.config(bg="#ECECEC")
+
         # space
-        self.placeholder1 = Label(self, width=1, bg="#ECECEC")
-        self.placeholder1.grid(row=0, column=1, sticky=NSEW)
-        
+        # self.placeholder1 = Label(self, width=1, bg="#ECECEC")
+        # self.placeholder1.grid(row=0, column=1, sticky=NSEW)
+
+        # # Checkbox for Vertices and Edges
+        # self.vertexCheckbox = Checkbutton(self, text="Vertices", command=parent.parent.canvasFrame.toggleVertsAndEdges, activebackground="#d9d9d9", activeforeground="#000000", background="#ffffff", borderwidth=2, compound='none', font='font9', foreground='#5b5b5b')
+        # self.vertexCheckbox.grid(row=0, column=0, sticky=NSEW)
+        # self.vertexCheckbox.select()
+        #
+        # # Checkbox for Vertices and Edges
+        # self.edgesCheckbox = Checkbutton(self, text="Edges", command=parent.parent.canvasFrame.toggleVertsAndEdges, activebackground="#d9d9d9", activeforeground="#000000", background="#ffffff", borderwidth=2, compound='none', font='font9', foreground='#5b5b5b')
+        # self.edgesCheckbox.grid(row=0, column=1, sticky=NSEW)
+        # #self.vertexCheckbox.select()
+
         # Checkbox for Vertices and Edges
-        self.vertexCheckbox = Checkbutton(self, text="Vertices and Edges", command=parent.parent.canvasFrame.toggleVertsAndEdges)
-        self.vertexCheckbox.grid(row=0, column=2, sticky=NSEW)
+        self.vertexCheckbox = Checkbutton(self, text="Vertices", command=parent.parent.canvasFrame.toggleVerts, activebackground="#ffffff", activeforeground="#000000", background="#ffffff", borderwidth=2, compound='none', font='font9', foreground='#5b5b5b')
+        self.vertexCheckbox.grid(row=0, column=0, sticky=NSEW, padx=7)
         self.vertexCheckbox.select()
-        
+
+        # Checkbox for Vertices and Edges
+        self.edgesCheckbox = Checkbutton(self, text="Edges", command=parent.parent.canvasFrame.toggleEdges, activebackground="#ffffff", activeforeground="#000000", background="#ffffff", borderwidth=2, compound='none', font='font9', foreground='#5b5b5b')
+        self.edgesCheckbox.grid(row=0, column=1, sticky=NSEW)
+        self.edgesCheckbox.select()
+
         # Checkbox for Faces
-        self.facesCheckbox = Checkbutton(self, text="Faces", command=parent.parent.canvasFrame.toggleFaces)
-        self.facesCheckbox.grid(row=0, column=3, sticky=NSEW)
+        self.facesCheckbox = Checkbutton(self, text="Faces", command=parent.parent.canvasFrame.toggleFaces, activebackground="#ffffff", activeforeground="#000000", background="#ffffff", borderwidth=2, compound='none', font='font9', foreground='#5b5b5b')
+        self.facesCheckbox.grid(row=0, column=2, sticky=NSEW, padx=7)
         self.facesCheckbox.select()
-        
-        
+
+
 # TODO: Move description to tags
 """
 Place, select and move points and lines with the mouse.
