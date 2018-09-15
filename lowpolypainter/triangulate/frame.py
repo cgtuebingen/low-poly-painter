@@ -1,4 +1,5 @@
 # Python Modules
+import math
 import numpy as np
 from Tkinter import *
 from PIL import ImageTk, Image
@@ -49,32 +50,28 @@ class TriangulateFrame(Frame):
         self.width_keeper_2 = Frame(self,  width=82, **color_opts1)
         self.width_keeper_2.grid(row=0, column=2, sticky=NSEW)
 
-        self.cannyLabel = Label(self, text='Canny Points', font=font1, **color_opts2)
-        self.cannyLabel.grid(row=1, column=1, sticky=N+W+S)
+        self.entryLabel = Label(self, text='Insert number', font=font1, **color_opts2)
+        self.entryLabel.grid(row=1, column=1, sticky=N+W+S)
 
-        self.cannyEntry = Entry(self, **entry_opts)
-        self.cannyEntry.grid(row=1, column=2, sticky=NSEW)
-        self.cannyEntry.insert(0,'0')
-
-        self.randomLabel = Label(self, text='Random Points', font=font1, **color_opts2)
-        self.randomLabel.grid(row=2, column=1, sticky=N+W+S)
-
-        self.randomEntry = Entry(self, **entry_opts)
-        self.randomEntry.grid(row=2, column=2, sticky=NSEW)
-        self.randomEntry.insert(0,'0')
+        self.entry = Entry(self, **entry_opts)
+        self.entry.grid(row=1, column=2, sticky=NSEW)
+        self.entry.bind('<FocusIn>', self.toogleEntryFocus)
+        self.entry.bind('<FocusOut>', self.toogleEntryFocus)
+        self.entry.insert(0,'0')
 
         self.height_keeper = Frame(self, **color_opts2)
         self.height_keeper.grid(row=3, column=1, sticky=NSEW)
 
         self.buttonFrame = Frame(self, **color_opts2)
         self.buttonFrame.grid(row=4, column=0, columnspan=3)
-        self.buttonFrame.grid_columnconfigure(0, weight=2, uniform="buttonframe")
+        self.buttonFrame.grid_columnconfigure(0, weight=1, uniform="buttonframe")
         self.buttonFrame.grid_columnconfigure(1, weight=1, uniform="buttonframe")
-        self.buttonFrame.grid_columnconfigure(2, weight=2, uniform="buttonframe")
+        self.buttonFrame.grid_columnconfigure(2, weight=1, uniform="buttonframe")
         self.buttonFrame.grid_columnconfigure(3, weight=1, uniform="buttonframe")
-        self.buttonFrame.grid_columnconfigure(4, weight=2, uniform="buttonframe")
+        self.buttonFrame.grid_columnconfigure(4, weight=1, uniform="buttonframe")
         self.buttonFrame.grid_columnconfigure(5, weight=1, uniform="buttonframe")
-        self.buttonFrame.grid_columnconfigure(6, weight=2, uniform="buttonframe")
+        self.buttonFrame.grid_columnconfigure(6, weight=1, uniform="buttonframe")
+        self.buttonFrame.grid_columnconfigure(7, weight=1, uniform="buttonframe")
 
         path = "lowpolypainter/resources/icons/"
 
@@ -86,7 +83,8 @@ class TriangulateFrame(Frame):
         self.maskButton = Button(self.buttonFrame, **mask_opts)
         self.maskButton.grid(row=0, column=0, sticky=N+E+S+W)
 
-        self.spacer = Frame(self.buttonFrame, width=1, **color_opts2)
+        # space
+        self.spacer = Frame(self.buttonFrame, **color_opts2)
         self.spacer.grid(row=0, column=1, sticky=NSEW)
 
         # border points button
@@ -97,7 +95,8 @@ class TriangulateFrame(Frame):
         self.borderButton = Button(self.buttonFrame, **border_opts)
         self.borderButton.grid(row=0, column=2, sticky=N+E+S+W)
 
-        self.spacer2 = Frame(self.buttonFrame, width=1, **color_opts2)
+        # space
+        self.spacer2 = Frame(self.buttonFrame, **color_opts2)
         self.spacer2.grid(row=0, column=3, sticky=NSEW)
 
         # triangulate button
@@ -108,34 +107,57 @@ class TriangulateFrame(Frame):
         self.triangulateButton = Button(self.buttonFrame, **triangulate_opts)
         self.triangulateButton.grid(row=0, column=4, sticky=NSEW)
 
-        self.spacer3 = Frame(self.buttonFrame, width=1, **color_opts2)
+        # space
+        self.spacer3 = Frame(self.buttonFrame, **color_opts2)
         self.spacer3.grid(row=0, column=5, sticky=NSEW)
 
         # border button to fill outer areas without mesh
-        self.BordersImage = PhotoImage(path+"fill.png")
-        borders_opts = {'image': self.BordersImage, 'command': self.parent.parent.generateBorderAndTriangulate}
+        self.BordersImage = PhotoImage(file=path+"fill.png")
+        borders_opts = {'image': self.BordersImage, 'command': self.parent.parent.borderTriangulate}
         borders_opts.update(button_opts)
 
         self.BordersButton = Button(self.buttonFrame, **borders_opts)
         self.BordersButton.grid(row=0, column=6, sticky=NSEW)
 
-        self.bottom_keeper = Frame(self, width=1, **color_opts1)
-        self.bottom_keeper.grid(row=5, column=0, columnspan=5, sticky=NSEW)
+        # space
+        self.spacer4 = Frame(self.buttonFrame, **color_opts2)
+        self.spacer4.grid(row=0, column=7, sticky=NSEW)
+
+        # random button
+        # TODO: random icon, for now we just use the borders image
+        random_opts = {'image':self.BordersImage, 'command':self.random}
+        random_opts.update(button_opts)
+
+        self.randomButton = Button(self.buttonFrame, **random_opts)
+        self.randomButton.grid(row=0, column=8, sticky=N+E+S+W)
 
     def mask(self):
         self.parent.parent.toggleCanvasFrame()
 
     def border(self):
-        self.parent.parent.generateBorder()
+        value = self.getEntryValue()
+        if value != None:
+            self.parent.parent.border(step=value)
+
+    def random(self):
+        value = self.getEntryValue()
+        if value != None:
+            self.parent.parent.random(size=value)
 
     def triangulate(self):
+        value = self.getEntryValue()
+        if value != None:
+            self.parent.parent.triangulate(size=value)
+
+    def getEntryValue(self):
         try:
-            cannyValue = int(self.cannyEntry.get())
-            randomValue = int(self.randomEntry.get())
-            self.parent.parent.triangulate(size=cannyValue, random=randomValue)
+            value = int(self.entry.get())
+            return value
         except ValueError:
-            self.cannyEntry.delete(0,END)
-            self.randomEntry.delete(0,END)
+            self.entry.delete(0,END)
+            return None
+    def toogleEntryFocus(self, event):
+        self.parent.parent.toggleEntryFocus()
 
 
 class MaskFrame(Frame):
@@ -190,9 +212,10 @@ class MaskFrame(Frame):
 
     def addPointToMask(self, point):
         # TODO: Currently rectenagle but is circle
-        for y in range(point[1] - self.radius, point[1] + self.radius + 1):
+        for y in range(point[1] - self.radius - 1, point[1] + self.radius + 1):
             for x in range(point[0] - self.radius, point[0] + self.radius + 1):
-                if self.inBounds([x,y]):
+                dist = math.sqrt((point[0] - x)**2 + (point[1] - y)**2)
+                if self.inBounds([x,y]) and dist <= self.radius:
                     self.mask[x][y] = 1
 
 

@@ -3,13 +3,15 @@ import time
 import math
 import numpy as np
 from Tkinter import *
+from random import randint
 from PIL import ImageTk, Image
 
 # Local Modules
 from mesh import Mesh
 from lowpolypainter.color import Color
-from lowpolypainter.triangulate.triangulate import Triangulate
+from lowpolypainter.triangulate.border import Border
 from lowpolypainter.canvas.objects.vertex import Vertex
+from lowpolypainter.triangulate.triangulate import Triangulate
 
 # Masks
 CTRL_MASK = 0x0004
@@ -63,6 +65,9 @@ class CanvasFrame(Frame):
          # Mouse Event
         self.mouseEventHandled = False
 
+        # Focus
+        self.focus = True
+
         # Toggle Events
         self.vertsState = NORMAL
         self.edgesState = NORMAL
@@ -85,6 +90,7 @@ class CanvasFrame(Frame):
         Description:
         Adds point to canvas, will draw line to last point while ctrl isn't pressed
         """
+        self.parent.root.focus()
         eventPoint = [event.x, event.y]
         if self.inBounds(eventPoint) and (not self.mouseEventHandled) and ((self.parent.controlMode=="Points") or (self.parent.controlMode=="Points and Lines")):
             self.parent.undoManager.do(self.parent)
@@ -95,34 +101,35 @@ class CanvasFrame(Frame):
                 self.mesh.addEdge(previousSelected, self.selected)
         self.mouseEventHandled = False
 
-    def generateBorder(self, step):
-        width = self.width
-        height = self.height
+    """ VERTICES """
+    def toggleVerts(self, event=None):
+        if not self.focus:
+            return
+        state = NORMAL
+        if self.vertsState is NORMAL:
+            state = HIDDEN
+        self.canvas.itemconfigure("v", state=state)
+        self.vertsState = state
 
-        # Height
-        height_indices = np.arange(0, height, math.floor(height/step), dtype=int)
-        height_indices[-1] = height - 1
-        height_points_west = np.zeros((len(height_indices), 2), dtype=int)
-        height_points_east = np.zeros((len(height_indices), 2), dtype=int)
-        for i in range(len(height_points_west)):
-            height_points_west[i][1] = height_indices[i]
-            height_points_east[i] = [width - 1, height_indices[i]]
-        points = height_points_west
-        points = np.vstack([points, height_points_east])
+    """ EDGES """
+    def toggleEdges(self, event=None):
+        if not self.focus:
+            return
+        state = NORMAL
+        if self.edgesState is NORMAL:
+            state = HIDDEN
+        self.canvas.itemconfigure("e", state=state)
+        self.edgesState = state
 
-        # Width
-        width_indices = np.arange(0, width, math.floor(width/step), dtype=int)
-        width_indices[-1] = width - 1
-        width_points_north = np.zeros((len(width_indices), 2), dtype=int)
-        width_points_south = np.zeros((len(width_indices), 2), dtype=int)
-        for i in range(len(width_points_north)):
-            width_points_north[i][0] = width_indices[i]
-            width_points_south[i] = [width_indices[i], height - 1]
-        points = np.vstack([points, width_points_north])
-        points = np.vstack([points, width_points_south])
-
-        for point in points:
-            self.mesh.addVertex([int(point[0]), int(point[1])])
+    """ FACE """
+    def toggleFaces(self, event=None):
+        if not self.focus:
+            return
+        state = NORMAL
+        if self.faceState is NORMAL:
+            state = HIDDEN
+        self.canvas.itemconfigure("f", state=state)
+        self.faceState = state
 
     """ checks Button for Vertices and Edges """
     def toggleVertsCheckbutton(self, event=None):
@@ -139,31 +146,6 @@ class CanvasFrame(Frame):
         self.parent.zoomAndToggleFrame.toggleFrame.facesCheckbox.toggle()
         self.toggleFaces(event)
 
-
-    """ VERTICES """
-    def toggleVerts(self, event=None):
-        state = NORMAL
-        if self.vertsState is NORMAL:
-            state = HIDDEN
-        self.canvas.itemconfigure("v", state=state)
-        self.vertsState = state
-
-    """ EDGES """
-    def toggleEdges(self, event=None):
-        state = NORMAL
-        if self.edgesState is NORMAL:
-            state = HIDDEN
-        self.canvas.itemconfigure("e", state=state)
-        self.edgesState = state
-
-    """ FACE """
-    def toggleFaces(self, event=None):
-        state = NORMAL
-        if self.faceState is NORMAL:
-            state = HIDDEN
-        self.canvas.itemconfigure("f", state=state)
-        self.faceState = state
-
     """ GENERAL """
     def inBounds(self, point):
         x, y = point[0], point[1]
@@ -175,6 +157,9 @@ class CanvasFrame(Frame):
             self.selected = object
 
     def deleteSelected(self, event):
+        if not self.focus:
+            return
+
         self.parent.undoManager.do(self.parent)
         if self.selected is not None:
             self.selected.delete()
@@ -188,8 +173,85 @@ class CanvasFrame(Frame):
         self.selectedFace = [False, None]
         self.mesh.clear()
 
+    """ Border """
+    def border(self, triangulate=False, step=0):
+        # generate border
+        border = Border(self.width, self.height)
+
+        if triangulate:
+            if len(self.mesh.vertices) <= 4:
+                return
+
+            coords = []
+            for vert in self.mesh.vertices:
+                coords.append(vert.coords)
+
+            # generate convex hull
+            border.generateConvexHull(coords)
+
+            # draw border and connect edges
+            for site_idx in range(len(border.sites)):
+                # draw first corner point
+                rp = border.sites[site_idx][0]
+                rv = self.mesh.bvertices[rp[0]][rp[1]]
+                bp = border.sites_orientation[site_idx][0]
+                bv = self.mesh.bvertices[bp[0]][bp[1]]
+                if bv == 0:
+                    bv = self.mesh.addVertex(bp)
+                self.mesh.addEdge(rv, bv)
+                past_rv = rv
+                past_bv = bv
+
+                # draw points inbetween
+                for point_idx in range(1,len(border.sites[site_idx])-1):
+                    rp = border.sites[site_idx][point_idx]
+                    rv = self.mesh.bvertices[rp[0]][rp[1]]
+                    bp = border.sites_orientation[site_idx][point_idx]
+                    bv = self.mesh.addVertex(bp)
+                    self.mesh.addEdge(rv, bv)
+                    self.mesh.addEdge(rv, past_rv)
+                    self.mesh.addEdge(rv, past_bv)
+                    self.mesh.addEdge(bv, past_bv)
+                    past_rv = rv
+                    past_bv = bv
+
+                # draw last corner point
+                rp = border.sites[site_idx][-1]
+                rv = self.mesh.bvertices[rp[0]][rp[1]]
+                bp = border.sites_orientation[site_idx][-1]
+                bv = self.mesh.bvertices[bp[0]][bp[1]]
+                if bv == 0:
+                    bv = self.mesh.addVertex(bp)
+                self.mesh.addEdge(rv, bv)
+                self.mesh.addEdge(rv, past_rv)
+                self.mesh.addEdge(rv, past_bv)
+                self.mesh.addEdge(bv, past_bv)
+
+            # mark hull points
+            # for point in border.hull:
+            #     id = self.mesh.bvertices[point[0]][point[1]].id
+            #     self.canvas.itemconfigure(id, fill='yellow')
+
+        else:
+            # draw border points
+            border.generatePoints(step)
+            for point in border.points:
+                self.mesh.addVertex([int(point[0]), int(point[1])])
+
+    """ Random """
+    def random(self, size=0):
+        if size == 0:
+            return
+
+        w, h = self.width - 1, self.height - 1
+        random_points = np.zeros((size, 2), dtype=int)
+        for i in range(size):
+            point = [randint(0, w), randint(0, h)]
+            if self.mesh.bvertices[point[0]][point[1]] == 0:
+                self.mesh.addVertex(point)
+
     """ Triangulate """
-    def triangulate(self, size=0, random=0, mask=None):
+    def triangulate(self, size=0, mask=None):
         if mask is None or len(mask[mask != 0]) == 0:
             mask = np.ones([self.width, self.height], dtype=bool)
 
@@ -198,9 +260,8 @@ class CanvasFrame(Frame):
         verts = np.asarray(self.mesh.bvertices)[mask]
         verts = verts[verts != 0.0]
 
-
         # Need min 4 points
-        if len(verts) + size + random <= 3:
+        if len(verts) + size <= 3:
             return
 
         for vert in verts:
@@ -213,7 +274,7 @@ class CanvasFrame(Frame):
         if size != 0:
             triangulate.generateCanny(mask=mask)
 
-        triangle = triangulate.triangulate(size, random)
+        triangle = triangulate.triangulate(size)
 
         # Generate Mesh Objects
         for tris in triangle:

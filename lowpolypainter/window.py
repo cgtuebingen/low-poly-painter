@@ -18,6 +18,7 @@ from Colorwheel import Colorwheel
 from lowpolypainter.undoManager import UndoManager
 
 
+
 class Window(object):
     """
     Window Class
@@ -167,6 +168,9 @@ class Window(object):
 
 
     """ ACTIONS """
+    def toggleEntryFocus(self):
+        self.canvasFrame.focus = not self.canvasFrame.focus
+
     def toggleCanvasFrame(self, event=None):
         if self.canvasFrameToggle:
             self.canvasFrameToggle = False
@@ -239,36 +243,24 @@ class Window(object):
     def redo(self, event=None):
         self.undoManager.redo(self)
 
-    def generateBorder(self, borderpoints=6):
-        self.canvasFrame.generateBorder(borderpoints)
+    def border(self, step=0):
+        self.canvasFrame.border(step=step)
 
-    def generateBorderAndTriangulate(self, event=None):
-        self.generateBorder()
-        self.triangulate()
+    def borderTriangulate(self, event=None):
+        self.canvasFrame.border(triangulate=True)
 
-    def triangulate(self, size=0, random=0):
+    def random(self, size=0):
+        self.canvasFrame.random(size=size)
+
+    def triangulate(self, size=0):
         self.undoManager.do(self)
         if self.canvasFrameToggle:
             self.toggleCanvasFrame()
             self.maskFrame.canvas.delete("v")
-            self.canvasFrame.triangulate(size, random, self.maskFrame.mask)
+            self.canvasFrame.triangulate(size, self.maskFrame.mask)
             self.maskFrame.mask = np.zeros([self.maskFrame.width, self.maskFrame.height], dtype=bool)
         else:
-            self.canvasFrame.triangulate(size, random)
-
-    # check if a vertex is an outer vertex
-    def updateOuterVertices(self):
-        # reset vertex degrees to 0
-        for vertex in self.canvasFrame.mesh.vertices:
-            vertex.degree = 0
-
-        # calculate degree of enclosing angles by surrounding faces
-        for face in self.canvasFrame.mesh.faces:
-            face.calcVerticesDegrees()
-
-        # if enclosing angle degree is not 360 a vertex is an outer vertex
-        for vertex in self.canvasFrame.mesh.vertices:
-            vertex.updateIsOuter()
+            self.canvasFrame.triangulate(size)
 
     # TODO: Move to detail view menu
     def colorwheel(self, event=None):
@@ -282,6 +274,12 @@ class Window(object):
         cw.destroy()
         self.canvasFrame.selectedFace[0]=False
 
+# TODO: check if necessary
+    """ DETAIL VIEW """
+    # def show_triangulate(self, event=None):
+    #     self.detailFrame.selectedFrame.grid_forget()
+    #     self.detailFrame.triangulateFrame.grid(row=0, column=1, sticky=N+E+S+W)
+    #     self.detailFrame.selectedFrame = self.detailFrame.triangulateFrame
 
     def loadImagePath(self, path):
         name = path[path.rindex('/')+1:]
@@ -576,5 +574,7 @@ Please note that there is no visualisation if you select any face.
 To connect two points with a line, or to split a line in two, hold the SHIFT button.
 If a line creates one or more triangles, then they will be automatically added.
 Delete selected objects with DEL.
+Toggle the visibility of the vertices with UP.
+Toggle the visibility of the edges with DOWN.
 Toggle the visibility of the faces with SPACE.
 """
