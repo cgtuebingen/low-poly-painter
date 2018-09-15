@@ -63,6 +63,9 @@ class CanvasFrame(Frame):
          # Mouse Event
         self.mouseEventHandled = False
 
+        # Focus
+        self.focus = True
+
         # Toggle Events
         self.vertsState = NORMAL
         self.edgesState = NORMAL
@@ -84,6 +87,7 @@ class CanvasFrame(Frame):
         Description:
         Adds point to canvas, will draw line to last point while ctrl isn't pressed
         """
+        self.parent.root.focus()
         eventPoint = [event.x, event.y]
         if self.inBounds(eventPoint) and not self.mouseEventHandled:
             self.parent.undoManager.do(self.parent)
@@ -96,6 +100,9 @@ class CanvasFrame(Frame):
 
     """ VERTICES """
     def toggleVerts(self, event):
+        if not self.focus:
+            return
+
         state = NORMAL
         if self.vertsState is NORMAL:
             state = HIDDEN
@@ -104,6 +111,9 @@ class CanvasFrame(Frame):
 
     """ EDGES """
     def toggleEdges(self, event):
+        if not self.focus:
+            return
+
         state = NORMAL
         if self.edgesState is NORMAL:
             state = HIDDEN
@@ -112,6 +122,9 @@ class CanvasFrame(Frame):
 
     """ FACE """
     def toggleFaces(self, event):
+        if not self.focus:
+            return
+
         state = NORMAL
         if self.faceState is NORMAL:
             state = HIDDEN
@@ -129,6 +142,9 @@ class CanvasFrame(Frame):
             self.selected = object
 
     def deleteSelected(self, event):
+        if not self.focus:
+            return
+
         self.parent.undoManager.do(self.parent)
         if self.selected is not None:
             self.selected.delete()

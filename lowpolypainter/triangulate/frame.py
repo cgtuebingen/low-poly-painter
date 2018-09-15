@@ -1,4 +1,5 @@
 # Python Modules
+import math
 import numpy as np
 from Tkinter import *
 from PIL import ImageTk, Image
@@ -45,14 +46,9 @@ class TriangulateFrame(Frame):
 
         self.entry = Entry(self, **entry_opts)
         self.entry.grid(row=1, column=2, sticky=NSEW)
+        self.entry.bind('<FocusIn>', self.toogleEntryFocus)
+        self.entry.bind('<FocusOut>', self.toogleEntryFocus)
         self.entry.insert(0,'0')
-        #
-        # self.randomLabel = Label(self, text='Random Points', **color_opts)
-        # self.randomLabel.grid(row=2, column=1, sticky=N+W+S)
-        #
-        # self.randomEntry = Entry(self, **entry_opts)
-        # self.randomEntry.grid(row=2, column=2, sticky=NSEW)
-        # self.randomEntry.insert(0,'0')
 
         self.height_keeper = Frame(self, **color_opts)
         self.height_keeper.grid(row=3, column=1, sticky=NSEW)
@@ -118,6 +114,8 @@ class TriangulateFrame(Frame):
         except ValueError:
             self.entry.delete(0,END)
             return None
+    def toogleEntryFocus(self, event):
+        self.parent.parent.toggleEntryFocus()
 
 
 class MaskFrame(Frame):
@@ -172,9 +170,10 @@ class MaskFrame(Frame):
 
     def addPointToMask(self, point):
         # TODO: Currently rectenagle but is circle
-        for y in range(point[1] - self.radius, point[1] + self.radius + 1):
+        for y in range(point[1] - self.radius - 1, point[1] + self.radius + 1):
             for x in range(point[0] - self.radius, point[0] + self.radius + 1):
-                if self.inBounds([x,y]):
+                dist = math.sqrt((point[0] - x)**2 + (point[1] - y)**2)
+                if self.inBounds([x,y]) and dist <= self.radius:
                     self.mask[x][y] = 1
 
 

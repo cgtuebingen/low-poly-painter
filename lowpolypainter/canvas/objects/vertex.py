@@ -1,3 +1,6 @@
+import math
+import numpy as np
+
 # TAG
 TAG_VERTEX = "v"
 TAG_EDGE = "e"
@@ -79,9 +82,22 @@ class Vertex:
         # Merge verts when droped on same position
         self.firstMove = True
         x, y = int(self.coords[0]), int(self.coords[1])
-        vert = self.parent.mesh.bvertices[x][y]
-        if vert != 0:
-            self.mergeWithVertex(vert)
+        x_0, x_1 = x - 3 if x - 3 > 0 else 0 , x + 3
+        y_0, y_1 = y - 3 if y - 3 > 0 else 0 , y + 3
+        verts_arr = np.asarray(self.parent.mesh.bvertices)[x_0:x_1,y_0:y_1]
+        verts = verts_arr[verts_arr != 0.0]
+
+        min_dist_vert = None
+        min_dist = float('Inf')
+
+        for vert in verts:
+            point = vert.coords
+            dist = math.sqrt((point[0] - x)**2 + (point[1] - y)**2)
+            if dist < min_dist:
+                min_dist = dist
+                min_dist_vert = vert
+        if min_dist_vert != None:
+            self.mergeWithVertex(min_dist_vert)
         self.parent.mesh.bvertices[x][y] = self
         self.parent.mouseEvent = False
 

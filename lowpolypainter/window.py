@@ -131,6 +131,9 @@ class Window(object):
 
 
     """ ACTIONS """
+    def toggleEntryFocus(self):
+        self.canvasFrame.focus = not self.canvasFrame.focus
+
     def toggleCanvasFrame(self, event=None):
         if self.canvasFrameToggle:
             self.canvasFrameToggle = False
