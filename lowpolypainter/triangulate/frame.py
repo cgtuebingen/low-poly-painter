@@ -40,19 +40,19 @@ class TriangulateFrame(Frame):
         self.width_keeper_2 = Frame(self,  width=82, **color_opts)
         self.width_keeper_2.grid(row=0, column=2, sticky=NSEW)
 
-        self.cannyLabel = Label(self, text='Canny Points', **color_opts)
-        self.cannyLabel.grid(row=1, column=1, sticky=N+W+S)
+        self.entryLabel = Label(self, text='Insert number', **color_opts)
+        self.entryLabel.grid(row=1, column=1, sticky=N+W+S)
 
-        self.cannyEntry = Entry(self, **entry_opts)
-        self.cannyEntry.grid(row=1, column=2, sticky=NSEW)
-        self.cannyEntry.insert(0,'0')
-
-        self.randomLabel = Label(self, text='Random Points', **color_opts)
-        self.randomLabel.grid(row=2, column=1, sticky=N+W+S)
-
-        self.randomEntry = Entry(self, **entry_opts)
-        self.randomEntry.grid(row=2, column=2, sticky=NSEW)
-        self.randomEntry.insert(0,'0')
+        self.entry = Entry(self, **entry_opts)
+        self.entry.grid(row=1, column=2, sticky=NSEW)
+        self.entry.insert(0,'0')
+        #
+        # self.randomLabel = Label(self, text='Random Points', **color_opts)
+        # self.randomLabel.grid(row=2, column=1, sticky=N+W+S)
+        #
+        # self.randomEntry = Entry(self, **entry_opts)
+        # self.randomEntry.grid(row=2, column=2, sticky=NSEW)
+        # self.randomEntry.insert(0,'0')
 
         self.height_keeper = Frame(self, **color_opts)
         self.height_keeper.grid(row=3, column=1, sticky=NSEW)
@@ -75,29 +75,49 @@ class TriangulateFrame(Frame):
         self.spacer2 = Frame(self, height=10, **color_opts)
         self.spacer2.grid(row=7, column=1, sticky=NSEW)
 
+        random_opts = {'text':'Random', 'command':self.random}
+        random_opts.update(button_opts)
+
+        self.randomButton = Button(self, **random_opts)
+        self.randomButton.grid(row=8, column=1, columnspan=2, sticky=N+E+S+W)
+
+        self.spacer3 = Frame(self, height=10, **color_opts)
+        self.spacer3.grid(row=9, column=1, sticky=NSEW)
+
         triangulate_opts = {'text':'Triangulate', 'command':self.triangulate}
         triangulate_opts.update(button_opts)
 
         self.triangulateButton = Button(self, **triangulate_opts)
-        self.triangulateButton.grid(row=8, column=1, columnspan=2, sticky=NSEW)
+        self.triangulateButton.grid(row=10, column=1, columnspan=2, sticky=NSEW)
 
         self.bottom_keeper = Frame(self, height=10, **color_opts)
-        self.bottom_keeper.grid(row=9, column=1, sticky=NSEW)
+        self.bottom_keeper.grid(row=11, column=1, sticky=NSEW)
 
     def mask(self):
         self.parent.parent.toggleCanvasFrame()
 
     def border(self):
-        self.parent.parent.border()
+        value = self.getEntryValue()
+        if value != None:
+            self.parent.parent.border(step=value)
+
+    def random(self):
+        value = self.getEntryValue()
+        if value != None:
+            self.parent.parent.random(size=value)
 
     def triangulate(self):
+        value = self.getEntryValue()
+        if value != None:
+            self.parent.parent.triangulate(size=value)
+
+    def getEntryValue(self):
         try:
-            cannyValue = int(self.cannyEntry.get())
-            randomValue = int(self.randomEntry.get())
-            self.parent.parent.triangulate(size=cannyValue, random=randomValue)
+            value = int(self.entry.get())
+            return value
         except ValueError:
-            self.cannyEntry.delete(0,END)
-            self.randomEntry.delete(0,END)
+            self.entry.delete(0,END)
+            return None
 
 
 class MaskFrame(Frame):

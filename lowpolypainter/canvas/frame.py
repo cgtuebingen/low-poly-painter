@@ -3,6 +3,7 @@ import time
 import math
 import numpy as np
 from Tkinter import *
+from random import randint
 from PIL import ImageTk, Image
 
 # Local Modules
@@ -108,7 +109,7 @@ class CanvasFrame(Frame):
             state = HIDDEN
         self.canvas.itemconfigure("e", state=state)
         self.edgesState = state
-        
+
     """ FACE """
     def toggleFaces(self, event):
         state = NORMAL
@@ -142,7 +143,7 @@ class CanvasFrame(Frame):
         self.mesh.clear()
 
     """ Border """
-    def border(self, triangulate=False, step=6):
+    def border(self, triangulate=False, step=0):
         # generate border
         border = Border(self.width, self.height)
 
@@ -195,11 +196,6 @@ class CanvasFrame(Frame):
                 self.mesh.addEdge(rv, past_bv)
                 self.mesh.addEdge(bv, past_bv)
 
-            rp = border.sites[3][-1]
-            id = self.mesh.bvertices[rp[0]][rp[1]].id
-            self.canvas.itemconfigure(id, fill='lawngreen')
-            return
-
             # mark hull points
             # for point in border.hull:
             #     id = self.mesh.bvertices[point[0]][point[1]].id
@@ -211,9 +207,20 @@ class CanvasFrame(Frame):
             for point in border.points:
                 self.mesh.addVertex([int(point[0]), int(point[1])])
 
+    """ Random """
+    def random(self, size=0):
+        if size == 0:
+            return
+
+        w, h = self.width - 1, self.height - 1
+        random_points = np.zeros((size, 2), dtype=int)
+        for i in range(size):
+            point = [randint(0, w), randint(0, h)]
+            if self.mesh.bvertices[point[0]][point[1]] == 0:
+                self.mesh.addVertex(point)
 
     """ Triangulate """
-    def triangulate(self, size=0, random=0, mask=None):
+    def triangulate(self, size=0, mask=None):
         if mask is None or len(mask[mask != 0]) == 0:
             mask = np.ones([self.width, self.height], dtype=bool)
 
@@ -223,7 +230,7 @@ class CanvasFrame(Frame):
         verts = verts[verts != 0.0]
 
         # Need min 4 points
-        if len(verts) + size + random <= 3:
+        if len(verts) + size <= 3:
             return
 
         for vert in verts:
@@ -236,7 +243,7 @@ class CanvasFrame(Frame):
         if size != 0:
             triangulate.generateCanny(mask=mask)
 
-        triangle = triangulate.triangulate(size, random)
+        triangle = triangulate.triangulate(size)
 
         # Generate Mesh Objects
         for tris in triangle:

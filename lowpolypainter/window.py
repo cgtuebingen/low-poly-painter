@@ -203,22 +203,24 @@ class Window(object):
     def redo(self, event=None):
         self.undoManager.redo(self)
 
-    def border(self, step=6):
+    def border(self, step=0):
         self.canvasFrame.border(step=step)
 
     def borderTriangulate(self, event=None):
-        self.canvasFrame.border(triangulate=True, step=6)
+        self.canvasFrame.border(triangulate=True)
 
+    def random(self, size=0):
+        self.canvasFrame.random(size=size)
 
-    def triangulate(self, size=0, random=0):
+    def triangulate(self, size=0):
         self.undoManager.do(self)
         if self.canvasFrameToggle:
             self.toggleCanvasFrame()
             self.maskFrame.canvas.delete("v")
-            self.canvasFrame.triangulate(size, random, self.maskFrame.mask)
+            self.canvasFrame.triangulate(size, self.maskFrame.mask)
             self.maskFrame.mask = np.zeros([self.maskFrame.width, self.maskFrame.height], dtype=bool)
         else:
-            self.canvasFrame.triangulate(size, random)
+            self.canvasFrame.triangulate(size)
 
     # TODO: Move to detail view menu
     def colorwheel(self, event=None):

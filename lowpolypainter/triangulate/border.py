@@ -19,7 +19,7 @@ class Border(object):
         self.width = width
         self.height = height
 
-    ''' Generate Points'''
+    """ Generate Points """
     def generatePoints(self, step):
         width = self.width
         height = self.height
@@ -47,7 +47,7 @@ class Border(object):
                                       width_points_south[::-1],
                                       height_points_west[::-1]])
 
-    ''' Generate Convex Hull'''
+    """ Generate Convex Hull """
     def generateConvexHull(self, verts):
         # hull points
         hull_points = []
