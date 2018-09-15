@@ -29,14 +29,14 @@ class TriangulateFrame(Frame):
         font1 = "-family {Heiti TC} -size 12 -weight normal -slant "  \
             "roman -underline 0 -overstrike 0"
         color_opts1 = {'bg': '#ffffff'}
-        color_opts2 = {'bg': '#ffffff'}
-        entry_opts = {'width':0,
+        entry_opts = {'width':8,
                          'justify':'right',
                          'highlightbackground':'#ffffff',
                          'font':'font1'}
-        button_opts = {'highlightthickness':0,
-                          'highlightbackground':'#ffffff',
-                          'width': 30, 'height': 32}
+        button_opts = {'highlightthickness':1,
+                          'highlightbackground':'#ffffff', 'borderwidth': 0,
+                          'highlightcolor':'#ffffff',
+                          'height': 30, 'width': 32}
 
         self.left_keeper = Frame(self, width=10, **color_opts1)
         self.left_keeper.grid(row=0, column=0, sticky=NSEW)
@@ -44,34 +44,33 @@ class TriangulateFrame(Frame):
         self.right_keeper = Frame(self, width=10, **color_opts1)
         self.right_keeper.grid(row=0, column=3, sticky=NSEW)
 
-        self.width_keeper_1 = Frame(self, width=110, **color_opts1)
+        self.width_keeper_1 = Frame(self, width=10, **color_opts1)
         self.width_keeper_1.grid(row=0, column=1, sticky=NSEW)
 
         self.width_keeper_2 = Frame(self,  width=82, **color_opts1)
         self.width_keeper_2.grid(row=0, column=2, sticky=NSEW)
 
-        self.entryLabel = Label(self, text='Insert number', font=font1, **color_opts2)
-        self.entryLabel.grid(row=1, column=1, sticky=N+W+S)
+        self.entryLabel = Label(self, text='Insert number', justify='right', font=font1, **color_opts1)
+        self.entryLabel.grid(row=1, column=0, sticky=N+S+E, padx=4)
 
         self.entry = Entry(self, **entry_opts)
-        self.entry.grid(row=1, column=2, sticky=NSEW)
+        self.entry.grid(row=1, column=1, sticky=N+S+W+E)
         self.entry.bind('<FocusIn>', self.toogleEntryFocus)
         self.entry.bind('<FocusOut>', self.toogleEntryFocus)
         self.entry.insert(0,'0')
 
-        self.height_keeper = Frame(self, **color_opts2)
+        self.height_keeper = Frame(self, **color_opts1)
         self.height_keeper.grid(row=3, column=1, sticky=NSEW)
 
-        self.buttonFrame = Frame(self, **color_opts2)
+        self.buttonFrame = Frame(self, **color_opts1)
         self.buttonFrame.grid(row=4, column=0, columnspan=3)
-        self.buttonFrame.grid_columnconfigure(0, weight=1, uniform="buttonframe")
-        self.buttonFrame.grid_columnconfigure(1, weight=1, uniform="buttonframe")
-        self.buttonFrame.grid_columnconfigure(2, weight=1, uniform="buttonframe")
-        self.buttonFrame.grid_columnconfigure(3, weight=1, uniform="buttonframe")
-        self.buttonFrame.grid_columnconfigure(4, weight=1, uniform="buttonframe")
-        self.buttonFrame.grid_columnconfigure(5, weight=1, uniform="buttonframe")
-        self.buttonFrame.grid_columnconfigure(6, weight=1, uniform="buttonframe")
-        self.buttonFrame.grid_columnconfigure(7, weight=1, uniform="buttonframe")
+        self.buttonFrame.grid_columnconfigure(0, weight=0, uniform="buttonframe")
+        self.buttonFrame.grid_columnconfigure(1, weight=0, uniform="buttonframe")
+        self.buttonFrame.grid_columnconfigure(2, weight=0, uniform="buttonframe")
+        self.buttonFrame.grid_columnconfigure(3, weight=0, uniform="buttonframe")
+        self.buttonFrame.grid_columnconfigure(4, weight=0, uniform="buttonframe")
+        self.buttonFrame.grid_columnconfigure(5, weight=0, uniform="buttonframe")
+        self.buttonFrame.grid_columnconfigure(6, weight=0, uniform="buttonframe")
 
         path = "lowpolypainter/resources/icons/"
 
@@ -81,11 +80,7 @@ class TriangulateFrame(Frame):
         mask_opts.update(button_opts)
 
         self.maskButton = Button(self.buttonFrame, **mask_opts)
-        self.maskButton.grid(row=0, column=0, sticky=N+E+S+W)
-
-        # space
-        self.spacer = Frame(self.buttonFrame, **color_opts2)
-        self.spacer.grid(row=0, column=1, sticky=NSEW)
+        self.maskButton.grid(row=0, column=1, sticky=N+E+S+W, padx=5)
 
         # border points button
         self.borderImage = PhotoImage(file=path+"borderpoints.png")
@@ -93,11 +88,7 @@ class TriangulateFrame(Frame):
         border_opts.update(button_opts)
 
         self.borderButton = Button(self.buttonFrame, **border_opts)
-        self.borderButton.grid(row=0, column=2, sticky=N+E+S+W)
-
-        # space
-        self.spacer2 = Frame(self.buttonFrame, **color_opts2)
-        self.spacer2.grid(row=0, column=3, sticky=NSEW)
+        self.borderButton.grid(row=0, column=2, sticky=N+E+S+W, padx=5)
 
         # triangulate button
         self.triangleImage = PhotoImage(file=path+"triangulate.png")
@@ -105,11 +96,7 @@ class TriangulateFrame(Frame):
         triangulate_opts.update(button_opts)
 
         self.triangulateButton = Button(self.buttonFrame, **triangulate_opts)
-        self.triangulateButton.grid(row=0, column=4, sticky=NSEW)
-
-        # space
-        self.spacer3 = Frame(self.buttonFrame, **color_opts2)
-        self.spacer3.grid(row=0, column=5, sticky=NSEW)
+        self.triangulateButton.grid(row=0, column=3, sticky=NSEW, padx=5)
 
         # border button to fill outer areas without mesh
         self.BordersImage = PhotoImage(file=path+"fill.png")
@@ -117,19 +104,15 @@ class TriangulateFrame(Frame):
         borders_opts.update(button_opts)
 
         self.BordersButton = Button(self.buttonFrame, **borders_opts)
-        self.BordersButton.grid(row=0, column=6, sticky=NSEW)
-
-        # space
-        self.spacer4 = Frame(self.buttonFrame, **color_opts2)
-        self.spacer4.grid(row=0, column=7, sticky=NSEW)
+        self.BordersButton.grid(row=0, column=4, sticky=NSEW, padx=5)
 
         # random button
-        # TODO: random icon, for now we just use the borders image
-        random_opts = {'image':self.BordersImage, 'command':self.random}
+        self.randomImage = PhotoImage(file=path+"random.png")
+        random_opts = {'image':self.randomImage, 'command':self.random}
         random_opts.update(button_opts)
 
         self.randomButton = Button(self.buttonFrame, **random_opts)
-        self.randomButton.grid(row=0, column=8, sticky=N+E+S+W)
+        self.randomButton.grid(row=0, column=5, sticky=N+E+S+W, padx=5)
 
     def mask(self):
         self.parent.parent.toggleCanvasFrame()
