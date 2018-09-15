@@ -18,6 +18,7 @@ from Colorwheel import Colorwheel
 from lowpolypainter.undoManager import UndoManager
 
 
+
 class Window(object):
     """
     Window Class
@@ -202,12 +203,12 @@ class Window(object):
     def redo(self, event=None):
         self.undoManager.redo(self)
 
-    def generateBorder(self, borderpoints=6):
-        self.canvasFrame.generateBorder(borderpoints)
+    def border(self, step=6):
+        self.canvasFrame.border(step=step)
 
-    def generateBorderAndTriangulate(self, event=None):
-        self.generateBorder()
-        self.triangulate()
+    def borderTriangulate(self, event=None):
+        self.canvasFrame.border(triangulate=True, step=6)
+
 
     def triangulate(self, size=0, random=0):
         self.undoManager.do(self)
@@ -218,20 +219,6 @@ class Window(object):
             self.maskFrame.mask = np.zeros([self.maskFrame.width, self.maskFrame.height], dtype=bool)
         else:
             self.canvasFrame.triangulate(size, random)
-
-    # check if a vertex is an outer vertex
-    def updateOuterVertices(self):
-        # reset vertex degrees to 0
-        for vertex in self.canvasFrame.mesh.vertices:
-            vertex.degree = 0
-
-        # calculate degree of enclosing angles by surrounding faces
-        for face in self.canvasFrame.mesh.faces:
-            face.calcVerticesDegrees()
-
-        # if enclosing angle degree is not 360 a vertex is an outer vertex
-        for vertex in self.canvasFrame.mesh.vertices:
-            vertex.updateIsOuter()
 
     # TODO: Move to detail view menu
     def colorwheel(self, event=None):
@@ -308,7 +295,6 @@ class ButtonFrame(Frame):
         Frame.__init__(self, parent)
         self.config(bg='#DADADA', height=46)
         self.grid_columnconfigure(7, weight=1)
-        # self.grid_rowconfigure(0, weight=0)
 
         icon_0 = PhotoImage(file="./lowpolypainter/resources/icons/Insert.gif")
         icon_1 = PhotoImage(file="./lowpolypainter/resources/icons/Clear.gif")
@@ -363,7 +349,7 @@ class ButtonFrame(Frame):
         self.redoButton = Label(self, image=icon_8, **options)
         self.redoButton.image = icon_8
         self.redoButton.grid(row=0, column=6, sticky=N+E+S+W)
-        self.redoButton.bind("<Button-1>", parent.parent.generateBorderAndTriangulate)
+        self.redoButton.bind("<Button-1>", parent.parent.borderTriangulate)
 
         # Space
         self.space = Label(self, height=2, bg='#DADADA', borderwidth=0)
@@ -406,7 +392,7 @@ class DetailFrame(Frame):
         self.selectedFrame = self.informationFrame
 
         self.triangulateFrame = TriangulateFrame(self)
-        #self.triangulateFrame.grid(row=0, column=1, sticky=N+E+S+W)
+        # self.triangulateFrame.grid(row=0, column=1, sticky=N+E+S+W)
 
         self.leftBorder = Frame(self, bg='#AAAAAA', width=1)
         self.leftBorder.grid(row=0, column=0, sticky=N+E+S+W)

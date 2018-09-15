@@ -129,8 +129,8 @@ class Face:
             self.parent.selectedFace[1] = self.id
 
 
-    # No Use right now but maybe some day.
-    # Calculate if a given Point is inside the current face
+    # Not in use
+    # Calculate if a given point is inside the current face
     # Using a given a rectangle as raw approximation and barycentric coordinates for fine tuning.
     def pointInside(self, point):
         coords = self.getCoordinates(self.getVerticesCoords())
@@ -155,6 +155,8 @@ class Face:
             else:
                 return False
 
+    # Not in use
+    # Calculate degree for connected vertices
     def calcVerticesDegrees(self):
         verts = self.getVertices()
         # points
@@ -172,6 +174,7 @@ class Face:
         beta = np.degrees(np.arccos( (b**2 - a**2 - c**2) / (-2*a*c) ))
         gamma = np.degrees(np.arccos( (c**2 - a**2 - b**2) / (-2*a*b) ))
 
-        verts[0].degree += alpha
-        verts[1].degree += beta
-        verts[2].degree += gamma
+        # Removed degree from vertex
+        # verts[0].degree += alpha
+        # verts[1].degree += beta
+        # verts[2].degree += gamma
