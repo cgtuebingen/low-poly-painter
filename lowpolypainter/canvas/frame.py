@@ -134,7 +134,7 @@ class CanvasFrame(Frame):
 
     """ Border """
     def border(self, triangulate=False, step=6):
-        # generate border points
+        # generate border
         border = Border(self.width, self.height)
 
         if triangulate:
@@ -148,130 +148,59 @@ class CanvasFrame(Frame):
             # generate convex hull
             border.generateConvexHull(coords)
 
+            # draw border and connect edges
+            for site_idx in range(len(border.sites)):
+                # draw first corner point
+                rp = border.sites[site_idx][0]
+                rv = self.mesh.bvertices[rp[0]][rp[1]]
+                bp = border.sites_orientation[site_idx][0]
+                bv = self.mesh.bvertices[bp[0]][bp[1]]
+                if bv == 0:
+                    bv = self.mesh.addVertex(bp)
+                self.mesh.addEdge(rv, bv)
+                past_rv = rv
+                past_bv = bv
+
+                # draw points inbetween
+                for point_idx in range(1,len(border.sites[site_idx])-1):
+                    rp = border.sites[site_idx][point_idx]
+                    rv = self.mesh.bvertices[rp[0]][rp[1]]
+                    bp = border.sites_orientation[site_idx][point_idx]
+                    bv = self.mesh.addVertex(bp)
+                    self.mesh.addEdge(rv, bv)
+                    self.mesh.addEdge(rv, past_rv)
+                    self.mesh.addEdge(rv, past_bv)
+                    self.mesh.addEdge(bv, past_bv)
+                    past_rv = rv
+                    past_bv = bv
+
+                # draw last corner point
+                rp = border.sites[site_idx][-1]
+                rv = self.mesh.bvertices[rp[0]][rp[1]]
+                bp = border.sites_orientation[site_idx][-1]
+                bv = self.mesh.bvertices[bp[0]][bp[1]]
+                if bv == 0:
+                    bv = self.mesh.addVertex(bp)
+                self.mesh.addEdge(rv, bv)
+                self.mesh.addEdge(rv, past_rv)
+                self.mesh.addEdge(rv, past_bv)
+                self.mesh.addEdge(bv, past_bv)
+
+            rp = border.sites[3][-1]
+            id = self.mesh.bvertices[rp[0]][rp[1]].id
+            self.canvas.itemconfigure(id, fill='lawngreen')
+            return
+
             # mark hull points
-            for point in border.hull:
-                id = self.mesh.bvertices[point[0]][point[1]].id
-                self.canvas.itemconfigure(id, fill='yellow')
+            # for point in border.hull:
+            #     id = self.mesh.bvertices[point[0]][point[1]].id
+            #     self.canvas.itemconfigure(id, fill='yellow')
 
-            # add corner points and edges
-            corn_verts = []
-            for i in range(len(border.corner)):
-                hpoint = border.hull[border.corner[i]]
-                hvert = self.mesh.bvertices[hpoint[0]][hpoint[1]]
-                bvert = self.mesh.addVertex(border.points[i])
-                self.mesh.addEdge(bvert, hvert)
-                corn_verts.append(bvert)
-
-            sort_verts_index = np.argsort(border.corner)
-
-            sort_index = sort_verts_index[3]
-            prev_vert = corn_verts[sort_index]
-            for i in range(border.corner[scorner[3]]+1, len(border.hull)):
-                hpoint = border.hull[i]
-                # hvert = self.mesh.bvertices[hpoint[0]][hpoint[1]]
-                # bvert = self.mesh.addVertex([border.hull[i][0], border.points[scorner[3]][1]])
-                # self.mesh.addEdge(bvert, hvert)
-                # self.mesh.addEdge(pbvert, hvert)
-                # self.mesh.addEdge(pbvert, bvert)
-                # pbvert = bvert
-
-            for i in range(0, border.corner[0]):
-                point = border.hull[i]
-                id = self.mesh.bvertices[point[0]][point[1]].id
-                self.canvas.itemconfigure(id, fill='red')
-
-            prev_vert = vcorner[sort_vert[0]]
-            for i in range(border.corner[scorner[0]]+1, border.corner[scorner[1]]):
-                hpoint = border.hull[i]
-                hvert = self.mesh.bvertices[hpoint[0]][hpoint[1]]
-                bvert = self.mesh.addVertex([border.hull[i][0], border.points[scorner[0]][1]])
-                self.mesh.addEdge(bvert, hvert)
-                self.mesh.addEdge(pbvert, hvert)
-                self.mesh.addEdge(pbvert, bvert)
-                pbvert = bvert
-
-            for i in range(border.corner[1]+1, border.corner[2]):
-                point = border.hull[i]
-                id = self.mesh.bvertices[point[0]][point[1]].id
-                self.canvas.itemconfigure(id, fill='orange')
-
-            for i in range(border.corner[2]+1, border.corner[3]):
-                point = border.hull[i]
-                id = self.mesh.bvertices[point[0]][point[1]].id
-                self.canvas.itemconfigure(id, fill='magenta')
-
-
-
-
-
-
-
-
-
-
-
-
-            return
-            # draw border from border to hull
-            bprev = None
-            for bpoint in border.points:
-                hvert = None
-                minDistance = float('Inf')
-                bvert = self.mesh.addVertex(bpoint)
-
-                for hpoint in border.hull:
-                    dist = math.sqrt((hpoint[0] - bpoint[0])**2 + (hpoint[1] - bpoint[1])**2)
-                    if dist < minDistance:
-                        minDistance = dist
-                        hvert = self.mesh.bvertices[hpoint[0]][hpoint[1]]
-
-                if hvert != None:
-                    self.mesh.addEdge(bvert, hvert)
-                    if bprev != None:
-                        self.mesh.addEdge(bprev, bvert)
-                        self.mesh.addEdge(bprev, hvert)
-                    bprev = bvert
-
-
-            return
-
-
-
-            # triangulate hull and border
-            if len(points) >= 4:
-
-                triangulate = Triangulate(self.image, points)
-                triangle = triangulate.triangulate(0, 0)
-
-                # sort out connection between hull points
-                for tris in triangle:
-                    l = len(border.hull) - 1
-
-                    if not (tris[0] < l and tris[1] < l and tris[2] < l):
-                        point1 = points[tris[0]]
-                        vert1 = self.mesh.bvertices[point1[0]][point1[1]]
-                        self.canvas.itemconfigure(vert1.id, fill='yellow')
-                        point2 = points[tris[1]]
-                        vert2 = self.mesh.bvertices[point2[0]][point2[1]]
-                        self.canvas.itemconfigure(vert2.id, fill='yellow')
-                        point3 = points[tris[2]]
-                        vert3 = self.mesh.bvertices[point3[0]][point3[1]]
-                        self.canvas.itemconfigure(vert3.id, fill='yellow')
-                        edge1 = self.mesh.addEdge(vert1, vert2)
-                        if len(edge1.intersectingEdges) != 0:
-                            edge1.delete()
-                        edge2 = self.mesh.addEdge(vert2, vert3)
-                        if len(edge2.intersectingEdges) != 0:
-                            edge2.delete()
-                        edge3 = self.mesh.addEdge(vert1, vert3)
-                        if len(edge3.intersectingEdges) != 0:
-                            edge3.delete()
         else:
             # draw border points
+            border.generatePoints(step)
             for point in border.points:
                 self.mesh.addVertex([int(point[0]), int(point[1])])
-
-
 
 
     """ Triangulate """

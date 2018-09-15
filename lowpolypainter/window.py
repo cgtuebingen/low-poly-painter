@@ -295,7 +295,6 @@ class ButtonFrame(Frame):
         Frame.__init__(self, parent)
         self.config(bg='#DADADA', height=46)
         self.grid_columnconfigure(7, weight=1)
-        # self.grid_rowconfigure(0, weight=0)
 
         icon_0 = PhotoImage(file="./lowpolypainter/resources/icons/Insert.gif")
         icon_1 = PhotoImage(file="./lowpolypainter/resources/icons/Clear.gif")
@@ -393,7 +392,7 @@ class DetailFrame(Frame):
         self.selectedFrame = self.informationFrame
 
         self.triangulateFrame = TriangulateFrame(self)
-        #self.triangulateFrame.grid(row=0, column=1, sticky=N+E+S+W)
+        # self.triangulateFrame.grid(row=0, column=1, sticky=N+E+S+W)
 
         self.leftBorder = Frame(self, bg='#AAAAAA', width=1)
         self.leftBorder.grid(row=0, column=0, sticky=N+E+S+W)
