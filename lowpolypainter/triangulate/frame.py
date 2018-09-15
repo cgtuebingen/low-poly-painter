@@ -25,15 +25,17 @@ class TriangulateFrame(Frame):
         self.grid_rowconfigure(4, weight=2, uniform="triangulateFrame")
         self.grid_rowconfigure(5, weight=3, uniform="triangulateFrame")
 
-        color1 = '#ffffff'
-        color2 = '#ffffff'
-        color_opts1 = {'bg': color1}
-        color_opts2 = {'bg': color2}
+        font1 = "-family {Heiti TC} -size 12 -weight normal -slant "  \
+            "roman -underline 0 -overstrike 0"
+        color_opts1 = {'bg': '#ffffff'}
+        color_opts2 = {'bg': '#ffffff'}
         entry_opts = {'width':0,
                          'justify':'right',
-                         'highlightbackground':color2}
+                         'highlightbackground':'#ffffff',
+                         'font':'font1'}
         button_opts = {'highlightthickness':0,
-                          'highlightbackground':color2}
+                          'highlightbackground':'#ffffff',
+                          'width': 30, 'height': 32}
 
         self.left_keeper = Frame(self, width=10, **color_opts1)
         self.left_keeper.grid(row=0, column=0, sticky=NSEW)
@@ -47,14 +49,14 @@ class TriangulateFrame(Frame):
         self.width_keeper_2 = Frame(self,  width=82, **color_opts1)
         self.width_keeper_2.grid(row=0, column=2, sticky=NSEW)
 
-        self.cannyLabel = Label(self, text='Canny Points', **color_opts2)
+        self.cannyLabel = Label(self, text='Canny Points', font=font1, **color_opts2)
         self.cannyLabel.grid(row=1, column=1, sticky=N+W+S)
 
         self.cannyEntry = Entry(self, **entry_opts)
         self.cannyEntry.grid(row=1, column=2, sticky=NSEW)
         self.cannyEntry.insert(0,'0')
 
-        self.randomLabel = Label(self, text='Random Points', **color_opts2)
+        self.randomLabel = Label(self, text='Random Points', font=font1, **color_opts2)
         self.randomLabel.grid(row=2, column=1, sticky=N+W+S)
 
         self.randomEntry = Entry(self, **entry_opts)
@@ -74,8 +76,10 @@ class TriangulateFrame(Frame):
         self.buttonFrame.grid_columnconfigure(5, weight=1, uniform="buttonframe")
         self.buttonFrame.grid_columnconfigure(6, weight=2, uniform="buttonframe")
 
-        image = Image.open("lowpolypainter/resources/images/mask.png")
-        self.maskImage = ImageTk.PhotoImage(image)
+        path = "lowpolypainter/resources/icons/"
+
+        # mask button
+        self.maskImage = PhotoImage(file=path+"mask.png")
         mask_opts = {'image':self.maskImage, 'command':self.mask}
         mask_opts.update(button_opts)
 
@@ -85,8 +89,8 @@ class TriangulateFrame(Frame):
         self.spacer = Frame(self.buttonFrame, width=1, **color_opts2)
         self.spacer.grid(row=0, column=1, sticky=NSEW)
 
-        image = Image.open("lowpolypainter/resources/images/BorderPoints.png")
-        self.borderImage = ImageTk.PhotoImage(image)
+        # border points button
+        self.borderImage = PhotoImage(file=path+"borderpoints.png")
         border_opts = {'image':self.borderImage, 'command':self.border}
         border_opts.update(button_opts)
 
@@ -96,8 +100,8 @@ class TriangulateFrame(Frame):
         self.spacer2 = Frame(self.buttonFrame, width=1, **color_opts2)
         self.spacer2.grid(row=0, column=3, sticky=NSEW)
 
-        image = Image.open("lowpolypainter/resources/images/triangulate.png")
-        self.triangleImage = ImageTk.PhotoImage(image)
+        # triangulate button
+        self.triangleImage = PhotoImage(file=path+"triangulate.png")
         triangulate_opts = {'image': self.triangleImage, 'command':self.triangulate}
         triangulate_opts.update(button_opts)
 
@@ -107,8 +111,8 @@ class TriangulateFrame(Frame):
         self.spacer3 = Frame(self.buttonFrame, width=1, **color_opts2)
         self.spacer3.grid(row=0, column=5, sticky=NSEW)
 
-        image = Image.open("lowpolypainter/resources/icons/Borders.gif")
-        self.BordersImage = ImageTk.PhotoImage(image)
+        # border button to fill outer areas without mesh
+        self.BordersImage = PhotoImage(path+"fill.png")
         borders_opts = {'image': self.BordersImage, 'command': self.parent.parent.generateBorderAndTriangulate}
         borders_opts.update(button_opts)
 

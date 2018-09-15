@@ -35,16 +35,18 @@ class CanvasFrame(Frame):
         self.background = ImageTk.PhotoImage(self.image)
 
         # Center Canvas
-        self.grid_rowconfigure(0, weight=1)
-        self.grid_rowconfigure(2, weight=1)
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_columnconfigure(2, weight=1)
+        # self.grid_rowconfigure(0, weight=1)
+        # self.grid_rowconfigure(2, weight=1)
+        # self.grid_columnconfigure(0, weight=1)
+        # self.grid_columnconfigure(2, weight=1)
+        self.grid_columnconfigure(1, minsize='550')
+        self.grid_rowconfigure(1, minsize='505')
 
         # Create Canvas
         self.width = self.background.width()
         self.height = self.background.height()
-        self.canvas = Canvas(self, width=self.width, height=self.height)
-        self.backgroundId = self.canvas.create_image(0, 0, image=self.background, anchor=NW)
+        self.canvas = Canvas(self, width='550', height='505', relief='flat', borderwidth='1', highlightbackground='#DADADA', highlightthickness='1')
+        self.backgroundId = self.canvas.create_image(0, 0, image=self.background, anchor='nw')
         self.canvas.grid(row=1, column=1, sticky=NSEW)
 
         # Color Object
