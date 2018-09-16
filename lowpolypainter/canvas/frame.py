@@ -37,16 +37,18 @@ class CanvasFrame(Frame):
         self.background = ImageTk.PhotoImage(self.image)
 
         # Center Canvas
-        self.grid_rowconfigure(0, weight=1)
-        self.grid_rowconfigure(2, weight=1)
-        self.grid_columnconfigure(0, weight=1)
-        self.grid_columnconfigure(2, weight=1)
+        # self.grid_rowconfigure(0, weight=1)
+        # self.grid_rowconfigure(2, weight=1)
+        # self.grid_columnconfigure(0, weight=1)
+        # self.grid_columnconfigure(2, weight=1)
+        self.grid_columnconfigure(1, minsize='550')
+        self.grid_rowconfigure(1, minsize='505')
 
         # Create Canvas
         self.width = self.background.width()
         self.height = self.background.height()
-        self.canvas = Canvas(self, width=self.width, height=self.height)
-        self.backgroundId = self.canvas.create_image(0, 0, image=self.background, anchor=NW)
+        self.canvas = Canvas(self, width='550', height='505', relief='flat', borderwidth='1', highlightbackground='#DADADA', highlightthickness='1')
+        self.backgroundId = self.canvas.create_image(0, 0, image=self.background, anchor='nw')
         self.canvas.grid(row=1, column=1, sticky=NSEW)
 
         # Color Object
@@ -73,11 +75,12 @@ class CanvasFrame(Frame):
 
         # Events
         self.canvas.bind("<Button-1>", self.click)
-        self.canvas.bind_all("<space>", func=self.toggleFaces)
+        self.canvas.bind_all("<space>", func=self.toggleFacesCheckbutton)
         self.canvas.bind_all("<BackSpace>", self.deleteSelected)
         self.canvas.bind_all("<Key-Delete>", self.deleteSelected)
-        self.canvas.bind_all("<Up>", func=self.toggleVerts)
-        self.canvas.bind_all("<Down>", func=self.toggleEdges)
+        self.canvas.bind_all("<Up>", func=self.toggleVertsCheckbutton)
+        self.canvas.bind_all("<Down>", func=self.toggleEdgesCheckbutton)
+
 
     """ EVENT """
     def click(self, event):
@@ -89,20 +92,19 @@ class CanvasFrame(Frame):
         """
         self.parent.root.focus()
         eventPoint = [event.x, event.y]
-        if self.inBounds(eventPoint) and not self.mouseEventHandled:
+        if self.inBounds(eventPoint) and (not self.mouseEventHandled) and ((self.parent.controlMode=="Points") or (self.parent.controlMode=="Points and Lines")):
             self.parent.undoManager.do(self.parent)
             previousSelected = self.selected
             zoomedCoords = self.parent.zoom.FromViewport([event.x, event.y])
             self.mesh.addVertex([int(zoomedCoords[0]), int(zoomedCoords[1])])
-            if (previousSelected is not None) and (isinstance(previousSelected, Vertex)) and not (event.state & CTRL_MASK):
+            if (previousSelected is not None) and (isinstance(previousSelected, Vertex)) and (self.parent.controlMode == "Points and Lines") and not (event.state & CTRL_MASK):
                 self.mesh.addEdge(previousSelected, self.selected)
         self.mouseEventHandled = False
 
     """ VERTICES """
-    def toggleVerts(self, event):
+    def toggleVerts(self, event=None):
         if not self.focus:
             return
-
         state = NORMAL
         if self.vertsState is NORMAL:
             state = HIDDEN
@@ -110,10 +112,9 @@ class CanvasFrame(Frame):
         self.vertsState = state
 
     """ EDGES """
-    def toggleEdges(self, event):
+    def toggleEdges(self, event=None):
         if not self.focus:
             return
-
         state = NORMAL
         if self.edgesState is NORMAL:
             state = HIDDEN
@@ -121,15 +122,29 @@ class CanvasFrame(Frame):
         self.edgesState = state
 
     """ FACE """
-    def toggleFaces(self, event):
+    def toggleFaces(self, event=None):
         if not self.focus:
             return
-
         state = NORMAL
         if self.faceState is NORMAL:
             state = HIDDEN
         self.canvas.itemconfigure("f", state=state)
         self.faceState = state
+
+    """ checks Button for Vertices and Edges """
+    def toggleVertsCheckbutton(self, event=None):
+        self.parent.zoomAndToggleFrame.toggleFrame.vertexCheckbox.toggle()
+        self.toggleVerts(event)
+
+    """ checks Button for Vertices and Edges """
+    def toggleEdgesCheckbutton(self, event=None):
+        self.parent.zoomAndToggleFrame.toggleFrame.edgesCheckbox.toggle()
+        self.toggleEdges(event)
+
+    """checks Button for Faces """
+    def toggleFacesCheckbutton(self, event=None):
+        self.parent.zoomAndToggleFrame.toggleFrame.facesCheckbox.toggle()
+        self.toggleFaces(event)
 
     """ GENERAL """
     def inBounds(self, point):

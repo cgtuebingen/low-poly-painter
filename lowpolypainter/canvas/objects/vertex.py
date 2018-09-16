@@ -62,10 +62,9 @@ class Vertex:
         self.parent.mouseEventHandled = True
         x, y = int(self.coords[0]), int(self.coords[1])
         self.parent.mesh.bvertices[x][y] = 0
-        if (event.state & MASK_SHIFT) and (self.parent.selected is not None):
+        if ((event.state & MASK_SHIFT) or (self.parent.parent.controlMode == "Points and Lines"))and (self.parent.selected is not None):
             self.parent.parent.undoManager.do(self.parent.parent)
             self.parent.mesh.addEdge(self, self.parent.selected)
-            return
         self.select()
         self.parent.select(self)
 
@@ -79,7 +78,7 @@ class Vertex:
 
 
     def releaseHandle(self, event):
-        # Merge verts when droped on same position
+        # Merge verts when dropped on same position
         self.firstMove = True
         x, y = int(self.coords[0]), int(self.coords[1])
         x_0, x_1 = x - 3 if x - 3 > 0 else 0 , x + 3
