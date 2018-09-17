@@ -17,6 +17,7 @@ from zoomTransformer import ZoomTransformer
 from Colorwheel import Colorwheel
 from lowpolypainter.undoManager import UndoManager
 
+import colorpicker_modified as cp
 
 
 class Window(object):
@@ -444,8 +445,10 @@ class DetailFrame(Frame):
         self.informationFrame.grid(row=1, column=1, sticky=N+E+S+W)
 
         #TODO: insert color wheel
-        self.colorWheel = Label(self, width=5, height=10, text="Color Wheel", font=font1)
-        self.colorWheel.config(bg='#ffffff')
+        #self.colorWheel = Label(self, width=5, height=10, text="Color Wheel", font=font1)
+        #self.colorWheel.config(bg='#ffffff')
+
+
 
         self.middleLine = Frame(self, bg='#DADADA', height=1, width=50)
 
