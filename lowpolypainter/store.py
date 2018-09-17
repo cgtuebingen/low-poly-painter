@@ -22,7 +22,7 @@ def savePath(mesh, path):
 # saves datamesh and picture to a file with the given path
 def saveState(mesh, image, path):
     pickleImage = {
-            'pixels': image.tostring(),
+            'pixels': image.tobytes(),
             'size': image.size,
             'mode': image.mode,
             }

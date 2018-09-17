@@ -188,7 +188,7 @@ class Window(object):
             if file_path.endswith('.py'):
                 name = file_path[file_path.rindex('/')+1:]
                 content = loadPath(file_path)
-                image = Image.fromstring(content[0]['mode'], content[0]['size'], content[0]['pixels'])
+                image = Image.frombytes(content[0]['mode'], content[0]['size'], content[0]['pixels'])
                 self.loadImage(image, name)
                 self.canvasFrame.mesh.quickload(content[1])
                 self.saveName = file_path
