@@ -194,6 +194,7 @@ class Window(object):
                 self.canvasFrame.mesh.quickload(content[1])
                 self.saveName = file_path
             else:
+                self.saveName = None
                 self.loadImagePath(file_path)
 
     def clear(self, event=None):
