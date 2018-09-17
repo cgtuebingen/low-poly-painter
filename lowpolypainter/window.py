@@ -165,6 +165,7 @@ class Window(object):
             backgroundPosition[0], backgroundPosition[1],
             image=self.canvasFrame.background, anchor=NW)
         self.canvasFrame.canvas.lower(self.canvasFrame.backgroundId)
+        self.canvasFrame.mesh.updateSize()
 
 
     """ ACTIONS """
@@ -183,12 +184,12 @@ class Window(object):
 
     def insert(self, event=None):
         defaultDirectory = "lowpolypainter/resources/stored_mesh_data/"
-        file_path = tkFileDialog.askopenfilename(initialdir = defaultDirectory, filetypes=[("all files","*"), ("python","*.py"), ("portable pixmap","*.ppm"), ("JPEG","*.jpg")])
+        file_path = tkFileDialog.askopenfilename(initialdir = defaultDirectory, filetypes=[("all files","*"), ("low poly painter","*.lpp"), ("portable pixmap","*.ppm"), ("JPEG","*.jpg")])
         if file_path != "":
-            if file_path.endswith('.py'):
+            if file_path.endswith('.lpp'):
                 name = file_path[file_path.rindex('/')+1:]
                 content = loadPath(file_path)
-                image = Image.frombytes(content[0]['mode'], content[0]['size'], content[0]['pixels'])
+                image = Image.fromarray(content[0])
                 self.loadImage(image, name)
                 self.canvasFrame.mesh.quickload(content[1])
                 self.saveName = file_path
@@ -227,10 +228,10 @@ class Window(object):
 
     def saveStateAs(self, event=None):
         defaultDirectory = "lowpolypainter/resources/stored_mesh_data/"
-        file_path = tkFileDialog.asksaveasfilename(initialdir = defaultDirectory, filetypes=[("python", "*.py")])
+        file_path = tkFileDialog.asksaveasfilename(initialdir = defaultDirectory, filetypes=[("low poly painter", "*.lpp")])
         if file_path != "":
-            if not file_path.endswith('.py'):
-                file_path += '.py'
+            if not file_path.endswith('.lpp'):
+                file_path += '.lpp'
             self.saveName = file_path
             self.saveState()
 
