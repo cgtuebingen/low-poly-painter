@@ -6,6 +6,7 @@ from PIL import ImageTk, Image
 import tkMessageBox
 import tkFileDialog
 import os, errno
+import colorpicker_modified as cp
 
 # Local Modules
 from store import save, load, savePath, loadPath, saveState
@@ -16,8 +17,6 @@ from triangulate.frame import TriangulateFrame
 from zoomTransformer import ZoomTransformer
 from Colorwheel import Colorwheel
 from lowpolypainter.undoManager import UndoManager
-
-import colorpicker_modified as cp
 
 
 class Window(object):
@@ -116,6 +115,9 @@ class Window(object):
         except OSError as e:
             if e.errno != errno.EEXIST:
                 raise
+
+    def updateColor(self, event=None):
+        self.detailFrame.updateColor()
 
     """ Control Mode"""
     # point mode
@@ -405,7 +407,7 @@ class ButtonFrame(Frame):
         # Colorwheel Button
         self.colorWheelButton = Label(self, image=self.colorImg, **options)
         self.colorWheelButton.grid(row=9, column=0, sticky=N+E+S+W, pady=5)
-        self.colorWheelButton.bind("<Button-1>", parent.parent.colorwheel)
+        self.colorWheelButton.bind("<Button-1>", parent.parent.updateColor)
 
         # Change to Points Mode
         self.pointsButton = Label(self, image=self.pointImg, **options)
@@ -429,6 +431,7 @@ class DetailFrame(Frame):
 
     Description:
     Contains details about current selected tool
+    Contains the color picker tool by which face color can be updated
     """
     def __init__(self, parent, *args, **kwargs):
         Frame.__init__(self, parent.frame)
@@ -437,34 +440,27 @@ class DetailFrame(Frame):
         font1 = "-family {Heiti TC} -size 12 -weight normal -slant "  \
             "roman -underline 0 -overstrike 0"
 
-
-        self.grid_rowconfigure(1, weight=1, uniform="detailframe")
+        self.grid_rowconfigure(1, weight=0, uniform="detailframe")
         self.grid_rowconfigure(3, weight=1, uniform="detailframe")
 
         self.informationFrame = Frame(self, bg='#ffffff', width=1)
         self.informationFrame.grid(row=1, column=1, sticky=N+E+S+W)
 
-        #TODO: insert color wheel
-        #self.colorWheel = Label(self, width=5, height=10, text="Color Wheel", font=font1)
-        #self.colorWheel.config(bg='#ffffff')
-
-
-
+        self.colorpicker = cp.ColorPicker(self)
         self.middleLine = Frame(self, bg='#DADADA', height=1, width=50)
-
         self.triangulateFrame = TriangulateFrame(self)
 
-        self.colorWheel.grid(row=1, column=1, sticky=N+E+S+W)
-        self.middleLine.grid(row=2, column=0, columnspan=3, sticky=N+E+S+W, padx=10)
-        self.triangulateFrame.grid(row=3, column=1, sticky=N+E+S+W)
+        self.colorpicker.grid(row=0, column=1, sticky=N+E+S+W)
+        self.middleLine.grid(row=1, column=0, columnspan=3, sticky=N+E+S+W, padx=10)
+        self.triangulateFrame.grid(row=2, column=1, sticky=N+E+S+W)
 
-        # self.leftBorder = Frame(self, bg='#AAAAAA', width=1)
-        # self.leftBorder.grid(row=0, column=0, rowspan=5, sticky=N+E+S+W)
-
-        # self.upperBorder = Frame(self, bg="#AAAAAA", height=1)
-        # self.upperBorder.grid(row=0, column=0, columnspan=3, sticky=N+E+S+W)
-        # self.lowerBorder = Frame(self, bg="#AAAAAA", height=1)
-        # self.lowerBorder.grid(row=4, column=0, columnspan=3, sticky=N+E+S+W)
+    def updateFaceColor(self, newColor):
+        if not self.parent.canvasFrame.selectedFace[0]:
+            tkMessageBox.showinfo("Error", "No face selected!")
+        else:
+            selectedFaceByID = self.parent.canvasFrame.selectedFace[1]
+            self.parent.canvasFrame.canvas.itemconfig(selectedFaceByID, fill=newColor)
+            self.parent.canvasFrame.selectedFace[0]=False
 
 
 class ZoomAndToggleFrame(Frame):
@@ -516,9 +512,6 @@ class ZoomFrame(Frame):
         self.zoomOutButton = Button(self, text=" - ", command=lambda: parent.parent.mouse_wheel(-120, 0, 0), borderwidth=2, relief='flat', highlightthickness='1', highlightbackground='#ffffff',  highlightcolor='#ffffff', background='#ffffff', bg='#ffffff', font=font1)
         self.zoomOutButton.grid(row=0, column=2, sticky=NSEW, padx=3)
 
-        # space
-        # self.spaceFrame = Frame(self, bg="#ffffff")
-        # self.spaceFrame.grid(row=0, column=3, sticky=NSEW)
 
 class ToggleFrame(Frame):
     """
@@ -532,25 +525,6 @@ class ToggleFrame(Frame):
         self.config(bg="#ffffff")
         font1 = "-family {Heiti TC} -size 10 -weight normal -slant "  \
             "roman -underline 0 -overstrike 0"
-
-        # Label
-        # self.frame = Label(self, height=1, text="Show...")
-        # self.frame.grid(row=0, column=0, sticky=NSEW)
-        # self.frame.config(bg="#ECECEC")
-
-        # space
-        # self.placeholder1 = Label(self, width=1, bg="#ECECEC")
-        # self.placeholder1.grid(row=0, column=1, sticky=NSEW)
-
-        # # Checkbox for Vertices and Edges
-        # self.vertexCheckbox = Checkbutton(self, text="Vertices", command=parent.parent.canvasFrame.toggleVertsAndEdges, activebackground="#d9d9d9", activeforeground="#000000", background="#ffffff", borderwidth=2, compound='none', font='font9', foreground='#5b5b5b')
-        # self.vertexCheckbox.grid(row=0, column=0, sticky=NSEW)
-        # self.vertexCheckbox.select()
-        #
-        # # Checkbox for Vertices and Edges
-        # self.edgesCheckbox = Checkbutton(self, text="Edges", command=parent.parent.canvasFrame.toggleVertsAndEdges, activebackground="#d9d9d9", activeforeground="#000000", background="#ffffff", borderwidth=2, compound='none', font='font9', foreground='#5b5b5b')
-        # self.edgesCheckbox.grid(row=0, column=1, sticky=NSEW)
-        # #self.vertexCheckbox.select()
 
         # Checkbox for Vertices and Edges
         self.vertexCheckbox = Checkbutton(self, text="Vertices", command=parent.parent.canvasFrame.toggleVerts, activebackground="#ffffff", activeforeground="#000000", background="#ffffff", borderwidth=2, compound='none', font=font1, foreground='#5b5b5b')

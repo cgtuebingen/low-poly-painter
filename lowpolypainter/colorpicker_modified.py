@@ -21,6 +21,7 @@ Colorpicker dialog
 
 
 from PIL import ImageTk
+from Tkinter import *
 from tkcolorpicker.functions import tk, ttk, round2, create_checkered_image, \
     overlay, PALETTE, hsv_to_rgb, hexa_to_rgb, rgb_to_hexa, col2hue, rgb_to_hsv
 from tkcolorpicker.alphabar import AlphaBar
@@ -29,32 +30,12 @@ from tkcolorpicker.colorsquare import ColorSquare
 from tkcolorpicker.spinbox import Spinbox
 from tkcolorpicker.limitvar import LimitVar
 from locale import getdefaultlocale
-import re
+import tkMessageBox
 
-
-# --- Translation
-EN = {}
-FR = {"Red": "Rouge", "Green": "Vert", "Blue": "Bleu",
-      "Hue": "Teinte", "Saturation": "Saturation", "Value": "Valeur",
-      "Cancel": "Annuler", "Color Chooser": "Sélecteur de couleur",
-      "Alpha": "Alpha"}
-
-if getdefaultlocale()[0][:2] == 'fr':
-    TR = FR
-else:
-    TR = EN
-
-
-def _(text):
-    """Translate text."""
-    return TR.get(text, text)
-
-
-class ColorPicker(tk.Frame):
+class ColorPicker(Frame):
     """Color picker dialog."""
 
-    def __init__(self, parent=None, color=(255, 0, 0), alpha=False,
-                 title=_("Color Chooser")):
+    def __init__(self, parent=None, color=(255, 196, 162), alpha=False, title=("Color Chooser")):
         """
         Create a ColorPicker dialog.
 
@@ -64,19 +45,16 @@ class ColorPicker(tk.Frame):
             * alpha: alpha channel support (boolean)
             * title: dialog title
         """
-        tk.Frame.__init__(self, parent)
-        self.root = parent
-
-        self.root.title(title)
-        self.root.resizable(False, False)
-        self.root.rowconfigure(1, weight=1)
-
+        Frame.__init__(self, parent)
+        self.parent = parent
         self.color = ""
         self.alpha_channel = bool(alpha)
+        font1 = "-family {Heiti TC} -size 12 -weight normal -slant "  \
+            "roman -underline 0 -overstrike 0"
         style = ttk.Style(self)
-        style.map("palette.TFrame", relief=[('focus', 'sunken')],
-                  bordercolor=[('focus', "#4D4D4D")])
-        self.configure(background=style.lookup("TFrame", "background"))
+        style.configure('.', font=font1, bg='#ffffff', highlightbackground='#ffffff')
+        style.map("palette.TFrame", relief=[('focus', 'flat')],
+                  bordercolor=[('focus', "#ffffff")])
 
         if isinstance(color, str):
             if re.match(r"^#[0-9A-F]{8}$", color.upper()):
@@ -111,26 +89,31 @@ class ColorPicker(tk.Frame):
                     self._old_alpha = color[3]
             old_color = rgb_to_hexa(*color)
 
-        # --- GradientBar
-        hue = col2hue(*self._old_color)
-        bar = ttk.Frame(self, borderwidth=2, relief='groove')
-        self.bar = GradientBar(bar, hue=hue, width=200, highlightthickness=0)
-        self.bar.pack()
-
         # --- ColorSquare
-        square = ttk.Frame(self, borderwidth=2, relief='groove')
+        hue = col2hue(*self._old_color)
+
+        square = tk.Frame(self, borderwidth=0, relief='flat')
         self.square = ColorSquare(square, hue=hue, width=200, height=200,
                                   color=rgb_to_hsv(*self._old_color),
                                   highlightthickness=0)
         self.square.pack()
 
-        frame = ttk.Frame(self)
+        # --- GradientBar
+        bar = tk.Frame(self, borderwidth=0, relief='flat')
+        self.bar = GradientBar(bar, hue=hue, width=200, height=15, highlightthickness=0)
+        self.bar.pack()
+
+        frame = tk.Frame(self)
+        frame.columnconfigure(0, weight=0)
+        frame.rowconfigure(0, weight=0)
         frame.columnconfigure(1, weight=1)
         frame.rowconfigure(1, weight=1)
+        frame.columnconfigure(2, weight=0)
+        frame.rowconfigure(2, weight=0)
 
         # --- color preview: initial color and currently selected color side by side
-        preview_frame = ttk.Frame(frame, relief="groove", borderwidth=2)
-        preview_frame.grid(row=0, column=0, sticky="nw", pady=2)
+        preview_frame = tk.Frame(frame, relief="flat", borderwidth=1)
+        preview_frame.grid(row=1, column=1, sticky="nswe", pady=2)
         if alpha:
             self._transparent_bg = create_checkered_image(42, 32)
             transparent_bg_old = create_checkered_image(42, 32,
@@ -158,31 +141,27 @@ class ColorPicker(tk.Frame):
         self.color_preview.grid(row=0, column=1)
 
         # --- palette
-        palette = ttk.Frame(frame)
+        palette = tk.Frame(frame)
         palette.grid(row=0, column=1, rowspan=2, sticky="ne")
         for i, col in enumerate(PALETTE):
-            f = ttk.Frame(palette, borderwidth=1, relief="raised",
-                          style="palette.TFrame")
+            f = tk.Frame(palette, borderwidth=0, relief="flat")
             l = tk.Label(f, background=col, width=2, height=1)
             l.bind("<1>", self._palette_cmd)
-            f.bind("<FocusOut>", lambda e: e.widget.configure(relief="raised"))
+            f.bind("<FocusOut>", lambda e: e.widget.configure(relief="flat"))
             l.pack()
             f.grid(row=i % 2, column=i // 2, padx=2, pady=2)
 
-        col_frame = ttk.Frame(self)
+        col_frame = tk.Frame(self)
         # --- hsv
-        hsv_frame = ttk.Frame(col_frame, relief="ridge", borderwidth=2)
+        hsv_frame = tk.Frame(col_frame, relief="flat", borderwidth=0)
         hsv_frame.pack(pady=(0, 4), fill="x")
         hsv_frame.columnconfigure(0, weight=1)
         self.hue = LimitVar(0, 360, self)
         self.saturation = LimitVar(0, 100, self)
         self.value = LimitVar(0, 100, self)
-#        self.hue = tk.StringVar(self)
-#        self.saturation = tk.StringVar(self)
-#        self.value = tk.StringVar(self)
 
         s_h = Spinbox(hsv_frame, from_=0, to=360, width=4, name='spinbox',
-                      textvariable=self.hue, command=self._update_color_hsv)
+                      textvariable=self.hue, bg='#ffffff', buttonbackground='#ffffff',insertbackground='#ffffff', command=self._update_color_hsv)
         s_s = Spinbox(hsv_frame, from_=0, to=100, width=4,
                       textvariable=self.saturation, name='spinbox',
                       command=self._update_color_hsv)
@@ -198,20 +177,17 @@ class ColorPicker(tk.Frame):
         s_h.grid(row=0, column=1, sticky='w', padx=4, pady=4)
         s_s.grid(row=1, column=1, sticky='w', padx=4, pady=4)
         s_v.grid(row=2, column=1, sticky='w', padx=4, pady=4)
-        ttk.Label(hsv_frame, text=_('Hue')).grid(row=0, column=0, sticky='e',
+        tk.Label(hsv_frame, text=('Hue'), font=font1, relief="flat").grid(row=0, column=0, sticky='e',
                                                  padx=4, pady=4)
-        ttk.Label(hsv_frame, text=_('Saturation')).grid(row=1, column=0, sticky='e',
+        tk.Label(hsv_frame, text=('Saturation'), font=font1, relief="flat").grid(row=1, column=0, sticky='e',
                                                         padx=4, pady=4)
-        ttk.Label(hsv_frame, text=_('Value')).grid(row=2, column=0, sticky='e',
+        tk.Label(hsv_frame, text=('Value'), font=font1, relief="flat").grid(row=2, column=0, sticky='e',
                                                    padx=4, pady=4)
 
         # --- rgb
-        rgb_frame = ttk.Frame(col_frame, relief="ridge", borderwidth=2)
+        rgb_frame = tk.Frame(col_frame, relief="flat", borderwidth=0)
         rgb_frame.pack(pady=4, fill="x")
         rgb_frame.columnconfigure(0, weight=1)
-#        self.red = tk.StringVar(self)
-#        self.green = tk.StringVar(self)
-#        self.blue = tk.StringVar(self)
         self.red = LimitVar(0, 255, self)
         self.green = LimitVar(0, 255, self)
         self.blue = LimitVar(0, 255, self)
@@ -231,27 +207,26 @@ class ColorPicker(tk.Frame):
         s_red.grid(row=0, column=1, sticky='e', padx=4, pady=4)
         s_green.grid(row=1, column=1, sticky='e', padx=4, pady=4)
         s_blue.grid(row=2, column=1, sticky='e', padx=4, pady=4)
-        ttk.Label(rgb_frame, text=_('Red')).grid(row=0, column=0, sticky='e',
+        tk.Label(rgb_frame, text=('r'), font=font1).grid(row=0, column=0, sticky='e',
                                                  padx=4, pady=4)
-        ttk.Label(rgb_frame, text=_('Green')).grid(row=1, column=0, sticky='e',
+        tk.Label(rgb_frame, text=('g'), font=font1).grid(row=1, column=0, sticky='e',
                                                    padx=4, pady=4)
-        ttk.Label(rgb_frame, text=_('Blue')).grid(row=2, column=0, sticky='e',
+        tk.Label(rgb_frame, text=('b'), font=font1).grid(row=2, column=0, sticky='e',
                                                   padx=4, pady=4)
         # --- hexa
-        hexa_frame = ttk.Frame(col_frame)
+        hexa_frame = tk.Frame(col_frame)
         hexa_frame.pack(fill="x")
-        self.hexa = ttk.Entry(hexa_frame, justify="center", width=10, name='entry')
+        self.hexa = tk.Entry(hexa_frame, justify="right", width=10, name='entry', font=font1, highlightbackground='#ffffff')
         self.hexa.insert(0, old_color.upper())
-        ttk.Label(hexa_frame, text="HTML").pack(side="left", padx=4, pady=(4, 1))
+        tk.Label(hexa_frame, text="Hex", font=font1).pack(side="left", padx=4, pady=(4, 1))
         self.hexa.pack(side="left", padx=6, pady=(4, 1), fill='x', expand=True)
 
         # --- alpha
         if alpha:
-            alpha_frame = ttk.Frame(self)
+            alpha_frame = tk.Frame(self)
             alpha_frame.columnconfigure(1, weight=1)
-#            self.alpha = tk.StringVar(self)
             self.alpha = LimitVar(0, 255, self)
-            alphabar = ttk.Frame(alpha_frame, borderwidth=2, relief='groove')
+            alphabar = tk.Frame(alpha_frame, borderwidth=2, relief='flat')
             self.alphabar = AlphaBar(alphabar, alpha=self._old_alpha, width=200,
                                      color=self._old_color, highlightthickness=0)
             self.alphabar.pack()
@@ -260,23 +235,28 @@ class ColorPicker(tk.Frame):
             s_alpha.delete(0, 'end')
             s_alpha.insert(0, self._old_alpha)
             alphabar.grid(row=0, column=0, padx=(0, 4), pady=4, sticky='w')
-            ttk.Label(alpha_frame, text=_('Alpha')).grid(row=0, column=1, sticky='e',
+            tk.Label(alpha_frame, text=_('Alpha')).grid(row=0, column=1, sticky='e',
                                                          padx=4, pady=4)
             s_alpha.grid(row=0, column=2, sticky='w', padx=(4, 6), pady=4)
 
         # --- validation
-        button_frame = ttk.Frame(self)
-        ttk.Button(button_frame, text="Ok",
-                   command=self.ok).pack(side="right", padx=10)
+        button_frame = tk.Frame(self)
+    #    path = "lowpolypainter/resources/icons/"
+        #self.button_ok_image = PhotoImage(path + 'checkmark.png')
+        tk.Button(button_frame, text='Ok', bg='#ffffff', highlightcolor='#ffffff', highlightthickness=2, border=None, font=font1, relief='flat',command=self.ok).pack(side="right", padx=10)
+        #button_label = tk.Label(button_frame, image=self.button_ok_image, width=8, height=12, bg='#ffffff', highlightthickness=2, font=font1, relief='solid')
+        #button_label.pack(side="top", padx=10)
+        #button_label.bind("<Button-1>", self.ok)
+
 
         # --- placement
-        bar.grid(row=0, column=0, padx=10, pady=(10, 4), sticky='n')
-        square.grid(row=1, column=0, padx=10, pady=(9, 0), sticky='n')
+        square.grid(row=0, column=0, padx=10, pady=(9, 0), sticky='nsew')
+        bar.grid(row=1, column=0, padx=10, pady=(10, 4), sticky='nsew')
         if alpha:
             alpha_frame.grid(row=2, column=0, columnspan=2, padx=10,
-                             pady=(1, 4), sticky='ewn')
+                             pady=(1, 4), sticky='nsew')
         col_frame.grid(row=0, rowspan=2, column=1, padx=(4, 10), pady=(10, 4))
-        frame.grid(row=3, column=0, columnspan=2, pady=(4, 10), padx=10, sticky="new")
+        frame.grid(row=3, column=0, columnspan=2, pady=(4, 10), padx=10, sticky="nsew")
         button_frame.grid(row=4, columnspan=2, pady=(0, 10), padx=10)
 
         # --- bindings
@@ -306,9 +286,7 @@ class ColorPicker(tk.Frame):
         self.hexa.bind("<FocusOut>", self._update_color_hexa)
         self.hexa.bind("<Return>", self._update_color_hexa)
 
-        #self.wait_visibility()
         self.lift()
-        self.grab_set()
 
     def get_color(self):
         """Return selected color, return an empty string if no color is selected."""
@@ -334,7 +312,7 @@ class ColorPicker(tk.Frame):
         """Respond to user click on a palette item."""
         label = event.widget
         label.master.focus_set()
-        label.master.configure(relief="sunken")
+        label.master.configure(relief="flat")
         args = self._old_color
         if self.alpha_channel:
             args += (self._old_alpha,)
@@ -358,7 +336,7 @@ class ColorPicker(tk.Frame):
         """Respond to user click on a palette item."""
         label = event.widget
         label.master.focus_set()
-        label.master.configure(relief="sunken")
+        label.master.configure(relief="flat")
         r, g, b = self.winfo_rgb(label.cget("background"))
         r = round2(r * 255 / 65535)
         g = round2(g * 255 / 65535)
@@ -366,7 +344,6 @@ class ColorPicker(tk.Frame):
         args = (r, g, b)
         if self.alpha_channel:
             a = self.alpha.get()
-#            a = self.get_color_value(self.alpha)
             args += (a,)
             self.alphabar.set_color(args)
         color = rgb_to_hexa(*args)
@@ -522,10 +499,9 @@ class ColorPicker(tk.Frame):
             hexa = self.hexa.get()
             rgb += (self.alpha.get(),)
         self.color = rgb, hsv, hexa
+        self.parent.updateFaceColor(hexa)
 
-
-
-def askcolor(color="red", parent=None, title=_("Color Chooser"), alpha=False):
+def askcolor(color="white", parent=None, title=("Color Chooser"), alpha=False):
     """
     Open a ColorPicker dialog and return the chosen color.
 
@@ -541,6 +517,7 @@ def askcolor(color="red", parent=None, title=_("Color Chooser"), alpha=False):
     col = ColorPicker(parent, color, alpha, title)
     col.wait_window(col)
     res = col.get_color()
+    print(res)
     if res:
         return res[0], res[2]
     else:
