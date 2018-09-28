@@ -1,7 +1,7 @@
 import os.path
 import cPickle as pickle
 import time
-
+import numpy as np
 
 # saves mesh data in a .py file by using cPickle
 def save(mesh, inputimage): 
@@ -21,11 +21,7 @@ def savePath(mesh, path):
 
 # saves datamesh and picture to a file with the given path
 def saveState(mesh, image, path):
-    pickleImage = {
-            'pixels': image.tobytes(),
-            'size': image.size,
-            'mode': image.mode,
-            }
+    pickleImage = np.array(image)
     file = open(path, 'w')
     pickle.dump([pickleImage, mesh.quicksave()], file)
     file.close
