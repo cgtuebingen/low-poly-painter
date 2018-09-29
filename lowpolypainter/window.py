@@ -460,8 +460,9 @@ class DetailFrame(Frame):
         else:
             selectedFaceByID = self.parent.canvasFrame.selectedFace[1]
             self.parent.canvasFrame.canvas.itemconfig(selectedFaceByID, fill=newColor)
+            # after updating color deselect face
             self.parent.canvasFrame.selectedFace[0]=False
-
+            self.parent.canvasFrame.mesh.getFaceByID(selectedFaceByID).deselect()
 
 class ZoomAndToggleFrame(Frame):
     """
@@ -547,7 +548,6 @@ class ToggleFrame(Frame):
 Place, select and move points and lines with the mouse.
 A line to the next point will automatically be created, as long as CTRL is not pressed.
 Faces are selected by simply clicking on them.
-Please note that there is no visualisation if you select any face.
 To connect two points with a line, or to split a line in two, hold the SHIFT button.
 If a line creates one or more triangles, then they will be automatically added.
 Delete selected objects with DEL.

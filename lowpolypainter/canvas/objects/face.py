@@ -121,13 +121,28 @@ class Face:
         return verts
 
     # New faceselection Method
-    # TODO Make Faceselection Visible
     def click(self, event):
-        if not (event.state & ALT_MASK):
+        # if face was already selected do deselection
+        if self.parent.selectedFace[0]:
+            self.parent.mouseEventHandled = True
+            self.parent.selectedFace[0] = False
+            self.parent.selectedFace[1] = None
+            self.deselect()
+        elif not (event.state & ALT_MASK):
             self.parent.mouseEventHandled = True
             self.parent.selectedFace[0] = True
             self.parent.selectedFace[1] = self.id
+            self.select()
 
+
+    def select(self):
+        for edge in self.edges:
+            self.parent.canvas.itemconfigure(edge.id, fill=COLOR_SELECTED)
+            self.parent.canvas.tag_raise(edge.id, TAG_EDGE)
+
+    def deselect(self):
+        for edge in self.edges:
+            self.parent.canvas.itemconfigure(edge.id, fill=edge.color)
 
     # Not in use
     # Calculate if a given point is inside the current face
