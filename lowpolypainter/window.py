@@ -74,6 +74,7 @@ class Window(object):
         self.canvasFrameToggle = False
         self.canvasFrame = CanvasFrame(self, inputimage)
         self.canvasFrame.grid(row=1, column=1, sticky=NSEW, padx=10)
+        self.frame.bind_all("<Control-p>", self.fun)
 
         # Toolbar Frame
         self.toolbarFrame = ToolbarFrame(self)

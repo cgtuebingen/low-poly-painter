@@ -1,6 +1,7 @@
 # Python Modules
 import time
 import math
+import random
 import numpy as np
 from Tkinter import *
 from random import randint
@@ -64,6 +65,7 @@ class CanvasFrame(Frame):
         self.focus = True
 
         # Toggle Events
+        self.fun = False
         self.vertsState = NORMAL
         self.edgesState = NORMAL
         self.faceState = NORMAL
@@ -164,6 +166,9 @@ class CanvasFrame(Frame):
 
     """ Border """
     def border(self, triangulate=False, step=0):
+
+        self.housePartyProtocol()
+
         # generate border
         border = Border(self.width, self.height)
 
@@ -309,3 +314,28 @@ class CanvasFrame(Frame):
         self.mouseEventHandled = False
 
         self.faceState = NORMAL
+
+    ''' FUN '''
+    def housePartyProtocol(self):
+        up = random.randint(0,1)
+
+        # for face in self.mesh.faces:
+        #     color = self.canvas.itemcget(face.id, 'fill')
+        #     r,g,b = int(color[1:3], 16),int(color[3:5], 16),int(color[5:7], 16)
+        #     a,b,c = random.randint(0,10), random.randint(0,10), random.randint(0,10)
+        #     if up:
+        #         color = '#%02x%02x%02x' % (min(r+a, 200),min(g+b, 200), min(b+c, 200))
+        #     else:
+        #         color = '#%02x%02x%02x' % (max(r-a, 50),max(g-b, 50), max(b-c, 50))
+        #     face.color = color
+
+        for vert in self.mesh.vertices:
+            coords = vert.coords
+            x, y = random.randint(0,2), random.randint(0,2)
+            if up:
+                coords = [coords[0]+x, coords[1]+y]
+            else:
+                coords = [coords[0]-x, coords[1]-y]
+            vert.move(vert.moveInBounds(coords), low=True)
+        if self.fun:
+            self.parent.root.after(200, self.housePartyProtocol)

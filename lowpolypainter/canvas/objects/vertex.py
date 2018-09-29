@@ -150,10 +150,10 @@ class Vertex:
         self.parent.canvas.itemconfigure(self.id, fill=COLOR_DEFAULT)
 
 
-    def move(self, vert):
+    def move(self, vert, low=False):
         self.coords = vert
         self.updatePosition()
-        self.moveEdges()
+        self.moveEdges(low)
 
     def moveInBounds(self, vert):
         x, y = vert[0], vert[1]
@@ -163,14 +163,16 @@ class Vertex:
         y = y if y < self.parent.height else self.parent.height - 1
         return [x, y]
 
-    def moveEdges(self):
+    def moveEdges(self, low=False):
         for edge in self.edges:
-            edge.move()
+            edge.move(low)
 
     def mergeWithVertex(self, vert):
         self.edges.extend(vert.edges)
         for edge in vert.edges:
             edge.verts[edge.verts.index(vert)] = self
+        for edge in self.edges:
+            edge.createFace()
         vert.edges = []
         vert.delete()
 
