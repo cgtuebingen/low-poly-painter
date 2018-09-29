@@ -560,9 +560,13 @@ class ColorPicker(Frame):
         self.color = rgb, hsv, hexa
         self.parent.updateFaceColor(hexa)
 
+    def getCoords(self, event=None):
+        colorInput_hexa = self.parent.get_pixel_colour(event.x, event.y)
+        self.grab_release()
+
     def chooseColorFromImage(self, event=None):
-        colorInput_hexa = self.parent.getColorFromImage(event.x, event.y)
-        #self.hexa = colorInput_hexa
+        self.bind("<1>", self.getCoords)
+        self.grab_set()
 
 
 def askcolor(color="white", parent=None, title=("Color Chooser"), alpha=False):
