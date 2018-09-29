@@ -275,7 +275,12 @@ class Window(object):
         else:
             self.canvasFrame.triangulate(size)
 
-    # TODO: Delete because unnecessary?
+    def fun(self, event):
+        self.canvasFrame.fun = not self.canvasFrame.fun
+        if (self.canvasFrame.fun):
+            self.canvasFrame.housePartyProtocol()
+
+    # TODO: Move to detail view menu
     def colorwheel(self, event=None):
         if not self.canvasFrame.selectedFace[0]:
             tkMessageBox.showinfo("Error", "No face selected!")
