@@ -67,6 +67,7 @@ class Window(object):
         self.canvasFrameToggle = False
         self.canvasFrame = CanvasFrame(self, inputimage)
         self.canvasFrame.grid(row=1, column=1, sticky=NSEW, padx=10)
+        self.frame.bind_all("<Control-p>", self.fun)
 
         # Toolbar Frame
         self.toolbarFrame = ToolbarFrame(self)
@@ -263,6 +264,11 @@ class Window(object):
             self.maskFrame.mask = np.zeros([self.maskFrame.width, self.maskFrame.height], dtype=bool)
         else:
             self.canvasFrame.triangulate(size)
+
+    def fun(self, event):
+        self.canvasFrame.fun = not self.canvasFrame.fun
+        if (self.canvasFrame.fun):
+            self.canvasFrame.housePartyProtocol()
 
     # TODO: Move to detail view menu
     def colorwheel(self, event=None):

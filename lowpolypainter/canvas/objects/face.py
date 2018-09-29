@@ -73,9 +73,9 @@ class Face:
     def getColorFromImage(self):
         return self.parent.color.fromImage(self.coords)
 
-    def move(self):
+    def move(self, low=False):
         self.updatePosition()
-        if not self.colorLock:
+        if not self.colorLock and not low:
             self.color = self.getColorFromImage()
 
         self.parent.canvas.itemconfig(self.id, fill=self.color)

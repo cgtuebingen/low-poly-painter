@@ -207,10 +207,10 @@ class Mesh:
                 return [True, fa.id]
         print(end - start)
         return [False, None]
-    
+
     def updateSize(self):
         for vertex in self.vertices:
             vertex.shrink()
-            
+
         for edge in self.edges:
             edge.shrink()
