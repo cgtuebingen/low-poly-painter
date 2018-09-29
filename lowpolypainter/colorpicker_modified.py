@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """
 tkcolorpicker - Alternative to colorchooser for Tkinter.
 Copyright 2017 Juliette Monsel <j_4321@protonmail.com>
@@ -8,15 +7,7 @@ it under the terms of the GNU General Public License as published by
 the Free Software Foundation, either version 3 of the License, or
 (at your option) any later version.
 
-tkcolorpicker is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-GNU General Public License for more details.
-
-You should have received a copy of the GNU General Public License
-along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
-Colorpicker dialog
+Colorpicker dialog (modified for Low Poly Painter program)
 """
 
 
@@ -35,7 +26,7 @@ import tkMessageBox
 class ColorPicker(Frame):
     """Color picker dialog."""
 
-    def __init__(self, parent=None, color=(255, 196, 162), alpha=False, title=("Color Chooser")):
+    def __init__(self, parent=None, color=(190, 187, 185), alpha=False, title=("Color Chooser")):
         """
         Create a ColorPicker dialog.
 
@@ -130,29 +121,31 @@ class ColorPicker(Frame):
                                           image=self._im_color,
                                           borderwidth=0, highlightthickness=0)
         else:
-            old_color_prev = tk.Label(preview_frame, background=old_color[:7],
-                                      width=5, highlightthickness=0, height=2,
-                                      padx=0, pady=0)
+            # old_color_prev = tk.Label(preview_frame, background=old_color[:7],
+            #                           width=5, highlightthickness=0, height=2,
+            #                           padx=0, pady=0)
             self.color_preview = tk.Label(preview_frame, width=5, height=2,
                                           pady=0, background=old_color[:7],
                                           padx=0, highlightthickness=0)
-        old_color_prev.bind("<1>", self._reset_preview)
-        old_color_prev.grid(row=0, column=0)
-        self.color_preview.grid(row=0, column=1)
+        #old_color_prev.bind("<1>", self._reset_preview)
+        #old_color_prev.grid(row=0, column=0)
+        self.color_preview.grid(row=0, column=0)
 
         # --- palette
+        # TODO: palette stores chosen colors
         palette = tk.Frame(frame)
         palette.grid(row=0, column=1, rowspan=2, sticky="ne")
         for i, col in enumerate(PALETTE):
             f = tk.Frame(palette, borderwidth=0, relief="flat")
             l = tk.Label(f, background=col, width=2, height=1)
             l.bind("<1>", self._palette_cmd)
-            f.bind("<FocusOut>", lambda e: e.widget.configure(relief="flat"))
+            f.bind("<FocusOut>", lambda e: e.widget.configure(relief="solid"))
             l.pack()
             f.grid(row=i % 2, column=i // 2, padx=2, pady=2)
 
         col_frame = tk.Frame(self)
-        # --- hsv
+
+        # --- hue saturation value
         hsv_frame = tk.Frame(col_frame, relief="flat", borderwidth=0)
         hsv_frame.pack(pady=(0, 4), fill="x")
         hsv_frame.columnconfigure(0, weight=1)
@@ -248,7 +241,6 @@ class ColorPicker(Frame):
         #button_label.pack(side="top", padx=10)
         #button_label.bind("<Button-1>", self.ok)
 
-
         # --- placement
         square.grid(row=0, column=0, padx=10, pady=(9, 0), sticky='nsew')
         bar.grid(row=1, column=0, padx=10, pady=(10, 4), sticky='nsew')
@@ -335,8 +327,10 @@ class ColorPicker(Frame):
     def _palette_cmd(self, event):
         """Respond to user click on a palette item."""
         label = event.widget
+        # label master = color square
         label.master.focus_set()
-        label.master.configure(relief="flat")
+        #label.configure(relief="solid", borderwidth=1)
+
         r, g, b = self.winfo_rgb(label.cget("background"))
         r = round2(r * 255 / 65535)
         g = round2(g * 255 / 65535)
@@ -359,6 +353,10 @@ class ColorPicker(Frame):
         self.bar.set(h)
         self.square.set_hsv((h, s, v))
         self._update_preview()
+
+        # TODO: update background color of label, unset solid border when unfocussing label
+        # if user clicks another palette item or the ok button, the focus of the palette item should be gone
+
 
     def _change_sel_color(self, event):
         """Respond to motion of the color selection cross."""
@@ -493,6 +491,7 @@ class ColorPicker(Frame):
             self.bar.set(h)
             self._update_preview()
 
+    # this method calls the update of chosen face color
     def ok(self):
         rgb, hsv, hexa = self.square.get()
         if self.alpha_channel:

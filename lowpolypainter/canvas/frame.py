@@ -41,9 +41,9 @@ class CanvasFrame(Frame):
         self.height = self.background.height()
         self.canvas = Canvas(self, width=self.width, height=self.height, relief='flat', borderwidth='1', highlightbackground='#DADADA', highlightthickness='1')
         self.backgroundId = self.canvas.create_image(0, 0, image=self.background, anchor='nw')
-        self.canvas.grid(row=1, column=1, sticky=NSEW)
-        self.grid_columnconfigure(1, minsize=self.width)
-        self.grid_rowconfigure(1, minsize=self.height)
+        self.canvas.grid(row=0, column=0, sticky=NSEW)
+        self.grid_columnconfigure(0, minsize=self.width)
+        self.grid_rowconfigure(0, minsize=self.height)
 
         # Color Object
         self.color = Color(np.array(self.image), 0.5, 0.5)
@@ -98,8 +98,6 @@ class CanvasFrame(Frame):
 
     """ VERTICES """
     def toggleVerts(self, event=None):
-        if not self.focus:
-            return
         state = NORMAL
         if self.vertsState is NORMAL:
             state = HIDDEN
@@ -108,8 +106,6 @@ class CanvasFrame(Frame):
 
     """ EDGES """
     def toggleEdges(self, event=None):
-        if not self.focus:
-            return
         state = NORMAL
         if self.edgesState is NORMAL:
             state = HIDDEN
@@ -118,8 +114,6 @@ class CanvasFrame(Frame):
 
     """ FACE """
     def toggleFaces(self, event=None):
-        if not self.focus:
-            return
         state = NORMAL
         if self.faceState is NORMAL:
             state = HIDDEN

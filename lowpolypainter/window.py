@@ -407,9 +407,9 @@ class ButtonFrame(Frame):
         self.space2.grid(row=8, column=0, sticky=N+E+S+W, padx=8, pady=15)
 
         # Colorwheel Button
-        self.colorWheelButton = Label(self, image=self.colorImg, **options)
-        self.colorWheelButton.grid(row=9, column=0, sticky=N+E+S+W, pady=5)
-        self.colorWheelButton.bind("<Button-1>", parent.parent.updateColor)
+        # self.colorWheelButton = Label(self, image=self.colorImg, **options)
+        # self.colorWheelButton.grid(row=9, column=0, sticky=N+E+S+W, pady=5)
+        # self.colorWheelButton.bind("<Button-1>", parent.parent.updateColor)
 
         # Change to Points Mode
         self.pointsButton = Label(self, image=self.pointImg, **options)
