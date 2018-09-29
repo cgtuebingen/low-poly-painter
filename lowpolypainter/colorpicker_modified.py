@@ -191,8 +191,8 @@ class ColorPicker(Frame):
         self.paletteFrames = [self.paletteFrame1, self.paletteFrame2, self.paletteFrame3, self.paletteFrame4, self.paletteFrame5,
                             self.paletteFrame6, self.paletteFrame7, self.paletteFrame8, self.paletteFrame9, self.paletteFrame10]
 
-        self.pipetteLabel = tk.Label(palette, text="Pipette")
-        self.pipetteLabel.bind("<1>", self.chooseColorFromImage)
+        # TODO: pipette tool for choosing color from image or screen?
+        self.pipetteLabel = tk.Label(palette, text="Pipette", font=font1)
         self.pipetteLabel.grid(row=0, column=10, padx=5)
 
         col_frame = tk.Frame(self)
@@ -266,7 +266,7 @@ class ColorPicker(Frame):
         tk.Label(hexa_frame, text="Hex", font=font1).pack(side="left", padx=4, pady=(4, 1))
         self.hexa.pack(side="left", padx=6, pady=(4, 1), fill='x', expand=True)
 
-        # --- alpha
+        # --- alpha (not implemented in GUI)
         if alpha:
             alpha_frame = tk.Frame(self)
             alpha_frame.columnconfigure(1, weight=1)
@@ -285,11 +285,11 @@ class ColorPicker(Frame):
             s_alpha.grid(row=0, column=2, sticky='w', padx=(4, 6), pady=4)
 
         # --- validation
-        # TODO: color or validation image instead of text?
+        # TODO: color or validation image instead of text, image placing still makes trouble
         self.button_frame = tk.Frame(self)
         #path = "lowpolypainter/resources/icons/"
         #self.okImage = PhotoImage(path + 'color.png')
-        self.okButton = Label(self.button_frame, text='Color Chosen Face', borderwidth="0", width='20', height='3', background='#ffffff', font=font1)
+        self.okButton = Label(self.button_frame, text='Color Face', borderwidth="0", width='20', height='3', background='#ffffff', font=font1)
         #self.okButton.configure(image=self.okImage)
         self.okButton.bind("<Button-1>", self.ok)
         self.okButton.pack(side='right')
@@ -559,14 +559,6 @@ class ColorPicker(Frame):
             rgb += (self.alpha.get(),)
         self.color = rgb, hsv, hexa
         self.parent.updateFaceColor(hexa)
-
-    def getCoords(self, event=None):
-        colorInput_hexa = self.parent.get_pixel_colour(event.x, event.y)
-        self.grab_release()
-
-    def chooseColorFromImage(self, event=None):
-        self.bind("<1>", self.getCoords)
-        self.grab_set()
 
 
 def askcolor(color="white", parent=None, title=("Color Chooser"), alpha=False):

@@ -7,13 +7,6 @@ import tkMessageBox
 import tkFileDialog
 import os, errno
 import colorpicker_modified as cp
-import cv2 as cv
-import sys
-
-import PIL.Image # python-imaging
-import PIL.ImageStat # python-imaging
-import Xlib.display # python-xlib
-import PIL.ImageGrab
 
 # Local Modules
 from store import save, load, savePath, loadPath, saveState
@@ -60,7 +53,6 @@ class Window(object):
         dist_right = int(self.root.winfo_screenwidth()/2 - min_width/2 + off_x)
         dist_down = int(self.root.winfo_screenheight()/2 - min_height/2 + off_y)
         self.root.geometry("+{}+{}".format(dist_right, dist_down))
-
 
         # Frame
         self.frame = Frame(self.root, bg='#ffffff')
@@ -468,36 +460,6 @@ class DetailFrame(Frame):
             selectedFaceByID = self.parent.canvasFrame.selectedFace[1]
             self.parent.canvasFrame.canvas.itemconfig(selectedFaceByID, fill=newColor)
             self.parent.canvasFrame.selectedFace[0]=False
-
-    def getColorFromImage(self, xcoord, ycoord):
-        print(xcoord, ycoord)
-        #self.parent.canvasFrame.color.fromImage()
-        return
-
-    # def get_pixel_colour(self, i_x, i_y):
-    #     o_gdk_pixbuf = gtk.gdk.Pixbuf(gtk.gdk.COLORSPACE_RGB, False, 8, 1, 1)
-    #     o_gdk_pixbuf.get_from_drawable(gtk.gdk.get_default_root_window(), gtk.gdk.colormap_get_system(), i_x, i_y, 0, 0, 1, 1)
-    #     res = tuple(o_gdk_pixbuf.get_pixels_array().tolist()[0][0])
-    #     print res
-	    #return tuple(o_gdk_pixbuf.get_pixels_array().tolist()[0][0])
-
-    # def get_pixel_colour(self, i_x, i_y):
-    #     o_x_root = Xlib.display.Display().screen().root
-    #     o_x_image = o_x_root.get_image(i_x, i_y, 1, 1, Xlib.X.ZPixmap, 0xffffffff)
-    #     o_pil_image_rgb = PIL.Image.fromstring("RGB", (1, 1), o_x_image.data, "raw", "BGRX")
-    #     lf_colour = PIL.ImageStat.Stat(o_pil_image_rgb).mean
-    #     print(lf_colour)
-        #return tuple(map(int, lf_colour))
-
-    # def get_pixel_colour(self, i_x, i_y):
-    #     print PIL.ImageGrab.grab().load()[i_x, i_y]
-        #return PIL.ImageGrab.grab().load()[i_x, i_y]
-
-    def get_pixel_colour(self, i_x, i_y):
-        root = Tk()
-        geometry = "%dx%d+0+0"%(imgCV.shape[0], imgCV.shape[1])
-        root.geometry()
-        print imgCV[i_y, i_x]
 
 
 class ZoomAndToggleFrame(Frame):
