@@ -18,6 +18,7 @@ from zoomTransformer import ZoomTransformer
 from Colorwheel import Colorwheel
 from lowpolypainter.undoManager import UndoManager
 
+ACTIVE_MODE_COLOR = "#DADADA"
 
 class Window(object):
     """
@@ -104,7 +105,7 @@ class Window(object):
 
         #Control Modus
         self.controlMode = None
-        self.changeModeToP()
+        self.changeModeToPAL()
 
         self.undoManager = UndoManager()
 
@@ -123,7 +124,7 @@ class Window(object):
     """ Control Mode"""
     # point mode
     def changeModeToP(self, event=None):
-        self.toolbarFrame.buttonFrame.pointsButton.config(bg="#ffffff")
+        self.toolbarFrame.buttonFrame.pointsButton.config(bg=ACTIVE_MODE_COLOR)
         self.toolbarFrame.buttonFrame.pointsAndLinesButton.config(bg="#ffffff")
         self.toolbarFrame.buttonFrame.splitLineButton.config(bg="#ffffff")
         self.controlMode = "Points"
@@ -131,7 +132,7 @@ class Window(object):
     # point and line mode
     def changeModeToPAL(self, event=None):
         self.toolbarFrame.buttonFrame.pointsButton.config(bg="#ffffff")
-        self.toolbarFrame.buttonFrame.pointsAndLinesButton.config(bg="#ffffff")
+        self.toolbarFrame.buttonFrame.pointsAndLinesButton.config(bg=ACTIVE_MODE_COLOR)
         self.toolbarFrame.buttonFrame.splitLineButton.config(bg="#ffffff")
         self.controlMode = "Points and Lines"
 
@@ -139,7 +140,7 @@ class Window(object):
     def changeModeToSL(self, event=None):
         self.toolbarFrame.buttonFrame.pointsButton.config(bg="#ffffff")
         self.toolbarFrame.buttonFrame.pointsAndLinesButton.config(bg="#ffffff")
-        self.toolbarFrame.buttonFrame.splitLineButton.config(bg="#ffffff")
+        self.toolbarFrame.buttonFrame.splitLineButton.config(bg=ACTIVE_MODE_COLOR)
         self.controlMode = "Split Line"
 
     """ ZOOM """
@@ -371,7 +372,6 @@ class ButtonFrame(Frame):
         self.insertButton.bind("<Button-1>", parent.parent.insert)
 
         # Save Button
-
         self.saveButton = Menubutton(self, image=self.saveImg,  height='30', bd='0', direction='below', relief='flat', highlightthickness='1', highlightcolor='#ffffff')
         self.saveButton.grid(row=1, column=0, columnspan=2, sticky=N+E+S+W, pady=5)
         self.saveButton.menu =  Menu(self.saveButton, tearoff = 0)
@@ -413,18 +413,24 @@ class ButtonFrame(Frame):
         self.space2.grid(row=8, column=0, sticky=N+E+S+W, padx=8, pady=15)
 
         # Change to Points Mode
-        self.pointsButton = Label(self, image=self.pointImg, **options)
-        self.pointsButton.grid(row=10, column=0, sticky=N+E+S+W, pady=5)
+        self.pointsFrame = Frame(self, height='35', bg='white')
+        self.pointsButton = Label(self.pointsFrame, image=self.pointImg, width=35, height=36, **options)
+        self.pointsButton.pack()
+        self.pointsFrame.grid(row=10, column=0, sticky=N+E+S+W, pady=5)
         self.pointsButton.bind("<Button-1>", parent.parent.changeModeToP)
 
         # Change to Points and Lines Mode
-        self.pointsAndLinesButton = Label(self, image=self.point_and_lineImg, **options)
-        self.pointsAndLinesButton.grid(row=11, column=0, sticky=N+E+S+W, pady=5)
+        self.pointsAndLinesFrame = Frame(self, height='35', bg='white')
+        self.pointsAndLinesButton = Label(self.pointsAndLinesFrame, image=self.point_and_lineImg, width=35, height=36, **options)
+        self.pointsAndLinesButton.pack()
+        self.pointsAndLinesFrame.grid(row=11, column=0, sticky=N+E+S+W, pady=5)
         self.pointsAndLinesButton.bind("<Button-1>", parent.parent.changeModeToPAL)
 
         # Change to Split Line Mode
-        self.splitLineButton = Label(self, image=self.line_breakImg, **options)
-        self.splitLineButton.grid(row=12, column=0, sticky=N+E+S+W, pady=5)
+        self.splitLineFrame = Frame(self, height='35', bg='white')
+        self.splitLineButton = Label(self.splitLineFrame, image=self.line_breakImg, width=35, height=36, **options)
+        self.splitLineButton.pack()
+        self.splitLineFrame.grid(row=12, column=0, sticky=N+E+S+W, pady=5)
         self.splitLineButton.bind("<Button-1>", parent.parent.changeModeToSL)
 
 
@@ -500,18 +506,18 @@ class ZoomFrame(Frame):
         self.config(bg='#ffffff')
         font1 = "-family {Heiti TC} -size 15 -weight normal -slant "  \
             "roman -underline 0 -overstrike 0"
-        self.grid_columnconfigure(0, weight=2, uniform="zoomFrame")
-        self.grid_columnconfigure(1, weight=1, uniform="zoomFrame")
-        self.grid_columnconfigure(2, weight=1, uniform="zoomFrame")
+        self.grid_columnconfigure(0, weight=1, uniform="zoomFrame")
+        self.grid_columnconfigure(1, weight=0, uniform="zoomFrame")
+        self.grid_columnconfigure(2, weight=0, uniform="zoomFrame")
         self.grid_columnconfigure(3, weight=1, uniform="zoomFrame")
 
         # zoom-in Button
-        self.zoomInButton = Button(self, text=" + ", command=lambda: parent.parent.mouse_wheel(120, 0, 0), borderwidth=2, relief='flat', highlightbackground='#ffffff', highlightcolor='#ffffff',highlightthickness='1', justify='center', padx=1, pady=0, font=font1)
-        self.zoomInButton.grid(row=0, column=1, sticky=NSEW, padx=3)
+        self.zoomInButton = Button(self, text=" + ", command=lambda: parent.parent.mouse_wheel(120, 0, 0), borderwidth="0", background='#ffffff',font=font1, highlightthickness='1')
+        self.zoomInButton.grid(row=0, column=1, sticky=N+S+E+W)
 
         # zoom-out Button
         self.zoomOutButton = Button(self, text=" - ", command=lambda: parent.parent.mouse_wheel(-120, 0, 0), borderwidth=2, relief='flat', highlightthickness='1', highlightbackground='#ffffff',  highlightcolor='#ffffff', background='#ffffff', bg='#ffffff', font=font1)
-        self.zoomOutButton.grid(row=0, column=2, sticky=NSEW, padx=3)
+        self.zoomOutButton.grid(row=0, column=2)
 
 
 class ToggleFrame(Frame):
