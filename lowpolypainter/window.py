@@ -267,7 +267,7 @@ class Window(object):
         else:
             self.canvasFrame.triangulate(size)
 
-    # TODO: Move to detail view menu
+    # TODO: Delete because unnecessary?
     def colorwheel(self, event=None):
         if not self.canvasFrame.selectedFace[0]:
             tkMessageBox.showinfo("Error", "No face selected!")
@@ -351,12 +351,13 @@ class ButtonFrame(Frame):
         self.undoImg = PhotoImage(file=path + "undo.png")
         self.redoImg = PhotoImage(file=path + "redo.png")
 
-        self.colorImg = PhotoImage(file=path + "color.png")
         self.pointImg = PhotoImage(file=path + "point.png")
         self.point_and_lineImg = PhotoImage(file=path + "point_and_line.png")
         self.line_breakImg = PhotoImage(file=path + "line_break.png")
 
         options = {'activebackground':"#ffffff", 'activeforeground':"#000000", 'background':"#ffffff", 'borderwidth':"0", 'foreground':"#000000", 'relief':'flat', 'highlightbackground':'#ffffff', 'highlightcolor':'#ffffff', 'justify':'center'}
+        font1 = "-family {Heiti TC} -size 10 -weight normal -slant "  \
+                "roman -underline 0 -overstrike 0"
 
         # Insert Button
         self.insertButton = Label(self, image=self.insertImg, activebackground="#ffffff", activeforeground="#000000", background="#ffffff", borderwidth="0", width='36', height='30')
@@ -364,8 +365,7 @@ class ButtonFrame(Frame):
         self.insertButton.bind("<Button-1>", parent.parent.insert)
 
         # Save Button
-        font1 = "-family {Heiti TC} -size 10 -weight normal -slant "  \
-            "roman -underline 0 -overstrike 0"
+
         self.saveButton = Menubutton(self, image=self.saveImg,  height='30', bd='0', direction='below', relief='flat', highlightthickness='1', highlightcolor='#ffffff')
         self.saveButton.grid(row=1, column=0, columnspan=2, sticky=N+E+S+W, pady=5)
         self.saveButton.menu =  Menu(self.saveButton, tearoff = 0)
@@ -378,9 +378,9 @@ class ButtonFrame(Frame):
         self.exportButton.grid(row=2, column=0, sticky=N+E+S+W, pady=5)
         self.exportButton.bind("<Button-1>", parent.parent.export)
 
-        # Space
-        self.space = Frame(self, height=1, width=1, bg='#DADADA', borderwidth=0)
-        self.space.grid(row=3, column=0, sticky=N+E+S+W, padx=8, pady=15)
+        # Space1
+        self.space1 = Frame(self, height=1, width=1, bg='#DADADA', borderwidth=0)
+        self.space1.grid(row=3, column=0, sticky=N+E+S+W, padx=8, pady=15)
 
         # Clear Button
         self.clearButton = Label(self, image=self.clearImg, **options)
@@ -405,11 +405,6 @@ class ButtonFrame(Frame):
         # Space2
         self.space2 = Frame(self, height=1,  bg='#DADADA', borderwidth=0)
         self.space2.grid(row=8, column=0, sticky=N+E+S+W, padx=8, pady=15)
-
-        # Colorwheel Button
-        # self.colorWheelButton = Label(self, image=self.colorImg, **options)
-        # self.colorWheelButton.grid(row=9, column=0, sticky=N+E+S+W, pady=5)
-        # self.colorWheelButton.bind("<Button-1>", parent.parent.updateColor)
 
         # Change to Points Mode
         self.pointsButton = Label(self, image=self.pointImg, **options)
@@ -445,9 +440,6 @@ class DetailFrame(Frame):
         self.grid_rowconfigure(1, weight=0, uniform="detailframe")
         self.grid_rowconfigure(3, weight=1, uniform="detailframe")
 
-        self.informationFrame = Frame(self, bg='#ffffff', width=1)
-        self.informationFrame.grid(row=1, column=1, sticky=N+E+S+W)
-
         self.colorpicker = cp.ColorPicker(self)
         self.middleLine = Frame(self, bg='#DADADA', height=1, width=50)
         self.triangulateFrame = TriangulateFrame(self)
@@ -463,6 +455,11 @@ class DetailFrame(Frame):
             selectedFaceByID = self.parent.canvasFrame.selectedFace[1]
             self.parent.canvasFrame.canvas.itemconfig(selectedFaceByID, fill=newColor)
             self.parent.canvasFrame.selectedFace[0]=False
+
+    def getColorFromImage(self, xcoord, ycoord):
+        print(xcoord, ycoord)
+        #self.parent.canvasFrame.color.fromImage()
+        return
 
 
 class ZoomAndToggleFrame(Frame):

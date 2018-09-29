@@ -26,7 +26,7 @@ import tkMessageBox
 class ColorPicker(Frame):
     """Color picker dialog."""
 
-    def __init__(self, parent=None, color=(190, 187, 185), alpha=False, title=("Color Chooser")):
+    def __init__(self, parent=None, color=(187, 192, 191), alpha=False, title=("Color Chooser")):
         """
         Create a ColorPicker dialog.
 
@@ -102,46 +102,98 @@ class ColorPicker(Frame):
         frame.columnconfigure(2, weight=0)
         frame.rowconfigure(2, weight=0)
 
-        # --- color preview: initial color and currently selected color side by side
-        preview_frame = tk.Frame(frame, relief="flat", borderwidth=1)
-        preview_frame.grid(row=1, column=1, sticky="nswe", pady=2)
-        if alpha:
-            self._transparent_bg = create_checkered_image(42, 32)
-            transparent_bg_old = create_checkered_image(42, 32,
-                                                        (100, 100, 100, 255),
-                                                        (154, 154, 154, 255))
-            prev_old = overlay(transparent_bg_old, hexa_to_rgb(old_color))
-            prev = overlay(self._transparent_bg, hexa_to_rgb(old_color))
-            self._im_old_color = ImageTk.PhotoImage(prev_old, master=self)
-            self._im_color = ImageTk.PhotoImage(prev, master=self)
-            old_color_prev = tk.Label(preview_frame, padx=0, pady=0,
-                                      image=self._im_old_color,
-                                      borderwidth=0, highlightthickness=0)
-            self.color_preview = tk.Label(preview_frame, pady=0, padx=0,
-                                          image=self._im_color,
-                                          borderwidth=0, highlightthickness=0)
-        else:
-            # old_color_prev = tk.Label(preview_frame, background=old_color[:7],
-            #                           width=5, highlightthickness=0, height=2,
-            #                           padx=0, pady=0)
-            self.color_preview = tk.Label(preview_frame, width=5, height=2,
-                                          pady=0, background=old_color[:7],
-                                          padx=0, highlightthickness=0)
-        #old_color_prev.bind("<1>", self._reset_preview)
-        #old_color_prev.grid(row=0, column=0)
-        self.color_preview.grid(row=0, column=0)
-
-        # --- palette
-        # TODO: palette stores chosen colors
+        # --- palette stores chosen colors
         palette = tk.Frame(frame)
-        palette.grid(row=0, column=1, rowspan=2, sticky="ne")
-        for i, col in enumerate(PALETTE):
-            f = tk.Frame(palette, borderwidth=0, relief="flat")
-            l = tk.Label(f, background=col, width=2, height=1)
-            l.bind("<1>", self._palette_cmd)
-            f.bind("<FocusOut>", lambda e: e.widget.configure(relief="solid"))
-            l.pack()
-            f.grid(row=i % 2, column=i // 2, padx=2, pady=2)
+        palette.grid(row=0, column=0, sticky="nsew")
+
+        self.paletteFrame1 = tk.Frame(palette, borderwidth=0, relief="solid")
+        self.paletteFrame1.number = 1
+        self.paletteItem1 = tk.Label(self.paletteFrame1, background=PALETTE[0], width=2, height=1)
+        self.paletteItem1.editMode = False
+        self.paletteItem1.bind("<1>", self._palette_cmd)
+        self.paletteItem1.pack()
+        self.paletteFrame1.grid(row=0, column=0, padx=2, pady=2)
+
+        self.paletteFrame2 = tk.Frame(palette, borderwidth=0, relief="solid")
+        self.paletteFrame2.number = 2
+        self.paletteItem2 = tk.Label(self.paletteFrame2, background=PALETTE[1], width=2, height=1)
+        self.paletteItem2.editMode = False
+        self.paletteItem2.bind("<1>", self._palette_cmd)
+        self.paletteItem2.pack()
+        self.paletteFrame2.grid(row=0, column=1, padx=2, pady=2)
+
+        self.paletteFrame3 = tk.Frame(palette, borderwidth=0, relief="solid")
+        self.paletteFrame3.number = 3
+        self.paletteItem3 = tk.Label(self.paletteFrame3, background=PALETTE[2], width=2, height=1)
+        self.paletteItem3.editMode = False
+        self.paletteItem3.bind("<1>", self._palette_cmd)
+        self.paletteItem3.pack()
+        self.paletteFrame3.grid(row=0, column=2, padx=2, pady=2)
+
+        self.paletteFrame4 = tk.Frame(palette, borderwidth=0, relief="solid")
+        self.paletteFrame4.number = 4
+        self.paletteItem4 = tk.Label(self.paletteFrame4, background=PALETTE[3], width=2, height=1)
+        self.paletteItem4.editMode = False
+        self.paletteItem4.bind("<1>", self._palette_cmd)
+        self.paletteItem4.pack()
+        self.paletteFrame4.grid(row=0, column=3, padx=2, pady=2)
+
+        self.paletteFrame5 = tk.Frame(palette, borderwidth=0, relief="solid")
+        self.paletteFrame5.number = 5
+        self.paletteItem5 = tk.Label(self.paletteFrame5, background=PALETTE[4], width=2, height=1)
+        self.paletteItem5.editMode = False
+        self.paletteItem5.bind("<1>", self._palette_cmd)
+        self.paletteItem5.pack()
+        self.paletteFrame5.grid(row=0, column=4, padx=2, pady=2)
+
+        self.paletteFrame6 = tk.Frame(palette, borderwidth=0, relief="solid")
+        self.paletteFrame6.number = 6
+        self.paletteItem6 = tk.Label(self.paletteFrame6, background=PALETTE[5], width=2, height=1)
+        self.paletteItem6.editMode = False
+        self.paletteItem6.bind("<1>", self._palette_cmd)
+        self.paletteItem6.pack()
+        self.paletteFrame6.grid(row=0, column=5, padx=2, pady=2)
+
+        self.paletteFrame7 = tk.Frame(palette, borderwidth=0, relief="solid")
+        self.paletteFrame7.number = 7
+        self.paletteItem7 = tk.Label(self.paletteFrame7, background=PALETTE[6], width=2, height=1)
+        self.paletteItem7.editMode = False
+        self.paletteItem7.bind("<1>", self._palette_cmd)
+        self.paletteItem7.pack()
+        self.paletteFrame7.grid(row=0, column=6, padx=2, pady=2)
+
+        self.paletteFrame8 = tk.Frame(palette, borderwidth=0, relief="solid")
+        self.paletteFrame8.number = 8
+        self.paletteItem8 = tk.Label(self.paletteFrame8, background=PALETTE[7], width=2, height=1)
+        self.paletteItem8.editMode = False
+        self.paletteItem8.bind("<1>", self._palette_cmd)
+        self.paletteItem8.pack()
+        self.paletteFrame8.grid(row=0, column=7, padx=2, pady=2)
+
+        self.paletteFrame9 = tk.Frame(palette, borderwidth=0, relief="solid")
+        self.paletteFrame9.number = 9
+        self.paletteItem9 = tk.Label(self.paletteFrame9, background=PALETTE[8], width=2, height=1)
+        self.paletteItem9.editMode = False
+        self.paletteItem9.bind("<1>", self._palette_cmd)
+        self.paletteItem9.pack()
+        self.paletteFrame9.grid(row=0, column=8, padx=2, pady=2)
+
+        self.paletteFrame10 = tk.Frame(palette, borderwidth=0, relief="solid")
+        self.paletteFrame10.number = 10
+        self.paletteItem10 = tk.Label(self.paletteFrame10, background=PALETTE[9], width=2, height=1)
+        self.paletteItem10.editMode = False
+        self.paletteItem10.bind("<1>", self._palette_cmd)
+        self.paletteItem10.pack()
+        self.paletteFrame10.grid(row=0, column=9, padx=2, pady=2)
+
+        self.paletteItems = [self.paletteItem1, self.paletteItem2, self.paletteItem3, self.paletteItem4, self.paletteItem5,
+                            self.paletteItem6, self.paletteItem7, self.paletteItem8, self.paletteItem9, self.paletteItem10]
+        self.paletteFrames = [self.paletteFrame1, self.paletteFrame2, self.paletteFrame3, self.paletteFrame4, self.paletteFrame5,
+                            self.paletteFrame6, self.paletteFrame7, self.paletteFrame8, self.paletteFrame9, self.paletteFrame10]
+
+        self.pipetteLabel = tk.Label(palette, text="Pipette")
+        self.pipetteLabel.bind("<1>", self.chooseColorFromImage)
+        self.pipetteLabel.grid(row=0, column=10, padx=5)
 
         col_frame = tk.Frame(self)
 
@@ -233,13 +285,14 @@ class ColorPicker(Frame):
             s_alpha.grid(row=0, column=2, sticky='w', padx=(4, 6), pady=4)
 
         # --- validation
-        button_frame = tk.Frame(self)
-    #    path = "lowpolypainter/resources/icons/"
-        #self.button_ok_image = PhotoImage(path + 'checkmark.png')
-        tk.Button(button_frame, text='Ok', bg='#ffffff', highlightcolor='#ffffff', highlightthickness=2, border=None, font=font1, relief='flat',command=self.ok).pack(side="right", padx=10)
-        #button_label = tk.Label(button_frame, image=self.button_ok_image, width=8, height=12, bg='#ffffff', highlightthickness=2, font=font1, relief='solid')
-        #button_label.pack(side="top", padx=10)
-        #button_label.bind("<Button-1>", self.ok)
+        # TODO: color or validation image instead of text?
+        self.button_frame = tk.Frame(self)
+        #path = "lowpolypainter/resources/icons/"
+        #self.okImage = PhotoImage(path + 'color.png')
+        self.okButton = Label(self.button_frame, text='Color Chosen Face', borderwidth="0", width='20', height='3', background='#ffffff', font=font1)
+        #self.okButton.configure(image=self.okImage)
+        self.okButton.bind("<Button-1>", self.ok)
+        self.okButton.pack(side='right')
 
         # --- placement
         square.grid(row=0, column=0, padx=10, pady=(9, 0), sticky='nsew')
@@ -249,7 +302,8 @@ class ColorPicker(Frame):
                              pady=(1, 4), sticky='nsew')
         col_frame.grid(row=0, rowspan=2, column=1, padx=(4, 10), pady=(10, 4))
         frame.grid(row=3, column=0, columnspan=2, pady=(4, 10), padx=10, sticky="nsew")
-        button_frame.grid(row=4, columnspan=2, pady=(0, 10), padx=10)
+        self.button_frame.grid(row=4, column=0, pady=(0, 10), padx=10, sticky="nsew")
+
 
         # --- bindings
         self.bar.bind("<ButtonRelease-1>", self._change_color, True)
@@ -291,14 +345,10 @@ class ColorPicker(Frame):
             self.focus_set()
 
     def _update_preview(self):
-        """Update color preview."""
+        """Update color preview in palette items"""
         color = self.hexa.get()
-        if self.alpha_channel:
-            prev = overlay(self._transparent_bg, hexa_to_rgb(color))
-            self._im_color = ImageTk.PhotoImage(prev, master=self)
-            self.color_preview.configure(image=self._im_color)
-        else:
-            self.color_preview.configure(background=color)
+        activePaletteItem = filter(lambda item: item.editMode, self.paletteItems)[0]
+        activePaletteItem.configure(background=color)
 
     def _reset_preview(self, event):
         """Respond to user click on a palette item."""
@@ -324,12 +374,26 @@ class ColorPicker(Frame):
         self.square.set_hsv((h, s, v))
         self._update_preview()
 
+    def _palette_items_update(self, activeItemNumber):
+        # change border look of active palette frame
+        for item in self.paletteFrames:
+            if item.number != activeItemNumber:
+                item.configure(borderwidth=0)
+            else:
+                item.configure(borderwidth=1)
+
+        # update editMode bools
+        for item in self.paletteItems:
+            if item.master.number != activeItemNumber:
+                item.editMode = False
+            else:
+                item.editMode = True
+
     def _palette_cmd(self, event):
         """Respond to user click on a palette item."""
-        label = event.widget
-        # label master = color square
-        label.master.focus_set()
-        #label.configure(relief="solid", borderwidth=1)
+        activeNumber = event.widget.master.number
+        self._palette_items_update(activeNumber)
+        label = self.paletteItems[activeNumber-1]
 
         r, g, b = self.winfo_rgb(label.cget("background"))
         r = round2(r * 255 / 65535)
@@ -353,10 +417,6 @@ class ColorPicker(Frame):
         self.bar.set(h)
         self.square.set_hsv((h, s, v))
         self._update_preview()
-
-        # TODO: update background color of label, unset solid border when unfocussing label
-        # if user clicks another palette item or the ok button, the focus of the palette item should be gone
-
 
     def _change_sel_color(self, event):
         """Respond to motion of the color selection cross."""
@@ -492,7 +552,7 @@ class ColorPicker(Frame):
             self._update_preview()
 
     # this method calls the update of chosen face color
-    def ok(self):
+    def ok(self, event=None):
         rgb, hsv, hexa = self.square.get()
         if self.alpha_channel:
             hexa = self.hexa.get()
@@ -500,11 +560,16 @@ class ColorPicker(Frame):
         self.color = rgb, hsv, hexa
         self.parent.updateFaceColor(hexa)
 
+    def chooseColorFromImage(self, event=None):
+        colorInput_hexa = self.parent.getColorFromImage(event.x, event.y)
+        #self.hexa = colorInput_hexa
+
+
 def askcolor(color="white", parent=None, title=("Color Chooser"), alpha=False):
     """
     Open a ColorPicker dialog and return the chosen color.
 
-    The selected color is retunred in RGB(A) and hexadecimal #RRGGBB(AA) formats.
+    The selected color is returned in RGB(A) and hexadecimal #RRGGBB(AA) formats.
     (None, None) is returned if the color selection is cancelled.
 
     Arguments:
