@@ -103,9 +103,13 @@ class Window(object):
         self.zoomAndToggleFrame = ZoomAndToggleFrame(self)
         self.zoomAndToggleFrame.grid(row=2, column=1, sticky=N+E+S+W)
 
-        # Space Frame for padding
-        spaceFrame = Frame(self.frame, bg="red")
-        spaceFrame.grid(row=0, column=3)
+        # Space Frame for right padding
+        spaceFrame1 = Frame(self.frame, bg="white")
+        spaceFrame1.grid(row=0, column=3)
+
+        # Space Frame for below padding
+        spaceFrame2 =  Frame(self.frame, bg="white", height=30)
+        spaceFrame2.grid(row=3, column=1)
 
         # TODO: delete because unnecessary?
         # Color Safepoints
