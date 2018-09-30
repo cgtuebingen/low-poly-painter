@@ -51,8 +51,6 @@ class Window(object):
         self.root.minsize(min_width, min_height)
         self.root.grid_rowconfigure(0, weight=1)
         self.root.grid_columnconfigure(0, weight=1)
-        self.root.grid_columnconfigure(0, weight=0)
-        self.root.grid_columnconfigure(0, weight=1)
 
         dist_right = int(self.root.winfo_screenwidth()/2 - min_width/2 + off_x)
         dist_down = int(self.root.winfo_screenheight()/2 - min_height/2 + off_y)
@@ -65,6 +63,8 @@ class Window(object):
         self.frame.grid_rowconfigure(1, weight=1)
         self.frame.grid_columnconfigure(0, weight=1)
         self.frame.grid_columnconfigure(1, weight=0)
+        self.frame.grid_columnconfigure(2, weight=0)
+        self.frame.grid_columnconfigure(3, weight=1)
 
         # Canvas Frame
         self.canvasFrameToggle = False
@@ -102,6 +102,10 @@ class Window(object):
         # Zoom and Toggle Frame
         self.zoomAndToggleFrame = ZoomAndToggleFrame(self)
         self.zoomAndToggleFrame.grid(row=2, column=1, sticky=N+E+S+W)
+
+        # Space Frame for padding
+        spaceFrame = Frame(self.frame, bg="red")
+        spaceFrame.grid(row=0, column=3)
 
         # TODO: delete because unnecessary?
         # Color Safepoints
