@@ -43,6 +43,7 @@ class ColorPicker(Frame):
         font1 = "-family {Heiti TC} -size 12 -weight normal -slant "  \
             "roman -underline 0 -overstrike 0"
         style = ttk.Style(self)
+        path = "lowpolypainter/resources/icons/"
         style.configure('.', font=font1, bg='#ffffff', highlightbackground='#ffffff')
         style.map("palette.TFrame", relief=[('focus', 'flat')],
                   bordercolor=[('focus', "#ffffff")])
@@ -179,26 +180,35 @@ class ColorPicker(Frame):
         self.paletteFrames = [self.paletteFrame1, self.paletteFrame2, self.paletteFrame3, self.paletteFrame4, self.paletteFrame5,
                             self.paletteFrame6, self.paletteFrame7, self.paletteFrame8, self.paletteFrame9, self.paletteFrame10]
 
-        # TODO: --- pipette tool for choosing color from image or screen?
-        self.pipetteLabel = tk.Label(palette, text="Pipette", font=font1)
-        self.pipetteLabel.bind("<1>", self.chooseColorFromImage)
-        self.pipetteLabel.grid(row=0, column=10, padx=5)
+        # --- Pipette
+        self.pipetteImg = ImageTk.PhotoImage(file=path + "pipette.png")
+        self.pipetteFrame = tk.Frame(palette, bg="white")
+        self.pipetteLabel = tk.Label(self.pipetteFrame, image=self.pipetteImg, bg="white", font=font1, relief="flat", height=22, width=20)
+        self.pipetteLabel.bind("<1>", self.enablePipette)
+        self.pipetteLabel.grid(row=0, column=0, padx=3, pady=3)
+        self.pipetteFrame.grid(row=0, column=10, padx=10)
+
+        # --- Validation
+        self.okImg = ImageTk.PhotoImage(file= path + "color.png")
+        self.okButton = Label(palette, image=self.okImg, text='Color Face', borderwidth="0", width='30', height='32', background='#ffffff', font=font1)
+        self.okButton.bind("<Button-1>", self.ok)
+        self.okButton.grid(row=0, column=11)
 
         # --- ColorSquare
         hue = col2hue(*self._old_color)
 
-        square = tk.Frame(self, borderwidth=0, relief='flat')
+        square = tk.Frame(self, borderwidth=0, relief='flat', bg="white")
         self.square = ColorSquare(square, hue=hue, width=200, height=200,
                                   color=rgb_to_hsv(*self._old_color),
                                   highlightthickness=0)
         self.square.pack()
 
         # --- GradientBar
-        bar = tk.Frame(self, borderwidth=0, relief='flat')
+        bar = tk.Frame(self, borderwidth=0, relief='flat', bg="white")
         self.bar = GradientBar(bar, hue=hue, width=200, height=15, highlightthickness=0)
         self.bar.pack()
 
-        col_frame = tk.Frame(self)
+        col_frame = tk.Frame(self, bg="white")
 
         # --- hue saturation value
         hsv_frame = tk.Frame(col_frame, relief="flat", borderwidth=0, bg="white")
@@ -225,11 +235,11 @@ class ColorPicker(Frame):
         s_h.grid(row=0, column=1, sticky='w', padx=4, pady=4)
         s_s.grid(row=1, column=1, sticky='w', padx=4, pady=4)
         s_v.grid(row=2, column=1, sticky='w', padx=4, pady=4)
-        tk.Label(hsv_frame, text=('Hue'), font=font1, relief="flat").grid(row=0, column=0, sticky='e',
+        tk.Label(hsv_frame, text=('Hue'), font=font1, relief="flat", bg="white").grid(row=0, column=0, sticky='e',
                                                  padx=4, pady=4)
-        tk.Label(hsv_frame, text=('Saturation'), font=font1, relief="flat").grid(row=1, column=0, sticky='e',
+        tk.Label(hsv_frame, text=('Saturation'), font=font1, relief="flat", bg="white").grid(row=1, column=0, sticky='e',
                                                         padx=4, pady=4)
-        tk.Label(hsv_frame, text=('Value'), font=font1, relief="flat").grid(row=2, column=0, sticky='e',
+        tk.Label(hsv_frame, text=('Value'), font=font1, relief="flat", bg="white").grid(row=2, column=0, sticky='e',
                                                    padx=4, pady=4)
 
         # --- rgb
@@ -262,7 +272,7 @@ class ColorPicker(Frame):
         tk.Label(rgb_frame, text=('b'), font=font1, bg="white").grid(row=2, column=0, sticky='e',
                                                   padx=4, pady=4)
         # --- hexa
-        hexa_frame = tk.Frame(col_frame)
+        hexa_frame = tk.Frame(col_frame, bg="white")
         hexa_frame.pack(fill="x")
         self.hexa = tk.Entry(hexa_frame, justify="right", width=10, name='entry', bg="white", font=font1, highlightbackground='#ffffff')
         self.hexa.insert(0, old_color.upper())
@@ -287,15 +297,8 @@ class ColorPicker(Frame):
                                                          padx=4, pady=4)
             s_alpha.grid(row=0, column=2, sticky='w', padx=(4, 6), pady=4)
 
-        # --- validation
-        # TODO: color or validation image instead of text, image placing still makes trouble
-        self.button_frame = tk.Frame(self, bg="white")
-        #path = "lowpolypainter/resources/icons/"
-        #self.okImage = PhotoImage(path + 'color.png')
-        self.okButton = Label(self.button_frame, text='Color Face', borderwidth="0", width='20', height='3', background='#ffffff', font=font1)
-        #self.okButton.configure(image=self.okImage)
-        self.okButton.bind("<Button-1>", self.ok)
-        self.okButton.pack(side='right')
+        # --- spaceFrame
+        spaceFrame = tk.Frame(self, bg="white")
 
         # --- placement
         square.grid(row=0, column=0, padx=10, pady=(9, 0), sticky='nsew')
@@ -305,7 +308,7 @@ class ColorPicker(Frame):
                              pady=(1, 4), sticky='nsew')
         col_frame.grid(row=0, rowspan=2, column=1, padx=(4, 10), pady=(10, 4))
         frame.grid(row=3, column=0, columnspan=2, pady=(4, 10), padx=10, sticky="nsew")
-        self.button_frame.grid(row=4, column=0, pady=(0, 10), padx=10, sticky="nsew")
+        spaceFrame.grid(row=4, column=0, pady=(0, 10), padx=10, sticky="nsew")
 
 
         # --- bindings
@@ -392,11 +395,16 @@ class ColorPicker(Frame):
             else:
                 item.editMode = True
 
-    def _palette_cmd(self, event):
+    def _palette_cmd(self, event=None):
         """Respond to user click on a palette item."""
-        activeNumber = event.widget.master.number
-        self._palette_items_update(activeNumber)
-        label = self.paletteItems[activeNumber-1]
+        if event is not None:
+            activeNumber = event.widget.master.number
+            self._palette_items_update(activeNumber)
+            label = self.paletteItems[activeNumber-1]
+        # else case used for pipette click event
+        else:
+            label = filter(lambda item: item.editMode, self.paletteItems)[0]
+            self.pipetteFrame.config(bg="white")
 
         r, g, b = self.winfo_rgb(label.cget("background"))
         r = round2(r * 255 / 65535)
@@ -588,16 +596,15 @@ class ColorPicker(Frame):
             self.paletteItem9.config(background=colors[8])
             self.paletteItem10.config(background=colors[9])
 
-    def getCoords(self, event=None):
-        print tuple([event.x_root, event.y_root])
-        #colorInput_hexa = self.parent.getColorFromImage(event.x, event.y)
-        self.grab_release()
 
-    def chooseColorFromImage(self, event=None):
-        self.bind("<1>", self.getCoords)
-        self.grab_set()
+    def enablePipette(self, event=None):
+        self.parent.parent.changeModeToPipette(event)
+        self.pipetteFrame.config(bg="#DADADA")
 
-
+    def setPipetteColor(self, color_rgb):
+        color_hex = rgb_to_hexa(*color_rgb)
+        activePaletteItem = filter(lambda item: item.editMode, self.paletteItems)[0]
+        activePaletteItem.configure(background=color_hex)
 
 def askcolor(color="white", parent=None, title=("Color Chooser"), alpha=False):
     """

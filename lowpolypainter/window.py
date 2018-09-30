@@ -108,7 +108,7 @@ class Window(object):
         spaceFrame1.grid(row=0, column=3)
 
         # Space Frame for below padding
-        spaceFrame2 =  Frame(self.frame, bg="white", height=30)
+        spaceFrame2 =  Frame(self.frame, bg="white", height=65)
         spaceFrame2.grid(row=3, column=1)
 
         # TODO: delete because unnecessary?
@@ -138,6 +138,7 @@ class Window(object):
     """ Control Mode"""
     # point mode
     def changeModeToP(self, event=None):
+        self.canvasFrame.pipetteActive = False
         self.toolbarFrame.buttonFrame.pointsButton.config(bg=ACTIVE_MODE_COLOR)
         self.toolbarFrame.buttonFrame.pointsAndLinesButton.config(bg="#ffffff")
         self.toolbarFrame.buttonFrame.splitLineButton.config(bg="#ffffff")
@@ -145,6 +146,7 @@ class Window(object):
 
     # point and line mode
     def changeModeToPAL(self, event=None):
+        self.canvasFrame.pipetteActive = False
         self.toolbarFrame.buttonFrame.pointsButton.config(bg="#ffffff")
         self.toolbarFrame.buttonFrame.pointsAndLinesButton.config(bg=ACTIVE_MODE_COLOR)
         self.toolbarFrame.buttonFrame.splitLineButton.config(bg="#ffffff")
@@ -152,10 +154,20 @@ class Window(object):
 
     # split line mode
     def changeModeToSL(self, event=None):
+        self.canvasFrame.pipetteActive = False
         self.toolbarFrame.buttonFrame.pointsButton.config(bg="#ffffff")
         self.toolbarFrame.buttonFrame.pointsAndLinesButton.config(bg="#ffffff")
         self.toolbarFrame.buttonFrame.splitLineButton.config(bg=ACTIVE_MODE_COLOR)
         self.controlMode = "Split Line"
+
+    # pipette enabled mode
+    def changeModeToPipette(self, event=None):
+        self.canvasFrame.pipetteActive = True
+        self.toolbarFrame.buttonFrame.pointsButton.config(bg="#ffffff")
+        self.toolbarFrame.buttonFrame.pointsAndLinesButton.config(bg="#ffffff")
+        self.toolbarFrame.buttonFrame.splitLineButton.config(bg="#ffffff")
+        self.controlMode = "Pipette"
+
 
     """ ZOOM """
     def mouse_wheel_button(self, event):

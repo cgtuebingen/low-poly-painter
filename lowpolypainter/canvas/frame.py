@@ -60,6 +60,9 @@ class CanvasFrame(Frame):
          # Mouse Event
         self.mouseEventHandled = False
 
+        # Pipette
+        self.pipetteActive = False
+
         # Focus
         self.focus = True
 
@@ -71,6 +74,7 @@ class CanvasFrame(Frame):
 
         # Events
         self.canvas.bind("<Button-1>", self.click)
+        self.canvas.bind("<Motion>", self.motion)
         self.canvas.bind_all("<space>", func=self.toggleFacesCheckbutton)
         self.canvas.bind_all("<BackSpace>", self.deleteSelected)
         self.canvas.bind_all("<Key-Delete>", self.deleteSelected)
@@ -88,6 +92,12 @@ class CanvasFrame(Frame):
         """
         self.parent.root.focus()
         eventPoint = [event.x, event.y]
+
+        if self.pipetteActive:
+            self.pipetteActive = False
+            self.parent.detailFrame.colorpicker._palette_cmd()
+            self.mouseEventHandled = True
+
         if self.inBounds(eventPoint) and (not self.mouseEventHandled) and ((self.parent.controlMode=="Points") or (self.parent.controlMode=="Points and Lines")):
             self.parent.undoManager.do(self.parent)
             previousSelected = self.selected
@@ -96,6 +106,21 @@ class CanvasFrame(Frame):
             if (previousSelected is not None) and (isinstance(previousSelected, Vertex)) and (self.parent.controlMode == "Points and Lines") and not (event.state & CTRL_MASK):
                 self.mesh.addEdge(previousSelected, self.selected)
         self.mouseEventHandled = False
+
+    def motion(self, event):
+        """
+        Canvas Motion Event
+
+        """
+        if self.pipetteActive:
+            try:
+                pipetteColor = self.image.getpixel((event.x, event.y))
+                self.parent.detailFrame.colorpicker.setPipetteColor(pipetteColor)
+                # next line enables square color update: works but takes too much time!
+                # self.parent.detailFrame.colorpicker._palette_cmd()
+            except IndexError:
+        		return
+
 
     """ VERTICES """
     def toggleVerts(self, event=None):
