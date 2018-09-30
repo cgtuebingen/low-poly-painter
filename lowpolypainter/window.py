@@ -87,7 +87,7 @@ class Window(object):
         #Title Frame
         self.titleFrame = Frame(self.frame, bg="white")
         space = Frame(self.titleFrame, width=400, height=20, bg="white")
-        self.titleLabel = Label(self.titleFrame, text="Low Poly Painter", height=3, anchor="se", font=font1)
+        self.titleLabel = Label(self.titleFrame, text="Low Poly Painter", height=3, bg="white", anchor="se", font=font1)
         space.grid(row=0, column=0)
         self.titleLabel.grid(row=0, column=1)
         self.titleFrame.grid(row=0, column=1, sticky=S+N+E+W, pady=3)
@@ -382,7 +382,7 @@ class ButtonFrame(Frame):
         self.insertButton.bind("<Button-1>", parent.parent.insert)
 
         # Save Button
-        self.saveButton = Menubutton(self, image=self.saveImg,  height='30', bd='0', direction='below', relief='flat', highlightthickness='1', highlightcolor='#ffffff')
+        self.saveButton = Menubutton(self, image=self.saveImg,  height='30', bd='0', direction='below', background="#ffffff", relief='flat', highlightthickness='1', highlightcolor='#ffffff')
         self.saveButton.grid(row=1, column=1, columnspan=2, sticky=N+E+S+W, pady=5)
         self.saveButton.menu =  Menu(self.saveButton, tearoff = 0)
         self.saveButton.menu.add('checkbutton', label="Save", command=parent.parent.saveState, font=font1)

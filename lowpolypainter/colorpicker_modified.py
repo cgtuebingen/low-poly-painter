@@ -81,7 +81,7 @@ class ColorPicker(Frame):
             old_color = rgb_to_hexa(*color)
 
         # --- frame for palette and pipette tool
-        frame = tk.Frame(self)
+        frame = tk.Frame(self, bg="white")
         frame.columnconfigure(0, weight=0)
         frame.rowconfigure(0, weight=0)
         frame.columnconfigure(1, weight=1)
@@ -201,7 +201,7 @@ class ColorPicker(Frame):
         col_frame = tk.Frame(self)
 
         # --- hue saturation value
-        hsv_frame = tk.Frame(col_frame, relief="flat", borderwidth=0)
+        hsv_frame = tk.Frame(col_frame, relief="flat", borderwidth=0, bg="white")
         hsv_frame.pack(pady=(0, 4), fill="x")
         hsv_frame.columnconfigure(0, weight=1)
         self.hue = LimitVar(0, 360, self)
@@ -210,10 +210,10 @@ class ColorPicker(Frame):
 
         s_h = Spinbox(hsv_frame, from_=0, to=360, width=4, name='spinbox',
                       textvariable=self.hue, bg='#ffffff', buttonbackground='#ffffff',insertbackground='#ffffff', command=self._update_color_hsv)
-        s_s = Spinbox(hsv_frame, from_=0, to=100, width=4,
+        s_s = Spinbox(hsv_frame, from_=0, to=100, width=4,bg='#ffffff',
                       textvariable=self.saturation, name='spinbox',
                       command=self._update_color_hsv)
-        s_v = Spinbox(hsv_frame, from_=0, to=100, width=4, name='spinbox',
+        s_v = Spinbox(hsv_frame, from_=0, to=100, width=4, name='spinbox', bg='#ffffff',
                       textvariable=self.value, command=self._update_color_hsv)
         h, s, v = rgb_to_hsv(*self._old_color)
         s_h.delete(0, 'end')
@@ -233,18 +233,18 @@ class ColorPicker(Frame):
                                                    padx=4, pady=4)
 
         # --- rgb
-        rgb_frame = tk.Frame(col_frame, relief="flat", borderwidth=0)
+        rgb_frame = tk.Frame(col_frame, relief="flat", borderwidth=0, bg="white")
         rgb_frame.pack(pady=4, fill="x")
         rgb_frame.columnconfigure(0, weight=1)
         self.red = LimitVar(0, 255, self)
         self.green = LimitVar(0, 255, self)
         self.blue = LimitVar(0, 255, self)
 
-        s_red = Spinbox(rgb_frame, from_=0, to=255, width=4, name='spinbox',
+        s_red = Spinbox(rgb_frame, from_=0, to=255, width=4, name='spinbox', bg="white",
                         textvariable=self.red, command=self._update_color_rgb)
-        s_green = Spinbox(rgb_frame, from_=0, to=255, width=4, name='spinbox',
+        s_green = Spinbox(rgb_frame, from_=0, to=255, width=4, name='spinbox',bg="white",
                           textvariable=self.green, command=self._update_color_rgb)
-        s_blue = Spinbox(rgb_frame, from_=0, to=255, width=4, name='spinbox',
+        s_blue = Spinbox(rgb_frame, from_=0, to=255, width=4, name='spinbox', bg="white",
                          textvariable=self.blue, command=self._update_color_rgb)
         s_red.delete(0, 'end')
         s_red.insert(0, self._old_color[0])
@@ -255,18 +255,18 @@ class ColorPicker(Frame):
         s_red.grid(row=0, column=1, sticky='e', padx=4, pady=4)
         s_green.grid(row=1, column=1, sticky='e', padx=4, pady=4)
         s_blue.grid(row=2, column=1, sticky='e', padx=4, pady=4)
-        tk.Label(rgb_frame, text=('r'), font=font1).grid(row=0, column=0, sticky='e',
+        tk.Label(rgb_frame, text=('r'), font=font1, bg="white").grid(row=0, column=0, sticky='e',
                                                  padx=4, pady=4)
-        tk.Label(rgb_frame, text=('g'), font=font1).grid(row=1, column=0, sticky='e',
+        tk.Label(rgb_frame, text=('g'), font=font1, bg="white").grid(row=1, column=0, sticky='e',
                                                    padx=4, pady=4)
-        tk.Label(rgb_frame, text=('b'), font=font1).grid(row=2, column=0, sticky='e',
+        tk.Label(rgb_frame, text=('b'), font=font1, bg="white").grid(row=2, column=0, sticky='e',
                                                   padx=4, pady=4)
         # --- hexa
         hexa_frame = tk.Frame(col_frame)
         hexa_frame.pack(fill="x")
-        self.hexa = tk.Entry(hexa_frame, justify="right", width=10, name='entry', font=font1, highlightbackground='#ffffff')
+        self.hexa = tk.Entry(hexa_frame, justify="right", width=10, name='entry', bg="white", font=font1, highlightbackground='#ffffff')
         self.hexa.insert(0, old_color.upper())
-        tk.Label(hexa_frame, text="Hex", font=font1).pack(side="left", padx=4, pady=(4, 1))
+        tk.Label(hexa_frame, text="Hex", font=font1, bg="white").pack(side="left", padx=4, pady=(4, 1))
         self.hexa.pack(side="left", padx=6, pady=(4, 1), fill='x', expand=True)
 
         # --- alpha (not implemented in GUI)
@@ -289,7 +289,7 @@ class ColorPicker(Frame):
 
         # --- validation
         # TODO: color or validation image instead of text, image placing still makes trouble
-        self.button_frame = tk.Frame(self)
+        self.button_frame = tk.Frame(self, bg="white")
         #path = "lowpolypainter/resources/icons/"
         #self.okImage = PhotoImage(path + 'color.png')
         self.okButton = Label(self.button_frame, text='Color Face', borderwidth="0", width='20', height='3', background='#ffffff', font=font1)
