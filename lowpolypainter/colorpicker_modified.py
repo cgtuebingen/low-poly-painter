@@ -36,7 +36,7 @@ class ColorPicker(Frame):
             * alpha: alpha channel support (boolean)
             * title: dialog title
         """
-        Frame.__init__(self, parent)
+        Frame.__init__(self, parent, bg="white")
         self.parent = parent
         self.color = ""
         self.alpha_channel = bool(alpha)

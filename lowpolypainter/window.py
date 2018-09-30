@@ -49,8 +49,12 @@ class Window(object):
         self.root.resizable(True, False)
         self.root.title('Low Poly Painter')
         self.root.minsize(min_width, min_height)
+        # TODO: fullsize screen mode should be prettier? -> edit weight components
         self.root.grid_rowconfigure(0, weight=1)
         self.root.grid_columnconfigure(0, weight=1)
+        self.root.grid_columnconfigure(0, weight=1)
+        self.root.grid_columnconfigure(0, weight=1)
+
         dist_right = int(self.root.winfo_screenwidth()/2 - min_width/2 + off_x)
         dist_down = int(self.root.winfo_screenheight()/2 - min_height/2 + off_y)
         self.root.geometry("+{}+{}".format(dist_right, dist_down))
@@ -65,11 +69,8 @@ class Window(object):
 
         # Canvas Frame
         self.canvasFrameToggle = False
-        self.frameForCanvas = Frame(self.root)
-        self.frameForCanvas.parent = self
-        self.canvasFrame = CanvasFrame(self.frameForCanvas, inputimage)
-        self.frameForCanvas.grid(row=1, column=1, sticky=NSEW)
-        self.canvasFrame.grid(row=1, column=1)
+        self.canvasFrame = CanvasFrame(self, inputimage)
+        self.canvasFrame.grid(row=1, column=1, sticky=NSEW, padx=10)
         self.frame.bind_all("<Control-p>", self.fun)
 
         # Toolbar Frame
@@ -86,7 +87,7 @@ class Window(object):
 
         #Title Frame
         self.titleFrame = Frame(self.frame, bg="white")
-        space = Frame(self.titleFrame, width=400, height=10, bg="white")
+        space = Frame(self.titleFrame, width=400, height=20, bg="white")
         self.titleLabel = Label(self.titleFrame, text="Low Poly Painter", height=3, anchor="se", font=font1)
         space.grid(row=0, column=0)
         self.titleLabel.grid(row=0, column=1)
@@ -152,9 +153,9 @@ class Window(object):
     """ ZOOM """
     def mouse_wheel_button(self, event):
         if event.num == 4:
-            self.mouse_wheel(120, event.x, event.y)
+            self.mouse_wheel(120, 0, 0)
         elif event.num == 5:
-            self.mouse_wheel(-120, event.x, event.y)
+            self.mouse_wheel(-120, 0, 0)
 
     def mouse_wheel_wheel(self, event):
         self.mouse_wheel(event.delta, event.x, event.y)
@@ -350,9 +351,8 @@ class ButtonFrame(Frame):
     Contains two buttons for clearing and testing.
     """
     def __init__(self, parent, *args, **kwargs):
-        Frame.__init__(self, parent)
+        Frame.__init__(self, parent, background="white")
         self.grid_columnconfigure(0, minsize=100)
-        self.grid_columnconfigure
         path = "lowpolypainter/resources/icons/"
 
         self.insertImg = ImageTk.PhotoImage(file=path + "open.png")
