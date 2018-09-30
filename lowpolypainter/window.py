@@ -355,18 +355,18 @@ class ButtonFrame(Frame):
         self.grid_columnconfigure
         path = "lowpolypainter/resources/icons/"
 
-        self.insertImg = PhotoImage(file=path + "open.png")
-        self.exportImg = PhotoImage(file=path + "export.png")
-        self.saveImg = PhotoImage(file=path + "save.png")
+        self.insertImg = ImageTk.PhotoImage(file=path + "open.png")
+        self.exportImg = ImageTk.PhotoImage(file=path + "export.png")
+        self.saveImg = ImageTk.PhotoImage(file=path + "save.png")
 
-        self.deleteImg = PhotoImage(file=path + "delete.png")
-        self.clearImg = PhotoImage(file=path + "clear.png")
-        self.undoImg = PhotoImage(file=path + "undo.png")
-        self.redoImg = PhotoImage(file=path + "redo.png")
+        self.deleteImg = ImageTk.PhotoImage(file=path + "delete.png")
+        self.clearImg = ImageTk.PhotoImage(file=path + "clear.png")
+        self.undoImg = ImageTk.PhotoImage(file=path + "undo.png")
+        self.redoImg = ImageTk.PhotoImage(file=path + "redo.png")
 
-        self.pointImg = PhotoImage(file=path + "point.png")
-        self.point_and_lineImg = PhotoImage(file=path + "point_and_line.png")
-        self.line_breakImg = PhotoImage(file=path + "line_break.png")
+        self.pointImg = ImageTk.PhotoImage(file=path + "point.png")
+        self.point_and_lineImg = ImageTk.PhotoImage(file=path + "point_and_line.png")
+        self.line_breakImg = ImageTk.PhotoImage(file=path + "line_break.png")
 
         options = {'activebackground':"#ffffff", 'activeforeground':"#000000", 'background':"#ffffff", 'borderwidth':"0", 'foreground':"#000000", 'relief':'flat', 'highlightbackground':'#ffffff', 'highlightcolor':'#ffffff', 'justify':'center'}
         font1 = "-family {Heiti TC} -size 10 -weight normal -slant "  \
