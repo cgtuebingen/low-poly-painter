@@ -167,8 +167,6 @@ class CanvasFrame(Frame):
     """ Border """
     def border(self, triangulate=False, step=0):
 
-        self.housePartyProtocol()
-
         # generate border
         border = Border(self.width, self.height)
 
