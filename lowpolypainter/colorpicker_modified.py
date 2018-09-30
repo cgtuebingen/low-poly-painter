@@ -80,20 +80,7 @@ class ColorPicker(Frame):
                     self._old_alpha = color[3]
             old_color = rgb_to_hexa(*color)
 
-        # --- ColorSquare
-        hue = col2hue(*self._old_color)
-
-        square = tk.Frame(self, borderwidth=0, relief='flat')
-        self.square = ColorSquare(square, hue=hue, width=200, height=200,
-                                  color=rgb_to_hsv(*self._old_color),
-                                  highlightthickness=0)
-        self.square.pack()
-
-        # --- GradientBar
-        bar = tk.Frame(self, borderwidth=0, relief='flat')
-        self.bar = GradientBar(bar, hue=hue, width=200, height=15, highlightthickness=0)
-        self.bar.pack()
-
+        # --- frame for palette and pipette tool
         frame = tk.Frame(self)
         frame.columnconfigure(0, weight=0)
         frame.rowconfigure(0, weight=0)
@@ -106,10 +93,11 @@ class ColorPicker(Frame):
         palette = tk.Frame(frame)
         palette.grid(row=0, column=0, sticky="nsew")
 
-        self.paletteFrame1 = tk.Frame(palette, borderwidth=0, relief="solid")
+        # at start default palette item 1 is in edit mode (borderwidth=1 instead of 0)
+        self.paletteFrame1 = tk.Frame(palette, borderwidth=1, relief="solid")
         self.paletteFrame1.number = 1
-        self.paletteItem1 = tk.Label(self.paletteFrame1, background=PALETTE[0], width=2, height=1)
-        self.paletteItem1.editMode = False
+        self.paletteItem1 = tk.Label(self.paletteFrame1, background=rgb_to_hexa(*self._old_color), width=2, height=1)
+        self.paletteItem1.editMode = True
         self.paletteItem1.bind("<1>", self._palette_cmd)
         self.paletteItem1.pack()
         self.paletteFrame1.grid(row=0, column=0, padx=2, pady=2)
@@ -191,9 +179,23 @@ class ColorPicker(Frame):
         self.paletteFrames = [self.paletteFrame1, self.paletteFrame2, self.paletteFrame3, self.paletteFrame4, self.paletteFrame5,
                             self.paletteFrame6, self.paletteFrame7, self.paletteFrame8, self.paletteFrame9, self.paletteFrame10]
 
-        # TODO: pipette tool for choosing color from image or screen?
+        # TODO: --- pipette tool for choosing color from image or screen?
         self.pipetteLabel = tk.Label(palette, text="Pipette", font=font1)
         self.pipetteLabel.grid(row=0, column=10, padx=5)
+
+        # --- ColorSquare
+        hue = col2hue(*self._old_color)
+
+        square = tk.Frame(self, borderwidth=0, relief='flat')
+        self.square = ColorSquare(square, hue=hue, width=200, height=200,
+                                  color=rgb_to_hsv(*self._old_color),
+                                  highlightthickness=0)
+        self.square.pack()
+
+        # --- GradientBar
+        bar = tk.Frame(self, borderwidth=0, relief='flat')
+        self.bar = GradientBar(bar, hue=hue, width=200, height=15, highlightthickness=0)
+        self.bar.pack()
 
         col_frame = tk.Frame(self)
 
@@ -414,9 +416,9 @@ class ColorPicker(Frame):
         self.value.set(v)
         self.hexa.delete(0, "end")
         self.hexa.insert(0, color.upper())
+        self._update_preview()
         self.bar.set(h)
         self.square.set_hsv((h, s, v))
-        self._update_preview()
 
     def _change_sel_color(self, event):
         """Respond to motion of the color selection cross."""
@@ -559,6 +561,31 @@ class ColorPicker(Frame):
             rgb += (self.alpha.get(),)
         self.color = rgb, hsv, hexa
         self.parent.updateFaceColor(hexa)
+
+    # method which might be useful for future storing methods
+    # return color of stored palette items
+    def getStoredHexaColors(self):
+        colors = [self.paletteItem1.cget("background"), self.paletteItem2.cget("background"),
+                self.paletteItem3.cget("background"), self.paletteItem4.cget("background"),
+                self.paletteItem5.cget("background"), self.paletteItem6.cget("background"),
+                self.paletteItem7.cget("background"), self.paletteItem8.cget("background"),
+                self.paletteItem9.cget("background"), self.paletteItem10.cget("background")]
+        return colors
+
+    # method which might be useful for future storing methods:
+    # configures color of palette items
+    def setStoredHexaColors(self, colors):
+        if len(colors) == 10:
+            self.paletteItem1.config(background=colors[0])
+            self.paletteItem2.config(background=colors[1])
+            self.paletteItem3.config(background=colors[2])
+            self.paletteItem4.config(background=colors[3])
+            self.paletteItem5.config(background=colors[4])
+            self.paletteItem6.config(background=colors[5])
+            self.paletteItem7.config(background=colors[6])
+            self.paletteItem8.config(background=colors[7])
+            self.paletteItem9.config(background=colors[8])
+            self.paletteItem10.config(background=colors[9])
 
 
 def askcolor(color="white", parent=None, title=("Color Chooser"), alpha=False):
