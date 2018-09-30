@@ -75,7 +75,7 @@ class TriangulateFrame(Frame):
         path = "lowpolypainter/resources/icons/"
 
         # mask button
-        self.maskImage = PhotoImage(file=path+"mask.png")
+        self.maskImage = ImageTk.PhotoImage(file=path+"mask.png")
         mask_opts = {'image':self.maskImage, 'command':self.mask}
         mask_opts.update(button_opts)
 
@@ -83,7 +83,7 @@ class TriangulateFrame(Frame):
         self.maskButton.grid(row=0, column=1, sticky=N+E+S+W, padx=5)
 
         # border points button
-        self.borderImage = PhotoImage(file=path+"borderpoints.png")
+        self.borderImage = ImageTk.PhotoImage(file=path+"borderpoints.png")
         border_opts = {'image':self.borderImage, 'command':self.border}
         border_opts.update(button_opts)
 
@@ -91,7 +91,7 @@ class TriangulateFrame(Frame):
         self.borderButton.grid(row=0, column=2, sticky=N+E+S+W, padx=5)
 
         # triangulate button
-        self.triangleImage = PhotoImage(file=path+"triangulate.png")
+        self.triangleImage = ImageTk.PhotoImage(file=path+"triangulate.png")
         triangulate_opts = {'image': self.triangleImage, 'command':self.triangulate}
         triangulate_opts.update(button_opts)
 
@@ -99,7 +99,7 @@ class TriangulateFrame(Frame):
         self.triangulateButton.grid(row=0, column=3, sticky=NSEW, padx=5)
 
         # border button to fill outer areas without mesh
-        self.BordersImage = PhotoImage(file=path+"fill.png")
+        self.BordersImage = ImageTk.PhotoImage(file=path+"fill.png")
         borders_opts = {'image': self.BordersImage, 'command': self.parent.parent.borderTriangulate}
         borders_opts.update(button_opts)
 
@@ -107,7 +107,7 @@ class TriangulateFrame(Frame):
         self.BordersButton.grid(row=0, column=4, sticky=NSEW, padx=5)
 
         # random button
-        self.randomImage = PhotoImage(file=path+"random.png")
+        self.randomImage = ImageTk.PhotoImage(file=path+"random.png")
         random_opts = {'image':self.randomImage, 'command':self.random}
         random_opts.update(button_opts)
 
