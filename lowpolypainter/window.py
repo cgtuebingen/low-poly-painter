@@ -49,10 +49,9 @@ class Window(object):
         self.root.resizable(True, False)
         self.root.title('Low Poly Painter')
         self.root.minsize(min_width, min_height)
-        # TODO: fullsize screen mode should be prettier? -> edit weight components
         self.root.grid_rowconfigure(0, weight=1)
         self.root.grid_columnconfigure(0, weight=1)
-        self.root.grid_columnconfigure(0, weight=1)
+        self.root.grid_columnconfigure(0, weight=0)
         self.root.grid_columnconfigure(0, weight=1)
 
         dist_right = int(self.root.winfo_screenwidth()/2 - min_width/2 + off_x)
@@ -352,7 +351,12 @@ class ButtonFrame(Frame):
     """
     def __init__(self, parent, *args, **kwargs):
         Frame.__init__(self, parent, background="white")
-        self.grid_columnconfigure(0, minsize=100)
+
+        spaceFrame = Frame(self, bg="black")
+        spaceFrame.grid(row=0, column=0)
+
+        self.grid_columnconfigure(0, weight=1)
+        self.grid_columnconfigure(1, minsize=100, weight=0)
         path = "lowpolypainter/resources/icons/"
 
         self.insertImg = ImageTk.PhotoImage(file=path + "open.png")
@@ -374,12 +378,12 @@ class ButtonFrame(Frame):
 
         # Insert Button
         self.insertButton = Label(self, image=self.insertImg, activebackground="#ffffff", activeforeground="#000000", background="#ffffff", borderwidth="0", width='36', height='30')
-        self.insertButton.grid(row=0, column=0, sticky=N+E+S+W, pady=5)
+        self.insertButton.grid(row=0, column=1, sticky=N+E+S+W, pady=5)
         self.insertButton.bind("<Button-1>", parent.parent.insert)
 
         # Save Button
         self.saveButton = Menubutton(self, image=self.saveImg,  height='30', bd='0', direction='below', relief='flat', highlightthickness='1', highlightcolor='#ffffff')
-        self.saveButton.grid(row=1, column=0, columnspan=2, sticky=N+E+S+W, pady=5)
+        self.saveButton.grid(row=1, column=1, columnspan=2, sticky=N+E+S+W, pady=5)
         self.saveButton.menu =  Menu(self.saveButton, tearoff = 0)
         self.saveButton.menu.add('checkbutton', label="Save", command=parent.parent.saveState, font=font1)
         self.saveButton.menu.add('checkbutton', label="Save as ... ", command=parent.parent.saveStateAs, font=font1)
@@ -387,56 +391,56 @@ class ButtonFrame(Frame):
 
         # Export Button
         self.exportButton = Label(self, image=self.exportImg, **options)
-        self.exportButton.grid(row=2, column=0, sticky=N+E+S+W, pady=5)
+        self.exportButton.grid(row=2, column=1, sticky=N+E+S+W, pady=5)
         self.exportButton.bind("<Button-1>", parent.parent.export)
 
         # Space1
         self.space1 = Frame(self, height=1, width=1, bg='#DADADA', borderwidth=0)
-        self.space1.grid(row=3, column=0, sticky=N+E+S+W, padx=8, pady=15)
+        self.space1.grid(row=3, column=1, sticky=N+E+S+W, padx=8, pady=15)
 
         # Clear Button
         self.clearButton = Label(self, image=self.clearImg, **options)
-        self.clearButton.grid(row=4, column=0, sticky=N+E+S+W, pady=5)
+        self.clearButton.grid(row=4, column=1, sticky=N+E+S+W, pady=5)
         self.clearButton.bind("<Button-1>", parent.parent.clear)
 
         # Delete Button
         self.deleteButton = Label(self, image=self.deleteImg, **options)
-        self.deleteButton.grid(row=5, column=0, sticky=N+E+S+W, pady=5)
+        self.deleteButton.grid(row=5, column=1, sticky=N+E+S+W, pady=5)
         self.deleteButton.bind("<Button-1>", parent.parent.canvasFrame.deleteSelected)
 
         # Undo Button
         self.undoButton = Label(self, image=self.undoImg, **options)
-        self.undoButton.grid(row=6, column=0, sticky=N+E+S+W, pady=5)
+        self.undoButton.grid(row=6, column=1, sticky=N+E+S+W, pady=5)
         self.undoButton.bind("<Button-1>", parent.parent.undo)
 
         # Redo Button
         self.redoButton = Label(self, image=self.redoImg, **options)
-        self.redoButton.grid(row=7, column=0, sticky=N+E+S+W, pady=5)
+        self.redoButton.grid(row=7, column=1, sticky=N+E+S+W, pady=5)
         self.redoButton.bind("<Button-1>", parent.parent.redo)
 
         # Space2
         self.space2 = Frame(self, height=1,  bg='#DADADA', borderwidth=0)
-        self.space2.grid(row=8, column=0, sticky=N+E+S+W, padx=8, pady=15)
+        self.space2.grid(row=8, column=1, sticky=N+E+S+W, padx=8, pady=15)
 
         # Change to Points Mode
         self.pointsFrame = Frame(self, height='35', bg='white')
         self.pointsButton = Label(self.pointsFrame, image=self.pointImg, width=35, height=36, **options)
         self.pointsButton.pack()
-        self.pointsFrame.grid(row=10, column=0, sticky=N+E+S+W, pady=5)
+        self.pointsFrame.grid(row=10, column=1, sticky=N+E+S+W, pady=5)
         self.pointsButton.bind("<Button-1>", parent.parent.changeModeToP)
 
         # Change to Points and Lines Mode
         self.pointsAndLinesFrame = Frame(self, height='35', bg='white')
         self.pointsAndLinesButton = Label(self.pointsAndLinesFrame, image=self.point_and_lineImg, width=35, height=36, **options)
         self.pointsAndLinesButton.pack()
-        self.pointsAndLinesFrame.grid(row=11, column=0, sticky=N+E+S+W, pady=5)
+        self.pointsAndLinesFrame.grid(row=11, column=1, sticky=N+E+S+W, pady=5)
         self.pointsAndLinesButton.bind("<Button-1>", parent.parent.changeModeToPAL)
 
         # Change to Split Line Mode
         self.splitLineFrame = Frame(self, height='35', bg='white')
         self.splitLineButton = Label(self.splitLineFrame, image=self.line_breakImg, width=35, height=36, **options)
         self.splitLineButton.pack()
-        self.splitLineFrame.grid(row=12, column=0, sticky=N+E+S+W, pady=5)
+        self.splitLineFrame.grid(row=12, column=1, sticky=N+E+S+W, pady=5)
         self.splitLineButton.bind("<Button-1>", parent.parent.changeModeToSL)
 
 
