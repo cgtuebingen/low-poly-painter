@@ -65,8 +65,11 @@ class Window(object):
 
         # Canvas Frame
         self.canvasFrameToggle = False
-        self.canvasFrame = CanvasFrame(self, inputimage)
-        self.canvasFrame.grid(row=1, column=1, sticky=NSEW, padx=10)
+        self.frameForCanvas = Frame(self.root)
+        self.frameForCanvas.parent = self
+        self.canvasFrame = CanvasFrame(self.frameForCanvas, inputimage)
+        self.frameForCanvas.grid(row=1, column=1, sticky=NSEW)
+        self.canvasFrame.grid(row=1, column=1)
         self.frame.bind_all("<Control-p>", self.fun)
 
         # Toolbar Frame
@@ -82,9 +85,12 @@ class Window(object):
         self.frame.bind_all("<Control-s>", self.saveState)
 
         #Title Frame
-        self.titleFrame = Label(self.frame, text="Low Poly Painter", height=3, justify='center', font=font1)
-        self.titleFrame.grid(row=0, column=1, sticky=S+N+E+W, pady=2)
-        self.titleFrame.config(bg="#ffffff")
+        self.titleFrame = Frame(self.frame, bg="white")
+        space = Frame(self.titleFrame, width=400, height=10, bg="white")
+        self.titleLabel = Label(self.titleFrame, text="Low Poly Painter", height=3, anchor="se", font=font1)
+        space.grid(row=0, column=0)
+        self.titleLabel.grid(row=0, column=1)
+        self.titleFrame.grid(row=0, column=1, sticky=S+N+E+W, pady=3)
 
         # Mask Frame
         self.maskFrame = MaskFrame(self, inputimage)

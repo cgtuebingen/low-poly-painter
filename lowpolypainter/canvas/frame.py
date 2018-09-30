@@ -26,10 +26,10 @@ class CanvasFrame(Frame):
     """
 
     def __init__(self, parent, inputimage, *args, **kwargs):
-        Frame.__init__(self, parent.frame)
+        Frame.__init__(self, parent.parent.frame)
 
         # Parent
-        self.parent = parent
+        self.parent = parent.parent
 
         # Load Image
         self.inputimage = inputimage
@@ -38,13 +38,13 @@ class CanvasFrame(Frame):
         self.background = ImageTk.PhotoImage(self.image)
 
         # Create Canvas
-        self.width = self.background.width()
-        self.height = self.background.height()
-        self.canvas = Canvas(self, width=self.width, height=self.height, relief='flat', borderwidth='1', highlightbackground='#DADADA', highlightthickness='1')
+        self.canvaswidth = self.background.width()
+        self.canvasheight = self.background.height()
+        self.width= self.canvaswidth 
+        self.height= self.canvasheight
+        self.canvas = Canvas(self, width=self.canvaswidth, height=self.canvasheight, relief='flat', borderwidth='1', highlightbackground='#DADADA', highlightthickness='1')
         self.backgroundId = self.canvas.create_image(0, 0, image=self.background, anchor='nw')
         self.canvas.grid(row=0, column=0, sticky=NSEW)
-        self.grid_columnconfigure(0, minsize=self.width)
-        self.grid_rowconfigure(0, minsize=self.height)
 
         # Color Object
         self.color = Color(np.array(self.image), 0.5, 0.5)

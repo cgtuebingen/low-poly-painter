@@ -181,6 +181,7 @@ class ColorPicker(Frame):
 
         # TODO: --- pipette tool for choosing color from image or screen?
         self.pipetteLabel = tk.Label(palette, text="Pipette", font=font1)
+        self.pipetteLabel.bind("<1>", self.chooseColorFromImage)
         self.pipetteLabel.grid(row=0, column=10, padx=5)
 
         # --- ColorSquare
@@ -586,6 +587,16 @@ class ColorPicker(Frame):
             self.paletteItem8.config(background=colors[7])
             self.paletteItem9.config(background=colors[8])
             self.paletteItem10.config(background=colors[9])
+
+    def getCoords(self, event=None):
+        print tuple([event.x_root, event.y_root])
+        #colorInput_hexa = self.parent.getColorFromImage(event.x, event.y)
+        self.grab_release()
+
+    def chooseColorFromImage(self, event=None):
+        self.bind("<1>", self.getCoords)
+        self.grab_set()
+
 
 
 def askcolor(color="white", parent=None, title=("Color Chooser"), alpha=False):
