@@ -146,9 +146,9 @@ class Window(object):
     """ ZOOM """
     def mouse_wheel_button(self, event):
         if event.num == 4:
-            self.mouse_wheel(120, 0, 0)
+            self.mouse_wheel(120, event.x, event.y)
         elif event.num == 5:
-            self.mouse_wheel(-120, 0, 0)
+            self.mouse_wheel(-120, event.x, event.y)
 
     def mouse_wheel_wheel(self, event):
         self.mouse_wheel(event.delta, event.x, event.y)
