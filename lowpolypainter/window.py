@@ -33,6 +33,7 @@ class Window(object):
 
         # Zoom
         self.zoom = ZoomTransformer()
+        self.zoomlist = []
 
         # Image Path
         self.inputimage = inputimage
@@ -111,12 +112,6 @@ class Window(object):
         spaceFrame2 =  Frame(self.frame, bg="white", height=65)
         spaceFrame2.grid(row=3, column=1)
 
-        # TODO: delete because unnecessary?
-        # Color Safepoints
-        # self.colorWheelSafePoint1 = "black"
-        # self.colorWheelSafePoint2 = "black"
-        # self.colorWheelSafePoint3 = "black"
-
         #Control Modus
         self.controlMode = None
         self.changeModeToPAL()
@@ -177,9 +172,42 @@ class Window(object):
             self.mouse_wheel(-120, 0, 0)
 
     def mouse_wheel_wheel(self, event):
-        self.mouse_wheel(event.delta, event.x, event.y)
+        if event.delta <0:
+            self.mouse_wheel(-120, event.x, event.y)
+        else:
+            self.mouse_wheel(120, event.x, event.y)
 
     def mouse_wheel(self, delta, x, y):
+
+        #Bug: Resizing the window makes the zoom weird
+        #TODO: insert the magic numbers of the canvas top right corner and update them when resizing
+
+        # fixing window coordinates
+        # (magic numbers for default window)
+        x = x - 112
+        y = y - 80
+
+
+        # checking bounds
+        if x < 0:
+            x=0
+        if y < 0:
+            y=0
+        if x>self.canvasFrame.image.size[0]:
+            x = self.canvasFrame.image.size[0]
+        if y>self.canvasFrame.image.size[1]:
+            y = self.canvasFrame.image.size[1]
+
+        #logging zoom
+        if delta > 0:
+            self.zoomlist.append(x)
+            self.zoomlist.append(y)
+        if delta < 0:
+            if len(self.zoomlist)==0:
+                return
+            y = self.zoomlist.pop()
+            x = self.zoomlist.pop()
+
         delta = 2**(delta * 0.001)
         self.zoom.ZoomAt(delta, [x, y])
         #self.canvasFrame.mesh.updatePositions()
