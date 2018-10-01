@@ -514,13 +514,13 @@ class ZoomAndToggleFrame(Frame):
         self.parent=parent
         self.zoomFrame=ZoomFrame(self)
         self.toggleFrame=ToggleFrame(self)
-        self.spaceFrame=Label(self, bg='#ffffff', width=5)
+        spaceFrame=Label(self, bg='#ffffff', width=8)
         self.grid_columnconfigure(0, weight=2, uniform="ZoomAndToggle")
-        self.grid_columnconfigure(1, weight=1, uniform="ZoomAndToggle")
-        self.grid_columnconfigure(2, weight=2, uniform="ZoomAndToggle")
+        self.grid_columnconfigure(1, weight=2, uniform="ZoomAndToggle")
+        self.grid_columnconfigure(2, weight=0, uniform="ZoomAndToggle")
         self.toggleFrame.grid(row=0, column=0, sticky=N+W)
-        self.spaceFrame.grid(row=0, column=1, sticky=N+E+S+W)
-        self.zoomFrame.grid(row=0, column=2, sticky=NE)
+        spaceFrame.grid(row=0, column=1, sticky=N+E+S+W)
+        self.zoomFrame.grid(row=0, column=2, sticky=N+E+S+W)
 
 
 class ZoomFrame(Frame):
@@ -541,13 +541,18 @@ class ZoomFrame(Frame):
         self.grid_columnconfigure(2, weight=0, uniform="zoomFrame")
         self.grid_columnconfigure(3, weight=1, uniform="zoomFrame")
 
+        path = "lowpolypainter/resources/icons/"
+
+        self.zoomPlusImg = ImageTk.PhotoImage(file=path + "plus.png")
+        self.zoomMinusImg = ImageTk.PhotoImage(file=path + "minus.png")
+
         # zoom-in Button
-        self.zoomInButton = Button(self, text=" + ", command=lambda: parent.parent.mouse_wheel(120, 0, 0), borderwidth="0", background='#ffffff',font=font1, highlightthickness='1')
-        self.zoomInButton.grid(row=0, column=1, sticky=N+S+E+W)
+        self.zoomInButton = Button(self, image=self.zoomPlusImg, command=lambda: parent.parent.mouse_wheel(120, 0, 0), relief="flat", background='#ffffff',font=font1, width=15, height=15)
+        self.zoomInButton.grid(row=0, column=1, sticky=N+S+E+W,)
 
         # zoom-out Button
-        self.zoomOutButton = Button(self, text=" - ", command=lambda: parent.parent.mouse_wheel(-120, 0, 0), borderwidth=2, relief='flat', highlightthickness='1', highlightbackground='#ffffff',  highlightcolor='#ffffff', background='#ffffff', bg='#ffffff', font=font1)
-        self.zoomOutButton.grid(row=0, column=2)
+        self.zoomOutButton = Button(self, image=self.zoomMinusImg, command=lambda: parent.parent.mouse_wheel(-120, 0, 0), borderwidth=2, relief='flat', highlightthickness='1',background='#ffffff',font=font1, width=15, height=15)
+        self.zoomOutButton.grid(row=0, column=2, padx=3)
 
 
 class ToggleFrame(Frame):
