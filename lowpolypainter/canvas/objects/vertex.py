@@ -1,6 +1,8 @@
 import math
 import numpy as np
 
+from lowpolypainter.controlMode import Mode
+
 # TAG
 TAG_VERTEX = "v"
 TAG_EDGE = "e"
@@ -52,7 +54,6 @@ class Vertex:
         self.select()
         self.parent.select(self)
 
-
     """ EVENTS """
     def clickHandle(self, event):
         '''
@@ -62,7 +63,9 @@ class Vertex:
         self.parent.mouseEventHandled = True
         x, y = int(self.coords[0]), int(self.coords[1])
         self.parent.mesh.bvertices[x][y] = 0
-        if ((event.state & MASK_SHIFT) or (self.parent.parent.controlMode == "Points and Lines"))and (self.parent.selected is not None):
+        if (self.parent.parent.controlMode.mode == Mode.CONNECT_OR_SPLIT) and \
+                (self.parent.selected is not None) and \
+                (isinstance(self.parent.selected, Vertex)):
             self.parent.parent.undoManager.do(self.parent.parent)
             self.parent.mesh.addEdge(self, self.parent.selected)
         self.select()

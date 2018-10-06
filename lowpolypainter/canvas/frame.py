@@ -14,6 +14,8 @@ from lowpolypainter.triangulate.border import Border
 from lowpolypainter.canvas.objects.vertex import Vertex
 from lowpolypainter.triangulate.triangulate import Triangulate
 
+from lowpolypainter.controlMode import Mode
+
 # Masks
 CTRL_MASK = 0x0004
 
@@ -60,9 +62,6 @@ class CanvasFrame(Frame):
          # Mouse Event
         self.mouseEventHandled = False
 
-        # Pipette
-        self.pipetteActive = False
-
         # Focus
         self.focus = True
 
@@ -88,22 +87,27 @@ class CanvasFrame(Frame):
         Canvas Click Event
 
         Description:
-        Adds point to canvas, will draw line to last point while ctrl isn't pressed
+        Adds point to canvas, will draw line to last point if control mode is POINT_AND_LINE
         """
         self.parent.root.focus()
         eventPoint = [event.x, event.y]
 
-        if self.pipetteActive:
-            self.pipetteActive = False
+        if self.parent.controlMode.mode == Mode.PIPETTE:
             self.parent.detailFrame.colorpicker._palette_cmd()
+            self.parent.controlMode.changeMode(Mode.POINT_AND_LINE)
             self.mouseEventHandled = True
-
-        if self.inBounds(eventPoint) and (not self.mouseEventHandled) and ((self.parent.controlMode=="Points") or (self.parent.controlMode=="Points and Lines")):
+        elif self.inBounds(eventPoint) and \
+                (not self.mouseEventHandled) and \
+                ((self.parent.controlMode.mode == Mode.POINT) or
+                 (self.parent.controlMode.mode == Mode.POINT_AND_LINE)):
             self.parent.undoManager.do(self.parent)
             previousSelected = self.selected
             zoomedCoords = self.parent.zoom.FromViewport([event.x, event.y])
             self.mesh.addVertex([int(zoomedCoords[0]), int(zoomedCoords[1])])
-            if (previousSelected is not None) and (isinstance(previousSelected, Vertex)) and (self.parent.controlMode == "Points and Lines") and not (event.state & CTRL_MASK):
+
+            if (previousSelected is not None) and \
+                    (isinstance(previousSelected, Vertex)) and \
+                    (self.parent.controlMode.mode == Mode.POINT_AND_LINE):
                 self.mesh.addEdge(previousSelected, self.selected)
         self.mouseEventHandled = False
 
@@ -112,7 +116,7 @@ class CanvasFrame(Frame):
         Canvas Motion Event
 
         """
-        if self.pipetteActive:
+        if self.parent.controlMode.mode == Mode.PIPETTE:
             try:
                 pipetteColor = self.image.getpixel((event.x, event.y))
                 self.parent.detailFrame.colorpicker.setPipetteColor(pipetteColor)

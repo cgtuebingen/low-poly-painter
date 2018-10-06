@@ -1,5 +1,6 @@
 # Local modules
 from vertex import Vertex
+from lowpolypainter.controlMode import Mode
 
 # TAG
 TAG_VERTEX = "v"
@@ -55,7 +56,7 @@ class Edge:
         '''
         self.parent.mouseEventHandled = True
 
-        if ((event.state & MASK_SHIFT) or (self.parent.parent.controlMode == "Split Line")):
+        if self.parent.parent.controlMode.mode == Mode.CONNECT_OR_SPLIT:
             self.parent.parent.undoManager.do(self.parent.parent)
             selected = self.parent.selected
             vert = self.parent.mesh.addVertex([event.x, event.y])

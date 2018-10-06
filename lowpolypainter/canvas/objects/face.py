@@ -128,7 +128,7 @@ class Face:
             self.parent.selectedFace[0] = False
             self.parent.selectedFace[1] = None
             self.deselect()
-        elif not (event.state & ALT_MASK):
+        else:
             self.parent.mouseEventHandled = True
             self.parent.selectedFace[0] = True
             self.parent.selectedFace[1] = self.id

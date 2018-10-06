@@ -15,8 +15,8 @@ from canvas.frame import CanvasFrame
 from triangulate.frame import MaskFrame
 from triangulate.frame import TriangulateFrame
 from zoomTransformer import ZoomTransformer
-from Colorwheel import Colorwheel
 from lowpolypainter.undoManager import UndoManager
+from lowpolypainter.controlMode import ControlMode, Mode
 
 ACTIVE_MODE_COLOR = "#DADADA"
 
@@ -37,6 +37,9 @@ class Window(object):
 
         # Image Path
         self.inputimage = inputimage
+
+        # Control Modus
+        self.controlMode = ControlMode(self)
 
         # Settings
         off_x = 0
@@ -85,6 +88,8 @@ class Window(object):
         self.frame.bind_all("<Control-y>", self.redo)
         self.frame.bind_all("<Control-s>", self.saveState)
 
+        self.frame.bind_all("<KeyPress>", self.controlMode.changeModeKeyPress, add="+")
+
         #Title Frame
         self.titleFrame = Frame(self.frame, bg="white")
         space = Frame(self.titleFrame, width=400, height=20, bg="white")
@@ -112,9 +117,7 @@ class Window(object):
         spaceFrame2 =  Frame(self.frame, bg="white", height=65)
         spaceFrame2.grid(row=3, column=1)
 
-        #Control Modus
-        self.controlMode = None
-        self.changeModeToPAL()
+        self.controlMode.reset()
 
         self.undoManager = UndoManager()
 
@@ -133,36 +136,27 @@ class Window(object):
     """ Control Mode"""
     # point mode
     def changeModeToP(self, event=None):
-        self.canvasFrame.pipetteActive = False
         self.toolbarFrame.buttonFrame.pointsButton.config(bg=ACTIVE_MODE_COLOR)
         self.toolbarFrame.buttonFrame.pointsAndLinesButton.config(bg="#ffffff")
         self.toolbarFrame.buttonFrame.splitLineButton.config(bg="#ffffff")
-        self.controlMode = "Points"
 
     # point and line mode
     def changeModeToPAL(self, event=None):
-        self.canvasFrame.pipetteActive = False
         self.toolbarFrame.buttonFrame.pointsButton.config(bg="#ffffff")
         self.toolbarFrame.buttonFrame.pointsAndLinesButton.config(bg=ACTIVE_MODE_COLOR)
         self.toolbarFrame.buttonFrame.splitLineButton.config(bg="#ffffff")
-        self.controlMode = "Points and Lines"
 
     # split line mode
     def changeModeToSL(self, event=None):
-        self.canvasFrame.pipetteActive = False
         self.toolbarFrame.buttonFrame.pointsButton.config(bg="#ffffff")
         self.toolbarFrame.buttonFrame.pointsAndLinesButton.config(bg="#ffffff")
         self.toolbarFrame.buttonFrame.splitLineButton.config(bg=ACTIVE_MODE_COLOR)
-        self.controlMode = "Split Line"
 
     # pipette enabled mode
     def changeModeToPipette(self, event=None):
-        self.canvasFrame.pipetteActive = True
         self.toolbarFrame.buttonFrame.pointsButton.config(bg="#ffffff")
         self.toolbarFrame.buttonFrame.pointsAndLinesButton.config(bg="#ffffff")
         self.toolbarFrame.buttonFrame.splitLineButton.config(bg="#ffffff")
-        self.controlMode = "Pipette"
-
 
     """ ZOOM """
     def mouse_wheel_button(self, event):
@@ -258,11 +252,6 @@ class Window(object):
 
     def clear(self, event=None):
         self.undoManager.do(self)
-        # TODO: delete because unnecessary?
-        # Colorwheel Speicherplaetze
-        # self.colorWheelSafePoint1 = "black"
-        # self.colorWheelSafePoint2 = "black"
-        # self.colorWheelSafePoint3 = "black"
         self.canvasFrame.clear()
 
     def export(self, event=None):
@@ -328,18 +317,6 @@ class Window(object):
         self.canvasFrame.fun = not self.canvasFrame.fun
         if (self.canvasFrame.fun):
             self.canvasFrame.housePartyProtocol()
-
-    # TODO: delete because unnecessary?
-    # def colorwheel(self, event=None):
-    #     if not self.canvasFrame.selectedFace[0]:
-    #         tkMessageBox.showinfo("Error", "No face selected!")
-    #         return
-    #     cw = Tk()
-    #     cw.title("Colorwheel")
-    #     app = Colorwheel(self, cw)
-    #     cw.mainloop()
-    #     cw.destroy()
-    #     self.canvasFrame.selectedFace[0]=False
 
 # TODO: check if necessary
     """ DETAIL VIEW """
@@ -475,21 +452,28 @@ class ButtonFrame(Frame):
         self.pointsButton = Label(self.pointsFrame, image=self.pointImg, width=35, height=36, **options)
         self.pointsButton.pack()
         self.pointsFrame.grid(row=10, column=1, sticky=N+E+S+W, pady=5)
-        self.pointsButton.bind("<Button-1>", parent.parent.changeModeToP)
+        def click_handler_point(event):
+            parent.parent.controlMode.changeMode(Mode.POINT)
+        self.pointsButton.bind("<Button-1>", click_handler_point)
 
         # Change to Points and Lines Mode
         self.pointsAndLinesFrame = Frame(self, height='35', bg='white')
         self.pointsAndLinesButton = Label(self.pointsAndLinesFrame, image=self.point_and_lineImg, width=35, height=36, **options)
         self.pointsAndLinesButton.pack()
         self.pointsAndLinesFrame.grid(row=11, column=1, sticky=N+E+S+W, pady=5)
-        self.pointsAndLinesButton.bind("<Button-1>", parent.parent.changeModeToPAL)
+
+        def click_handler_point_and_line(event):
+            parent.parent.controlMode.changeMode(Mode.POINT_AND_LINE)
+        self.pointsAndLinesButton.bind("<Button-1>", click_handler_point_and_line)
 
         # Change to Split Line Mode
         self.splitLineFrame = Frame(self, height='35', bg='white')
         self.splitLineButton = Label(self.splitLineFrame, image=self.line_breakImg, width=35, height=36, **options)
         self.splitLineButton.pack()
         self.splitLineFrame.grid(row=12, column=1, sticky=N+E+S+W, pady=5)
-        self.splitLineButton.bind("<Button-1>", parent.parent.changeModeToSL)
+        def click_handler_split(event):
+            parent.parent.controlMode.changeMode(Mode.CONNECT_OR_SPLIT)
+        self.splitLineButton.bind("<Button-1>", click_handler_split)
 
 
 class DetailFrame(Frame):
