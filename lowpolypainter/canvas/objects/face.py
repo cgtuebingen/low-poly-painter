@@ -73,13 +73,18 @@ class Face:
     def getColorFromImage(self):
         return self.parent.color.fromImage(self.coords)
 
+    def setColor(self, color):
+        self.colorLock = True
+        self.color = color
+        # Recolor
+        self.parent.canvas.itemconfig(self.id, fill=self.color)
+
     def move(self, low=False):
         self.updatePosition()
         if not self.colorLock and not low:
             self.color = self.getColorFromImage()
 
         self.parent.canvas.itemconfig(self.id, fill=self.color)
-
 
     def delete(self):
         queue = self.edges[:]
@@ -122,17 +127,15 @@ class Face:
 
     # New faceselection Method
     def click(self, event):
-        # if face was already selected do deselection
-        if self.parent.selectedFace[0]:
-            self.parent.mouseEventHandled = True
-            self.parent.selectedFace[0] = False
-            self.parent.selectedFace[1] = None
-            self.deselect()
-        else:
-            self.parent.mouseEventHandled = True
-            self.parent.selectedFace[0] = True
-            self.parent.selectedFace[1] = self.id
-            self.select()
+        # Selection on click for coloring
+        # Deselection by clicking on empty canvas
+
+        if self.parent.selectedFace is not None:
+            self.parent.selectedFace.deselect()
+
+        self.parent.mouseEventHandled = True
+        self.parent.selectedFace = self
+        self.select()
 
 
     def select(self):

@@ -17,6 +17,7 @@ from triangulate.frame import TriangulateFrame
 from zoomTransformer import ZoomTransformer
 from lowpolypainter.undoManager import UndoManager
 from lowpolypainter.controlMode import ControlMode, Mode
+from lowpolypainter.toolTip import CreateToolTip
 
 ACTIVE_MODE_COLOR = "#DADADA"
 
@@ -427,11 +428,16 @@ class ButtonFrame(Frame):
         self.clearButton = Label(self, image=self.clearImg, **options)
         self.clearButton.grid(row=4, column=1, sticky=N+E+S+W, pady=5)
         self.clearButton.bind("<Button-1>", parent.parent.clear)
+        self.clearButton_ttp = CreateToolTip(self.clearButton,
+                                             "Delete everything.")
 
         # Delete Button
         self.deleteButton = Label(self, image=self.deleteImg, **options)
         self.deleteButton.grid(row=5, column=1, sticky=N+E+S+W, pady=5)
         self.deleteButton.bind("<Button-1>", parent.parent.canvasFrame.deleteSelected)
+        self.clearButton_ttp = CreateToolTip(self.clearButton,
+                                             "Delete selected.\n"
+                                             "Shortcut: DELETE")
 
         # Undo Button
         self.undoButton = Label(self, image=self.undoImg, **options)
@@ -455,12 +461,22 @@ class ButtonFrame(Frame):
         def click_handler_point(event):
             parent.parent.controlMode.changeMode(Mode.POINT)
         self.pointsButton.bind("<Button-1>", click_handler_point)
+        self.pointsButton_ttp = CreateToolTip(self.pointsButton, "Place single points without connecting "
+                                                                 "to other points.\n"
+                                                                 "Shortcut: Q")
 
         # Change to Points and Lines Mode
         self.pointsAndLinesFrame = Frame(self, height='35', bg='white')
         self.pointsAndLinesButton = Label(self.pointsAndLinesFrame, image=self.point_and_lineImg, width=35, height=36, **options)
         self.pointsAndLinesButton.pack()
         self.pointsAndLinesFrame.grid(row=11, column=1, sticky=N+E+S+W, pady=5)
+        self.pointsAndLinesButton_ttp = CreateToolTip(self.pointsAndLinesButton,
+                                                      "Place point that automtically connects to the "
+                                                      "currently selectd point.\n"
+                                                      "If the lines connect as a triangle, a face is created "
+                                                      "and filled automatically.\n"
+                                                      "Clicking other points selects them.\n"
+                                                      "Shortcut: W")
 
         def click_handler_point_and_line(event):
             parent.parent.controlMode.changeMode(Mode.POINT_AND_LINE)
@@ -474,6 +490,12 @@ class ButtonFrame(Frame):
         def click_handler_split(event):
             parent.parent.controlMode.changeMode(Mode.CONNECT_OR_SPLIT)
         self.splitLineButton.bind("<Button-1>", click_handler_split)
+        self.splitLineButton_ttp = CreateToolTip(self.splitLineButton,
+                                                      "Connect selected to clicked point.\n"
+                                                      "If the lines connect as a triangle, a face is created "
+                                                      "and filled automatically.\n"
+                                                      "Can also be used to split a line and create a point there.\n"
+                                                      "Shortcut: E")
 
 
 class DetailFrame(Frame):
@@ -503,14 +525,12 @@ class DetailFrame(Frame):
         self.triangulateFrame.grid(row=2, column=1, sticky=N+E+S+W)
 
     def updateFaceColor(self, newColor):
-        if not self.parent.canvasFrame.selectedFace[0]:
+        if not self.parent.canvasFrame.selectedFace:
             tkMessageBox.showinfo("Error", "No face selected!")
         else:
-            selectedFaceByID = self.parent.canvasFrame.selectedFace[1]
-            self.parent.canvasFrame.canvas.itemconfig(selectedFaceByID, fill=newColor)
-            # after updating color deselect face
-            self.parent.canvasFrame.selectedFace[0]=False
-            self.parent.canvasFrame.mesh.getFaceByID(selectedFaceByID).deselect()
+            self.parent.canvasFrame.selectedFace.setColor(newColor)
+            self.parent.canvasFrame.selectedFace.deselect()
+            self.parent.canvasFrame.selectedFace = None
 
 class ZoomAndToggleFrame(Frame):
     """

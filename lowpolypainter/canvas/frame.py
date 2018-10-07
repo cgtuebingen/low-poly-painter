@@ -51,7 +51,7 @@ class CanvasFrame(Frame):
         self.color = Color(np.array(self.image), 0.5, 0.5)
 
         # Tuple of boolean for face existence and the belonging face id
-        self.selectedFace = [False, None]
+        self.selectedFace = None
 
         # Mesh
         self.mesh = Mesh(self)
@@ -123,7 +123,7 @@ class CanvasFrame(Frame):
                 # next line enables square color update: works but takes too much time!
                 # self.parent.detailFrame.colorpicker._palette_cmd()
             except IndexError:
-        		return
+                return
 
 
     """ VERTICES """
@@ -189,7 +189,7 @@ class CanvasFrame(Frame):
             object.deselect()
 
     def clear(self):
-        self.selectedFace = [False, None]
+        self.selectedFace = None
         self.mesh.clear()
 
     """ Border """
@@ -328,7 +328,7 @@ class CanvasFrame(Frame):
 
         self.color = Color(np.array(self.image), 0.5, 0.5)
 
-        self.selectedFace = [False, None]
+        self.selectedFace = None
 
         # Mesh
         self.mesh = Mesh(self)
