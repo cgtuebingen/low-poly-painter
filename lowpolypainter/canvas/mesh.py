@@ -75,6 +75,12 @@ class Mesh:
                 return face
         return None
 
+    def getFaceByCoordinates(self, coords):
+        for face in self.faces:
+            if face.coords == coords:
+                return face
+        return None
+
     def addFaceFromPoints(self, vert1, vert2, vert3):
         edge1 = self.addEdge(vert1, vert2)
         edge2 = self.addEdge(vert1, vert3)
@@ -169,7 +175,11 @@ class Mesh:
     def quicksave(self):
         vertices = map(lambda x: x.coords, self.vertices)
         edges = map(lambda x: [x.verts[0].coords, x.verts[1].coords], self.edges)
-        return [vertices, edges]
+        customColorFaces = []
+        for face in self.faces:
+            if face.IsCustomColored:
+                customColorFaces.append([face.coords, face.color])
+        return [vertices, edges, customColorFaces]
 
     def load(self, meshArray):
         if (meshArray == None):
@@ -191,6 +201,12 @@ class Mesh:
         edges = meshArray[1]
         for edge in edges:
             self.addEdge(self.getVertexByCoords(edge[0]), self.getVertexByCoords(edge[1]))
+        customColorFaces = meshArray[2]
+        for face in customColorFaces:
+            coloredFaceID = self.getFaceByCoordinates(face[0])
+            self.parent.mouseEventHandled = True
+            self.parent.selectedFace = coloredFaceID
+            self.parent.parent.detailFrame.updateFaceColor(face[1])
 
     def getVertexByCoords(self, coordinates):
         for vertex in self.vertices:

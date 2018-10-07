@@ -569,6 +569,7 @@ class ColorPicker(Frame):
             hexa = self.hexa.get()
             rgb += (self.alpha.get(),)
         self.color = rgb, hsv, hexa
+        self.parent.parent.undoManager.do(self.parent.parent)
         self.parent.updateFaceColor(hexa)
 
     # method which might be useful for future storing methods

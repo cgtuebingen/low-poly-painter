@@ -296,12 +296,15 @@ class Window(object):
         self.undoManager.redo(self)
 
     def border(self, step=0):
+        self.undoManager.do(self)
         self.canvasFrame.border(step=step)
 
     def borderTriangulate(self, event=None):
+        self.undoManager.do(self)
         self.canvasFrame.border(triangulate=True)
 
     def random(self, size=0):
+        self.undoManager.do(self)
         self.canvasFrame.random(size=size)
 
     def triangulate(self, size=0):
@@ -530,6 +533,7 @@ class DetailFrame(Frame):
         else:
             self.parent.canvasFrame.selectedFace.setColor(newColor)
             self.parent.canvasFrame.selectedFace.deselect()
+            self.parent.canvasFrame.selectedFace.IsCustomColored = True
             self.parent.canvasFrame.selectedFace = None
 
 class ZoomAndToggleFrame(Frame):

@@ -20,6 +20,7 @@ class Face:
         self.color = COLOR_DEFAULT
         self.edges = (edge1, edge2, edge3)
         self.colorLock = False
+        self.IsCustomColored = False
 
         # Update
         edge1.faces.append(self)
