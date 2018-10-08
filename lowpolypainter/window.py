@@ -163,6 +163,14 @@ class Window(object):
         self.toolbarFrame.buttonFrame.splitLineButton.config(bg="#ffffff")
         self.detailFrame.colorpicker.pipetteFrame.config(bg=ACTIVE_MODE_COLOR)
 
+    def changeModeToBucket(self, event=None):
+        self.toolbarFrame.buttonFrame.pointsButton.config(bg="#ffffff")
+        self.toolbarFrame.buttonFrame.pointsAndLinesButton.config(bg="#ffffff")
+        self.toolbarFrame.buttonFrame.splitLineButton.config(bg="#ffffff")
+        self.detailFrame.colorpicker.pipetteFrame.config(bg="#ffffff")
+        self.detailFrame.colorpicker.okButton.config(bg=ACTIVE_MODE_COLOR)
+
+
     """ ZOOM """
     def mouse_wheel_button(self, event):
         if event.num == 4:
@@ -531,6 +539,7 @@ class DetailFrame(Frame):
         self.middleLine.grid(row=1, column=0, columnspan=3, sticky=N+E+S+W, padx=10)
         self.triangulateFrame.grid(row=2, column=1, sticky=N+E+S+W)
 
+    #Legacy content
     def updateFaceColor(self, newColor):
         if not self.parent.canvasFrame.selectedFace:
             tkMessageBox.showinfo("Error", "No face selected!")

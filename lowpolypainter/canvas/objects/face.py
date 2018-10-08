@@ -1,4 +1,5 @@
 import numpy as np
+from lowpolypainter.controlMode import Mode, NUM_MIDDLE_CLICK
 
 # TAG
 TAG_VERTEX = "v"
@@ -132,15 +133,19 @@ class Face:
         # Deselection by clicking on empty canvas or clicking again
 
         self.parent.mouseEventHandled = True
-        if self.parent.selectedFace is not None:
-            self.parent.selectedFace.deselect()
+        if self.parent.parent.controlMode.mode == Mode.BUCKET:
+            rgb, hsv, hexa = self.parent.parent.detailFrame.colorpicker.square.get()
+            if self.parent.parent.detailFrame.colorpicker.alpha_channel:
+                hexa = self.parent.parent.detailFrame.colorpicker.hexa.get()
+                rgb += (self.parent.parent.detailFrame.colorpicker.alpha.get(),)
+            self.parent.parent.detailFrame.colorpicker.color  = rgb, hsv, hexa
+            self.setColor(hexa)
+            self.IsCustomColored = True
+            self.parent.parent.undoManager.do(self.parent.parent)
 
-            if self.parent.selectedFace is self:
-                self.parent.selectedFace = None
-                return
 
-        self.parent.selectedFace = self
-        self.select()
+
+
 
 
     def select(self):

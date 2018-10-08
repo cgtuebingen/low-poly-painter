@@ -16,6 +16,7 @@ class Mode(Enum):
     POINT_AND_LINE = 1
     CONNECT_OR_SPLIT = 2
     PIPETTE = 3
+    BUCKET = 4
 
 
 class ControlMode:
@@ -24,7 +25,8 @@ class ControlMode:
         self.modeChangeFunctions = {Mode.POINT: window.changeModeToP,
                                     Mode.POINT_AND_LINE: window.changeModeToPAL,
                                     Mode.CONNECT_OR_SPLIT: window.changeModeToSL,
-                                    Mode.PIPETTE: window.changeModeToPipette}
+                                    Mode.PIPETTE: window.changeModeToPipette,
+                                    Mode.BUCKET: window.changeModeToBucket}
 
         self.mode = None
         self.lastClickedMode = None

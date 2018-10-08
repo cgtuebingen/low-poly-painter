@@ -566,13 +566,10 @@ class ColorPicker(Frame):
 
     # this method calls the update of chosen face color
     def ok(self, event=None):
-        rgb, hsv, hexa = self.square.get()
-        if self.alpha_channel:
-            hexa = self.hexa.get()
-            rgb += (self.alpha.get(),)
-        self.color = rgb, hsv, hexa
-        self.parent.parent.undoManager.do(self.parent.parent)
-        self.parent.updateFaceColor(hexa)
+        self.parent.parent.controlMode.changeMode(Mode.BUCKET)
+        self.okButton.config(bg="#DADADA")
+
+
 
     # method which might be useful for future storing methods
     # return color of stored palette items
