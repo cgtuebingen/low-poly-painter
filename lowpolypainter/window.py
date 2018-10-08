@@ -140,24 +140,28 @@ class Window(object):
         self.toolbarFrame.buttonFrame.pointsButton.config(bg=ACTIVE_MODE_COLOR)
         self.toolbarFrame.buttonFrame.pointsAndLinesButton.config(bg="#ffffff")
         self.toolbarFrame.buttonFrame.splitLineButton.config(bg="#ffffff")
+        self.detailFrame.colorpicker.pipetteFrame.config(bg="#ffffff")
 
     # point and line mode
     def changeModeToPAL(self, event=None):
         self.toolbarFrame.buttonFrame.pointsButton.config(bg="#ffffff")
         self.toolbarFrame.buttonFrame.pointsAndLinesButton.config(bg=ACTIVE_MODE_COLOR)
         self.toolbarFrame.buttonFrame.splitLineButton.config(bg="#ffffff")
+        self.detailFrame.colorpicker.pipetteFrame.config(bg="#ffffff")
 
     # split line mode
     def changeModeToSL(self, event=None):
         self.toolbarFrame.buttonFrame.pointsButton.config(bg="#ffffff")
         self.toolbarFrame.buttonFrame.pointsAndLinesButton.config(bg="#ffffff")
         self.toolbarFrame.buttonFrame.splitLineButton.config(bg=ACTIVE_MODE_COLOR)
+        self.detailFrame.colorpicker.pipetteFrame.config(bg="#ffffff")
 
     # pipette enabled mode
     def changeModeToPipette(self, event=None):
         self.toolbarFrame.buttonFrame.pointsButton.config(bg="#ffffff")
         self.toolbarFrame.buttonFrame.pointsAndLinesButton.config(bg="#ffffff")
         self.toolbarFrame.buttonFrame.splitLineButton.config(bg="#ffffff")
+        self.detailFrame.colorpicker.pipetteFrame.config(bg=ACTIVE_MODE_COLOR)
 
     """ ZOOM """
     def mouse_wheel_button(self, event):

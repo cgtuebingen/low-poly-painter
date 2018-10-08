@@ -23,6 +23,8 @@ from tkcolorpicker.limitvar import LimitVar
 from locale import getdefaultlocale
 import tkMessageBox
 
+from lowpolypainter.controlMode import Mode
+
 class ColorPicker(Frame):
     """Color picker dialog."""
 
@@ -599,7 +601,7 @@ class ColorPicker(Frame):
 
 
     def enablePipette(self, event=None):
-        self.parent.parent.changeModeToPipette(event)
+        self.parent.parent.controlMode.changeMode(Mode.PIPETTE)
         self.pipetteFrame.config(bg="#DADADA")
 
     def setPipetteColor(self, color_rgb):
