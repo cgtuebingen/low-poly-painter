@@ -61,8 +61,6 @@ class Vertex:
         Default click on vertex: Sets vertex as selected
         '''
         self.parent.mouseEventHandled = True
-        x, y = int(self.coords[0]), int(self.coords[1])
-        self.parent.mesh.bvertices[x][y] = 0
         if ((self.parent.parent.controlMode.mode == Mode.CONNECT_OR_SPLIT) or
             (event.num == NUM_RIGHT_CLICK)) and \
                 (self.parent.selected is not None) and \
@@ -155,6 +153,7 @@ class Vertex:
 
 
     def move(self, vert, low=False):
+        self.parent.mesh.bvertices[int(self.coords[0])][int(self.coords[1])] = 0
         self.coords = vert
         self.updatePosition()
         self.moveEdges(low)
