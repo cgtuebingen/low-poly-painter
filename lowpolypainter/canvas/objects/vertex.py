@@ -72,6 +72,7 @@ class Vertex:
 
     def moveHandle(self, event):
         if self.firstMove:
+            self.parent.mesh.bvertices[int(self.coords[0])][int(self.coords[1])] = 0
             self.parent.parent.undoManager.do(self.parent.parent)
             self.firstMove = False
         zoomedCoords = self.parent.parent.zoom.FromViewport([event.x, event.y])
@@ -80,6 +81,8 @@ class Vertex:
 
 
     def releaseHandle(self, event):
+        if self.firstMove == True:
+            return
         # Merge verts when dropped on same position
         self.firstMove = True
         x, y = int(self.coords[0]), int(self.coords[1])
@@ -153,7 +156,6 @@ class Vertex:
 
 
     def move(self, vert, low=False):
-        self.parent.mesh.bvertices[int(self.coords[0])][int(self.coords[1])] = 0
         self.coords = vert
         self.updatePosition()
         self.moveEdges(low)

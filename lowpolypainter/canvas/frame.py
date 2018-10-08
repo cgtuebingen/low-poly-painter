@@ -74,6 +74,7 @@ class CanvasFrame(Frame):
         # Events
         self.canvas.bind("<Button-1>", self.click)
         self.canvas.bind("<Button-2>", self.click)
+        self.canvas.bind("<Button-3>", self.click)
         self.canvas.bind("<Motion>", self.motion)
         self.canvas.bind_all("<space>", func=self.toggleFacesCheckbutton)
         self.canvas.bind_all("<BackSpace>", self.deleteSelected)
@@ -105,7 +106,6 @@ class CanvasFrame(Frame):
         if self.parent.controlMode.mode == Mode.PIPETTE:
             self.parent.detailFrame.colorpicker._palette_cmd()
             self.parent.controlMode.changeMode(Mode.POINT_AND_LINE)
-            self.mouseEventHandled = True
         elif self.inBounds(eventPoint) and \
                 ((self.parent.controlMode.mode == Mode.POINT) or
                  (self.parent.controlMode.mode == Mode.POINT_AND_LINE) or
