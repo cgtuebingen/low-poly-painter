@@ -162,9 +162,9 @@ class Window(object):
     """ ZOOM """
     def mouse_wheel_button(self, event):
         if event.num == 4:
-            self.mouse_wheel(120, 0, 0)
+            self.mouse_wheel(120, event.x, event.y)
         elif event.num == 5:
-            self.mouse_wheel(-120, 0, 0)
+            self.mouse_wheel(-120, event.x, event.y)
 
     def mouse_wheel_wheel(self, event):
         if event.delta <0:
@@ -438,7 +438,7 @@ class ButtonFrame(Frame):
         self.deleteButton = Label(self, image=self.deleteImg, **options)
         self.deleteButton.grid(row=5, column=1, sticky=N+E+S+W, pady=5)
         self.deleteButton.bind("<Button-1>", parent.parent.canvasFrame.deleteSelected)
-        self.clearButton_ttp = CreateToolTip(self.clearButton,
+        self.deleteButton_ttp = CreateToolTip(self.deleteButton,
                                              "Delete selected.\n"
                                              "Shortcut: DELETE")
 
