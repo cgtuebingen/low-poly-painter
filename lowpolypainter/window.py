@@ -63,7 +63,7 @@ class Window(object):
 
         # Frame
         self.frame = Frame(self.root, bg='#ffffff')
-        self.frame.grid(sticky=N+S+E+W)
+        self.frame.grid(sticky=N+S+W)
         self.frame.grid_rowconfigure(0, weight=0)
         self.frame.grid_rowconfigure(1, weight=1)
         self.frame.grid_columnconfigure(0, weight=1)
