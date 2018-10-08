@@ -129,12 +129,16 @@ class Face:
     # New faceselection Method
     def click(self, event):
         # Selection on click for coloring
-        # Deselection by clicking on empty canvas
+        # Deselection by clicking on empty canvas or clicking again
 
+        self.parent.mouseEventHandled = True
         if self.parent.selectedFace is not None:
             self.parent.selectedFace.deselect()
 
-        self.parent.mouseEventHandled = True
+            if self.parent.selectedFace is self:
+                self.parent.selectedFace = None
+                return
+
         self.parent.selectedFace = self
         self.select()
 

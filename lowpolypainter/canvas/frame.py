@@ -14,7 +14,7 @@ from lowpolypainter.triangulate.border import Border
 from lowpolypainter.canvas.objects.vertex import Vertex
 from lowpolypainter.triangulate.triangulate import Triangulate
 
-from lowpolypainter.controlMode import Mode
+from lowpolypainter.controlMode import Mode, NUM_MIDDLE_CLICK
 
 # Masks
 CTRL_MASK = 0x0004
@@ -73,6 +73,7 @@ class CanvasFrame(Frame):
 
         # Events
         self.canvas.bind("<Button-1>", self.click)
+        self.canvas.bind("<Button-2>", self.click)
         self.canvas.bind("<Motion>", self.motion)
         self.canvas.bind_all("<space>", func=self.toggleFacesCheckbutton)
         self.canvas.bind_all("<BackSpace>", self.deleteSelected)
@@ -92,14 +93,23 @@ class CanvasFrame(Frame):
         self.parent.root.focus()
         eventPoint = [event.x, event.y]
 
+        if self.mouseEventHandled:
+            self.mouseEventHandled = False
+            return
+
+        # deselect face
+        if self.selectedFace is not None:
+            self.selectedFace.deselect()
+            self.selectedFace = None
+
         if self.parent.controlMode.mode == Mode.PIPETTE:
             self.parent.detailFrame.colorpicker._palette_cmd()
             self.parent.controlMode.changeMode(Mode.POINT_AND_LINE)
             self.mouseEventHandled = True
         elif self.inBounds(eventPoint) and \
-                (not self.mouseEventHandled) and \
                 ((self.parent.controlMode.mode == Mode.POINT) or
-                 (self.parent.controlMode.mode == Mode.POINT_AND_LINE)):
+                 (self.parent.controlMode.mode == Mode.POINT_AND_LINE) or
+                 (event.num == NUM_MIDDLE_CLICK)):
             self.parent.undoManager.do(self.parent)
             previousSelected = self.selected
             zoomedCoords = self.parent.zoom.FromViewport([event.x, event.y])
@@ -107,7 +117,8 @@ class CanvasFrame(Frame):
 
             if (previousSelected is not None) and \
                     (isinstance(previousSelected, Vertex)) and \
-                    (self.parent.controlMode.mode == Mode.POINT_AND_LINE):
+                    (self.parent.controlMode.mode == Mode.POINT_AND_LINE) and \
+                    not (event.num == NUM_MIDDLE_CLICK):
                 self.mesh.addEdge(previousSelected, self.selected)
         self.mouseEventHandled = False
 

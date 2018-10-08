@@ -498,7 +498,7 @@ class ButtonFrame(Frame):
                                                       "If the lines connect as a triangle, a face is created "
                                                       "and filled automatically.\n"
                                                       "Can also be used to split a line and create a point there.\n"
-                                                      "Shortcut: E")
+                                                      "Shortcut: E or Right-Click")
 
 
 class DetailFrame(Frame):

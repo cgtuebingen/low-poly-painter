@@ -1,7 +1,7 @@
 import math
 import numpy as np
 
-from lowpolypainter.controlMode import Mode
+from lowpolypainter.controlMode import Mode, NUM_RIGHT_CLICK
 
 # TAG
 TAG_VERTEX = "v"
@@ -57,13 +57,14 @@ class Vertex:
     """ EVENTS """
     def clickHandle(self, event):
         '''
-        Shift click on vertex: Creates edge to vertex
+        Right click on vertex: Creates edge to vertex
         Default click on vertex: Sets vertex as selected
         '''
         self.parent.mouseEventHandled = True
         x, y = int(self.coords[0]), int(self.coords[1])
         self.parent.mesh.bvertices[x][y] = 0
-        if (self.parent.parent.controlMode.mode == Mode.CONNECT_OR_SPLIT) and \
+        if ((self.parent.parent.controlMode.mode == Mode.CONNECT_OR_SPLIT) or
+            (event.num == NUM_RIGHT_CLICK)) and \
                 (self.parent.selected is not None) and \
                 (isinstance(self.parent.selected, Vertex)):
             self.parent.parent.undoManager.do(self.parent.parent)

@@ -4,6 +4,7 @@
 *.svg
 *.png
 .idea
+lowpolypainter/resources/stored_mesh_data/
 
 # Created by https://www.gitignore.io/api/linux,macos,python,windows
 

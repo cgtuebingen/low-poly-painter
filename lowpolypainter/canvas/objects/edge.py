@@ -1,6 +1,6 @@
 # Local modules
 from vertex import Vertex
-from lowpolypainter.controlMode import Mode
+from lowpolypainter.controlMode import Mode, NUM_RIGHT_CLICK
 
 # TAG
 TAG_VERTEX = "v"
@@ -51,12 +51,12 @@ class Edge:
     """ EVENTS """
     def click(self, event):
         '''
-        Shift click on Edge: Place vertex on edge
+        Right click on Edge: Place vertex on edge
         Default click on vertex: Sets edge as selected
         '''
         self.parent.mouseEventHandled = True
 
-        if self.parent.parent.controlMode.mode == Mode.CONNECT_OR_SPLIT:
+        if (self.parent.parent.controlMode.mode == Mode.CONNECT_OR_SPLIT) or (event.num == NUM_RIGHT_CLICK):
             self.parent.parent.undoManager.do(self.parent.parent)
             selected = self.parent.selected
             vert = self.parent.mesh.addVertex([event.x, event.y])
