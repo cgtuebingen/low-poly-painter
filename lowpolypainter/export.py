@@ -25,6 +25,7 @@ def exportFromCanvasObjectsMesh(filename, mesh, width, height):
     for face in mesh.faces:
         # vertices for triangle
         points = face.getCoordinates(face.getVerticesCoords())
+        points = ((str(points[0][0]),str(points[0][1])),(str(points[1][0]),str(points[1][1])),(str(points[2][0]),str(points[2][1])))
         # color of the face, converted to decimal rgb values
         color = svgwrite.rgb(r=int(face.color[1:3], 16),
                              g=int(face.color[3:5], 16),
@@ -34,5 +35,10 @@ def exportFromCanvasObjectsMesh(filename, mesh, width, height):
         # HACK: Twice to get less gaps in the final svg
         img.add(img.polygon(points=points, fill=color))
         img.add(img.polygon(points=points, fill=color))
+
+
+    #XML Printtesting
+    #print(img.tostring())
+
     # save image
     img.save()
