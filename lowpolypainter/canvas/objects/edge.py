@@ -59,7 +59,10 @@ class Edge:
         if (self.parent.parent.controlMode.mode == Mode.CONNECT_OR_SPLIT) or (event.num == NUM_RIGHT_CLICK):
             self.parent.parent.undoManager.do(self.parent.parent)
             selected = self.parent.selected
-            vert = self.parent.mesh.addVertex([event.x, event.y])
+
+            x, y = self.parent.parent.zoom.FromViewport((event.x, event.y))
+
+            vert = self.parent.mesh.addVertex([int(x), int(y)])
 
             if isinstance(selected, Vertex):
                 self.parent.mesh.addEdge(vert, selected)
