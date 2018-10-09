@@ -56,3 +56,6 @@ class ControlMode:
         elif event.char == 'w':
             self.storeOldMode()
             self.changeMode(Mode.POINT_AND_LINE)
+        elif event.char == 't':
+            self.storeOldMode()
+            self.changeMode(Mode.BUCKET)
