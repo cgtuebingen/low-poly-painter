@@ -134,6 +134,7 @@ class Face:
 
         self.parent.mouseEventHandled = True
         if self.parent.parent.controlMode.mode == Mode.BUCKET:
+            self.parent.parent.undoManager.do(self.parent.parent)
             rgb, hsv, hexa = self.parent.parent.detailFrame.colorpicker.square.get()
             if self.parent.parent.detailFrame.colorpicker.alpha_channel:
                 hexa = self.parent.parent.detailFrame.colorpicker.hexa.get()
@@ -141,7 +142,7 @@ class Face:
             self.parent.parent.detailFrame.colorpicker.color  = rgb, hsv, hexa
             self.setColor(hexa)
             self.IsCustomColored = True
-            self.parent.parent.undoManager.do(self.parent.parent)
+
 
 
 
