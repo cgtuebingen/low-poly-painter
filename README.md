@@ -9,6 +9,9 @@
 	* SVGwrite
 	* OpenCV
 	* Scikit-image
+	* Bresenham
+	* Tkcolorpicker
+	* Enum34
 
 ## Recommended
 * **VirtualEnv:** A python tool to create separate environments with different python versions and packages.
