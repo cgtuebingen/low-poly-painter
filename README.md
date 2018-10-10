@@ -4,8 +4,6 @@
 
 [![Phyton][python-image]][python-url]
 [![Dependencies][dependencies-image]][dependencies-url]
-[![Ubuntu][python-image]][npm-url]
-[![macOS][python-image]][npm-url]
 
  Graphical application to load images and export low poly art. Draw or automate
  2D mesh creation with point, edge, face and triangulation tools. For further
