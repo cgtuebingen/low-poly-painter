@@ -64,10 +64,18 @@ class Edge:
 
             vert = self.parent.mesh.addVertex([int(x), int(y)])
 
-            if isinstance(selected, Vertex):
-                self.parent.mesh.addEdge(vert, selected)
+            # Split all connected faces in two
+            for face in self.faces:
+                faceVerts = face.getVertices()
+                for faceVert in faceVerts:
+                    if not self in faceVert.edges:
+                        self.parent.mesh.addEdge(vert, faceVert)
+
             self.parent.mesh.addEdge(vert, self.verts[0])
             self.parent.mesh.addEdge(vert, self.verts[1])
+
+
+
             self.delete()
         else:
             self.select()
