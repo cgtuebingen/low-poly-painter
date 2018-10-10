@@ -16,17 +16,8 @@
 
 ## Requirements
 * **Python 2.7**
-* **Python packages**
-  * Scipy
-  * Numpy
-  * Pillow
-  * Enum34
-  * OpenCV
-  * Tkinter
-  * SVGwrite
-  * Bresenham
-  * Scikit-image
-  * Tkcolorpicker
+* **Python packages**\
+Scipy, Numpy, Pillow, Enum34, OpenCV, Tkinter, SVGwrite, Bresenham, Scikit-image, Tkcolorpicker
 
 
 ## Install
