@@ -9,61 +9,73 @@
  2D mesh creation with point, edge, face and triangulation tools. For further
  detail take a look at [usage](https://github.com/cgtuebingen/low-poly-painter#usage).
 
-![](https://media.giphy.com/media/2vnOyJKnI0JYcgLNSN/giphy.gif)
+<p align="center">
+  <img src="https://thumbs.gfycat.com/AcclaimedParchedKiskadee-size_restricted.gif">
+</p>
 
 
 ## Requirements
 * **Python 2.7**
 * **Python packages**
-	* Scipy
+  * Scipy
   * Numpy
-	* Pillow
+  * Pillow
   * Enum34
-	* OpenCV
+  * OpenCV
   * Tkinter
   * SVGwrite
-	* Bresenham
+  * Bresenham
   * Scikit-image
-	* Tkcolorpicker
+  * Tkcolorpicker
 
 
 ## Install
-1. Install dependencies `pip install scipy scikit-image numpy pillow enum34 opencv-python tkinter svgwrite bresenham tkcolorpicker`
-2. Clone repository `git clone https://github.com/cgtuebingen/low-poly-painter.git`
-3. Run program: `python lowpolypainter.py lenna.jpg`
+1. Install dependencies\
+```pip install scipy scikit-image numpy pillow enum34 opencv-python tkinter svgwrite bresenham tkcolorpicker```
+2. Clone repository\
+```git clone https://github.com/cgtuebingen/low-poly-painter.git```
+3. Run program\
+```python lowpolypainter.py lenna.jpg```
 
 
 ## Usage
 ![](header.gif)
-### Import / Export / Save
 
-### Mesh / Point / Line / Face
+#### Import / Export / Save
+Content Soon
 
-### Clear / Delete
+#### Mesh / Point / Line / Face
+Content Soon
 
-### Triangulation
+#### Clear / Delete
+Content Soon
 
-### Undo / Redo
+#### Triangulation
+Content Soon
 
-### Canvas Zoom
+#### Undo / Redo
+Content Soon
 
-### Visibility
+#### Canvas Zoom
+Content Soon
+
+#### Visibility
 
 
 
 ## Meta
-Jan Huber - [Jan-Huber](https://github.com/Jan-Huber)
-Anton Maidl - [aMaidl](https://github.com/aMaidl)
-Felix Scholl - [FelixFifi](https://github.com/FelixFifi)
-Timo Mohrlok - [NudelGamesDE](https://github.com/NudelGamesDE)
-Sarah Tartaruga - [sarahtartaruga](https://github.com/sarahtartaruga)
-Jan-Niklas Dihmann – [JDihlmann](https://github.com/JDihlmann)
-Marianna Glanovitis - [MariannaGla](https://github.com/MariannaGla)
+Jan Huber - [Jan-Huber](https://github.com/Jan-Huber) \
+Anton Maidl - [aMaidl](https://github.com/aMaidl)\
+Felix Scholl - [FelixFifi](https://github.com/FelixFifi)\
+Timo Mohrlok - [NudelGamesDE](https://github.com/NudelGamesDE)\
+Sarah Tartaruga - [sarahtartaruga](https://github.com/sarahtartaruga)\
+Jan-Niklas Dihmann – [JDihlmann](https://github.com/JDihlmann)\
+Marianna Glanovitis - [MariannaGla](https://github.com/MariannaGla)\
 
 
 ## Contributing
 
-Feel free to fork and create branches. This is an non comercial students project.
+Feel free to fork and create branches. This is an non comercial students project.\
 We can't guarantee for any functionality thus wont take resposibility.
 
 
