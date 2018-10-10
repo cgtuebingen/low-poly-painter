@@ -73,7 +73,9 @@ Face color can be changed by selecting a color from the ten given slots. The slo
 * Fill color of faces with the brush button
 
 ## Gallery
+#### Handmade
 ![](lowpolypainter/resources/images/gallery_1.png)
+#### Automated
 ![](lowpolypainter/resources/images/gallery_2.png)
 
 ## Meta
