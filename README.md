@@ -1,26 +1,76 @@
-# low-poly-painter
+# Low Poly Painter
+
+> Application designed for easy creation of lowpoly art.
+
+[![Phyton][python-image]][python-url]
+[![Dependencies][dependencies-image]][dependencies-url]
+[![Ubuntu][python-image]][npm-url]
+[![macOS][python-image]][npm-url]
+
+ Graphical application to load images and export low poly art. Draw or automate
+ 2D mesh creation with point, edge, face and triangulation tools. For further
+ detail take a look at [usage](https://github.com/cgtuebingen/low-poly-painter#usage).
+
+![](https://media.giphy.com/media/2vnOyJKnI0JYcgLNSN/giphy.gif)
+
+
 ## Requirements
-* **Python2.7**
-* **Python packages:**
-    * Numpy
-	* Tkinter (Should be installed by default)
-	* Pillow (or other PIL versions)
+* **Python 2.7**
+* **Python packages**
 	* Scipy
-	* SVGwrite
+  * Numpy
+	* Pillow
+  * Enum34
 	* OpenCV
-	* Scikit-image
+  * Tkinter
+  * SVGwrite
 	* Bresenham
+  * Scikit-image
 	* Tkcolorpicker
-	* Enum34
 
-## Recommended
-* **VirtualEnv:** A python tool to create separate environments with different python versions and packages.
 
-## How to run
-1. Clone the repository
-2. **Optional:** Create a new virtual environment in this folder, e.g.  
-`virtualenv --python=D:\Python27\python.exe env`  
-(Use `source env/bin/activate` or deactivate to enable/disable this virtualEnv)
-3. `pip install numpy scipy pillow svgwrite opencv-python bresenham scikit-image tkcolorpicker enum34`
-4. Change to cloned directory  
-5. Run the program: `python lowpolypainter.py lenna.jpg`
+## Install
+1. Install dependencies `pip install scipy scikit-image numpy pillow enum34 opencv-python tkinter svgwrite bresenham tkcolorpicker`
+2. Clone repository `git clone https://github.com/cgtuebingen/low-poly-painter.git`
+3. Run program: `python lowpolypainter.py lenna.jpg`
+
+
+## Usage
+![](header.gif)
+### Import / Export / Save
+
+### Mesh / Point / Line / Face
+
+### Clear / Delete
+
+### Triangulation
+
+### Undo / Redo
+
+### Canvas Zoom
+
+### Visibility
+
+
+
+## Meta
+Jan Huber - [Jan-Huber](https://github.com/Jan-Huber)
+Anton Maidl - [aMaidl](https://github.com/aMaidl)
+Felix Scholl - [FelixFifi](https://github.com/FelixFifi)
+Timo Mohrlok - [NudelGamesDE](https://github.com/NudelGamesDE)
+Sarah Tartaruga - [sarahtartaruga](https://github.com/sarahtartaruga)
+Jan-Niklas Dihmann – [JDihlmann](https://github.com/JDihlmann)
+Marianna Glanovitis - [MariannaGla](https://github.com/MariannaGla)
+
+
+## Contributing
+
+Feel free to fork and create branches. This is an non comercial students project.
+We can't guarantee for any functionality thus wont take resposibility.
+
+
+<!-- Markdown link & img dfn's -->
+[python-image]: https://img.shields.io/badge/Python-2.7-blue.svg?style=flat-square
+[python-url]: https://www.anaconda.com/download/
+[dependencies-image]: https://img.shields.io/depfu/depfu/example-ruby.svg?style=flat-square
+[dependencies-url]: https://github.com/cgtuebingen/low-poly-painter#requirements
