@@ -81,7 +81,7 @@ Jan Huber - [Jan-Huber](https://github.com/Jan-Huber) \
 Anton Maidl - [aMaidl](https://github.com/aMaidl)\
 Felix Scholl - [FelixFifi](https://github.com/FelixFifi)\
 Timo Mohrlok - [NudelGamesDE](https://github.com/NudelGamesDE)\
-Sarah Tartaruga - [sarahtartaruga](https://github.com/sarahtartaruga)\
+Sarah Burkhardt - [sarahtartaruga](https://github.com/sarahtartaruga)\
 Jan-Niklas Dihmann – [JDihlmann](https://github.com/JDihlmann)\
 Marianna Glanovitis - [MariannaGla](https://github.com/MariannaGla)
 
