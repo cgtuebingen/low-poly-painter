@@ -90,7 +90,7 @@ Marianna Glanovitis - [MariannaGla](https://github.com/MariannaGla)
 
 ## Contributing
 
-Feel free to fork and create branches. This is an non comercial students project.\
+Feel free to fork and create branches. This is a non comercial students project.\
 We can't guarantee for any functionality thus wont take resposibility.
 
 
