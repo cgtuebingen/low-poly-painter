@@ -178,7 +178,7 @@ class MaskFrame(Frame):
         self.canvas.grid(row=1, column=1, sticky=NSEW)
 
         # Radius
-        self.radius = 2
+        self.radius = 8
 
         # Mask
         self.mask = np.zeros([self.width, self.height], dtype=bool)

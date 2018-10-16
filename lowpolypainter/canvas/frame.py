@@ -129,7 +129,8 @@ class CanvasFrame(Frame):
         """
         if self.parent.controlMode.mode == Mode.PIPETTE:
             try:
-                pipetteColor = self.image.getpixel((event.x, event.y))
+                x, y = self.parent.zoom.FromViewport((event.x, event.y))
+                pipetteColor = self.image.getpixel((x, y))
                 self.parent.detailFrame.colorpicker.setPipetteColor(pipetteColor)
                 # next line enables square color update: works but takes too much time!
                 # self.parent.detailFrame.colorpicker._palette_cmd()
